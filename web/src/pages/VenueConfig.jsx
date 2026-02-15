@@ -2,7 +2,7 @@ import React from 'react';
 import SidebarLayout from '../layouts/SidebarLayout';
 import '../styles/Admin.css';
 
-const VenueConfig = () => {
+const VenueConfig = ({ theme, toggleTheme }) => {
   const user = {
     email: localStorage.getItem('userEmail'),
     role: localStorage.getItem('userRole')
@@ -67,7 +67,7 @@ const VenueConfig = () => {
   ];
 
   return (
-    <SidebarLayout menuItems={menuItems} user={user}>
+    <SidebarLayout menuItems={menuItems} user={user} theme={theme} toggleTheme={toggleTheme}>
       <div className="admin-content">
         {/* Header */}
         <div className="admin-header">

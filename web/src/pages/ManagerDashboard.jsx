@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import SidebarLayout from '../layouts/SidebarLayout';
 import '../styles/Manager.css';
 
-const ManagerDashboard = () => {
+const ManagerDashboard = ({ theme, toggleTheme }) => {
   const user = {
     email: localStorage.getItem('userEmail'),
     role: localStorage.getItem('userRole')
@@ -96,7 +96,7 @@ const ManagerDashboard = () => {
   ];
 
   return (
-    <SidebarLayout menuItems={menuItems} user={user}>
+    <SidebarLayout menuItems={menuItems} user={user} theme={theme} toggleTheme={toggleTheme}>
       <div className="manager-content">
         {/* Top Section */}
         <div className="manager-grid">

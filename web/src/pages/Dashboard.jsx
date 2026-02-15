@@ -164,7 +164,7 @@ const Dashboard = ({ user, onLogout, theme, toggleTheme }) => {
   ];
 
   return (
-    <SidebarLayout menuItems={menuItems} user={user}>
+    <SidebarLayout menuItems={menuItems} user={user} theme={theme} toggleTheme={toggleTheme}>
       <div className="dashboard-content">
         
         {/* Statistics Cards Section */}

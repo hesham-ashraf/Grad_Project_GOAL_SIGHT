@@ -35,7 +35,7 @@ const Register = ({ onRegister, onSwitchToLogin }) => {
           <div className="input-wrapper">
             <input 
               type="text" 
-              placeholder="Hesham Ashraf"
+              placeholder="Enter your username"
               value={username} 
               onChange={e => setUsername(e.target.value)} 
               required 
@@ -48,7 +48,7 @@ const Register = ({ onRegister, onSwitchToLogin }) => {
           <div className="input-wrapper">
             <input 
               type="email" 
-              placeholder="heshemashraf@gmail.com"
+              placeholder="Enter your email"
               value={email} 
               onChange={e => setEmail(e.target.value)} 
               required 
@@ -75,14 +75,14 @@ const Register = ({ onRegister, onSwitchToLogin }) => {
           </div>
         </div>
 
-        <div className="form-group">
+        {/* <div className="form-group">
           <label>Role</label>
           <select value={role} onChange={e => setRole(e.target.value)}>
             <option value="fan">Fan</option>
             <option value="manager">Manager</option>
             <option value="admin">Admin</option>
           </select>
-        </div>
+        </div> */}
 
         <button type="submit" className="submit-button">Register</button>
 

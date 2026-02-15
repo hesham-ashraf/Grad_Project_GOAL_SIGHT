@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import SettingsMenu from '../components/SettingsMenu';
+import SidebarLayout from '../layouts/SidebarLayout';
 import '../styles/MatchDetails.css';
 
 /**
@@ -12,13 +12,29 @@ import '../styles/MatchDetails.css';
  * - Team statistics comparison
  * - Match timeline with events (Goals, Fouls, Cards, Substitutions)
  */
-const MatchDetails = ({ theme, toggleTheme }) => {
+const MatchDetails = ({ user, theme, toggleTheme }) => {
   // Get match ID from URL params
   const { id } = useParams();
   const matchId = parseInt(id);
   
   // Navigation hook for back button
   const navigate = useNavigate();
+  
+  // Sidebar menu items
+  const menuItems = [
+    {
+      path: '/dashboard',
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <rect x="3" y="3" width="7" height="7"/>
+          <rect x="14" y="3" width="7" height="7"/>
+          <rect x="14" y="14" width="7" height="7"/>
+          <rect x="3" y="14" width="7" height="7"/>
+        </svg>
+      ),
+      label: 'Analytics Dashboard'
+    }
+  ];
   
   // State for active tab selection
   const [activeTab, setActiveTab] = useState('overview');
@@ -163,14 +179,14 @@ const MatchDetails = ({ theme, toggleTheme }) => {
   // ===== RENDER =====
 
   return (
-    <div className="match-details-container">
-      {/* Top Action Bar */}
-      <div className="match-details-top-bar">
-        <button className="back-button" onClick={() => navigate('/')}>
-          ← Back to Dashboard
-        </button>
-        <SettingsMenu theme={theme} toggleTheme={toggleTheme} />
-      </div>
+    <SidebarLayout menuItems={menuItems} user={user} theme={theme} toggleTheme={toggleTheme}>
+      <div className="match-details-container">
+        {/* Top Action Bar */}
+        <div className="match-details-top-bar">
+          <button className="back-button" onClick={() => navigate('/')}>
+            ← Back to Dashboard
+          </button>
+        </div>
 
       {/* Match Header */}
       <div className="match-header-section">
@@ -412,9 +428,9 @@ const MatchDetails = ({ theme, toggleTheme }) => {
             </div>
           </div>
         )}
-
       </div>
-    </div>
+      </div>
+    </SidebarLayout>
   );
 };
 

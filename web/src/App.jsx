@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import MatchDetails from './pages/MatchDetails';
 import AdminDashboard from './pages/AdminDashboard';
@@ -72,9 +73,22 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Redirect based on user role */}
+        {/* Home Page - Default after login */}
         <Route 
           path="/" 
+          element={
+            <Home 
+              user={user} 
+              onLogout={handleLogout}
+              theme={theme}
+              toggleTheme={toggleTheme}
+            />
+          } 
+        />
+
+        {/* Dashboard - Analytics */}
+        <Route 
+          path="/dashboard" 
           element={
             user.role === 'admin' ? <Navigate to="/admin" replace /> :
             user.role === 'manager' ? <Navigate to="/manager" replace /> :
@@ -86,6 +100,8 @@ function App() {
             />
           } 
         />
+        
+        {/* Match Details */}
         <Route 
           path="/match/:id" 
           element={
@@ -99,14 +115,14 @@ function App() {
         />
         
         {/* Admin Routes */}
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/admin/users" element={<UsersManagement />} />
-        <Route path="/admin/matches" element={<MatchesManagement />} />
-        <Route path="/admin/subscriptions" element={<SubscriptionPlans />} />
-        <Route path="/admin/venues" element={<VenueConfig />} />
+        <Route path="/admin" element={<AdminDashboard theme={theme} toggleTheme={toggleTheme} />} />
+        <Route path="/admin/users" element={<UsersManagement theme={theme} toggleTheme={toggleTheme} />} />
+        <Route path="/admin/matches" element={<MatchesManagement theme={theme} toggleTheme={toggleTheme} />} />
+        <Route path="/admin/subscriptions" element={<SubscriptionPlans theme={theme} toggleTheme={toggleTheme} />} />
+        <Route path="/admin/venues" element={<VenueConfig theme={theme} toggleTheme={toggleTheme} />} />
         
         {/* Manager Routes */}
-        <Route path="/manager" element={<ManagerDashboard />} />
+        <Route path="/manager" element={<ManagerDashboard theme={theme} toggleTheme={toggleTheme} />} />
         
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
