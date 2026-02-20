@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { mockLiveMatches, delay } from '../data/mockData'
+import matchService from '../services/matchService'
 import MatchCard from './match/MatchCard'
 import { IoFootballOutline, IoRefreshOutline } from 'react-icons/io5'
 
@@ -9,16 +9,16 @@ function LiveMatches() {
   const [error, setError] = useState(null)
   const [lastUpdate, setLastUpdate] = useState(null)
 
-  // Fetch live matches (mock data)
+  // Fetch live matches from the real API
   const fetchLiveMatches = async () => {
     try {
       setError(null)
-      await delay(300) // Simulate API delay
-      setMatches(mockLiveMatches)
+      const data = await matchService.getLiveMatches()
+      setMatches(data)
       setLastUpdate(new Date())
     } catch (err) {
       console.error('Error fetching live matches:', err)
-      setError('Failed to load live matches')
+      setError('Failed to load live matches. Please try again.')
     } finally {
       setLoading(false)
     }

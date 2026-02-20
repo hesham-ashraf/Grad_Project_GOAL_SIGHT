@@ -96,6 +96,32 @@ const liveController = {
             message: 'Cache cleared successfully',
         })
     },
+
+    /**
+     * Get leagues with today's matches grouped by league
+     * @route GET /api/today-leagues
+     */
+    getTodayLeagues: async(req, res) => {
+        try {
+            const { date } = req.query // Optional date parameter
+
+            const leagues = await sportmonksService.getLeaguesByDate(date)
+
+            return res.status(200).json({
+                success: true,
+                data: leagues,
+                count: leagues.length,
+            })
+        } catch (error) {
+            console.error('Today leagues controller error:', error)
+
+            return res.status(500).json({
+                success: false,
+                message: 'Failed to fetch today\'s leagues',
+                error: process.env.NODE_ENV === 'development' ? error.message : undefined,
+            })
+        }
+    },
 }
 
 export default liveController

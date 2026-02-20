@@ -24,4 +24,11 @@ router.get('/today-fixtures', liveController.getTodayFixtures)
  */
 router.post('/live-matches/clear-cache', liveController.clearCache)
 
+/**
+ * @route   GET /api/today-leagues
+ * @desc    Get all leagues with today's matches grouped by league
+ * @access  Public
+ */
+router.get('/today-leagues', liveController.getTodayLeagues)
+
 export default router

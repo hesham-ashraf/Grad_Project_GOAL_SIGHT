@@ -3,6 +3,7 @@ import { Toaster } from 'react-hot-toast'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import HomePage from './pages/HomePage'
+import TodayMatchesPage from './pages/TodayMatchesPage'
 import MainLayout from './layouts/MainLayout'
 import ProtectedRoute from './components/ProtectedRoute'
 
@@ -27,6 +28,7 @@ function App() {
             </ProtectedRoute>
           }>
             <Route path="home" element={<HomePage />} />
+            <Route path="today-matches" element={<TodayMatchesPage />} />
             <Route path="dashboard" element={
               <div className="p-6">
                 <h1 className="text-2xl font-bold text-dark-900">Dashboard</h1>

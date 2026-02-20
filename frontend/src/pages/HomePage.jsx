@@ -1,11 +1,15 @@
 import { useState, useEffect } from 'react'
-import { IoPlayCircleOutline, IoTimeOutline, IoTrophyOutline, IoCalendarOutline } from 'react-icons/io5'
-import { mockFeaturedMatch, mockTodayMatches, mockRecentResults, mockNews, mockHighlights, delay } from '../data/mockData'
+import { useNavigate } from 'react-router-dom'
+import { IoPlayCircleOutline, IoTimeOutline, IoTrophyOutline, IoCalendarOutline, IoArrowForward } from 'react-icons/io5'
+import { mockFeaturedMatch, mockRecentResults, mockNews, mockHighlights, delay } from '../data/mockData'
 import useAuthStore from '../context/authStore'
 import LiveMatches from '../components/LiveMatches'
+import matchService from '../services/matchService'
+import { getTodayDate, formatMatchTime, getStatusDisplay } from '../utils/dateUtils'
 
 function HomePage() {
   const user = useAuthStore((state) => state.user)
+  const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
   const [data, setData] = useState({
     featuredMatch: null,
@@ -22,18 +26,48 @@ function HomePage() {
   const fetchData = async () => {
     setLoading(true)
     try {
-      // Simulate API delay
-      await delay(500)
+      // Fetch real data from API
+      const todayDate = getTodayDate()
+      const leagues = await matchService.getTodayLeagues(todayDate)
+      
+      // Extract all matches from all leagues
+      const allMatches = []
+      leagues.forEach(league => {
+        league.matches.forEach(match => {
+          allMatches.push({
+            ...match,
+            leagueName: league.name,
+            leagueLogo: league.logo
+          })
+        })
+      })
+
+      // Sort matches by start time
+      allMatches.sort((a, b) => new Date(a.startTime) - new Date(b.startTime))
+
+      // Get first 6 matches for the homepage
+      const todayMatches = allMatches.slice(0, 6)
+
+      // Simulate API delay for other mock data
+      await delay(300)
 
       setData({
         featuredMatch: mockFeaturedMatch,
         recentResults: mockRecentResults,
-        todayMatches: mockTodayMatches,
+        todayMatches: todayMatches,
         news: mockNews,
         highlights: mockHighlights,
       })
     } catch (error) {
       console.error('Error fetching data:', error)
+      // Fall back to mock data on error
+      setData({
+        featuredMatch: mockFeaturedMatch,
+        recentResults: mockRecentResults,
+        todayMatches: [],
+        news: mockNews,
+        highlights: mockHighlights,
+      })
     } finally {
       setLoading(false)
     }
@@ -109,23 +143,72 @@ function HomePage() {
 
         {/* Today's Matches */}
         <section>
-          <h2 className="text-xl font-bold text-dark-900 mb-4 flex items-center gap-2">
-            <IoCalendarOutline className="text-secondary-500" />
-            Today's Matches
-          </h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold text-dark-900 flex items-center gap-2">
+              <IoCalendarOutline className="text-secondary-500" />
+              Today's Matches
+            </h2>
+            <button
+              onClick={() => navigate('/today-matches')}
+              className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors duration-200"
+            >
+              See All
+              <IoArrowForward />
+            </button>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {data.todayMatches.length > 0 ? (
               data.todayMatches.map((match) => (
-                <div key={match.id} className="bg-white rounded-xl p-4 border border-dark-200 hover:shadow-lg transition-shadow duration-200">
+                <div 
+                  key={match.id} 
+                  className="bg-white rounded-xl p-4 border border-dark-200 hover:shadow-lg transition-shadow duration-200 cursor-pointer"
+                  onClick={() => navigate(`/match/${match.id}`)}
+                >
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs text-dark-500">{match.league}</span>
-                    <span className="flex items-center gap-1 text-xs text-primary-500">
+                    <div className="flex items-center gap-2">
+                      {match.leagueLogo && (
+                        <img src={match.leagueLogo} alt="" className="w-4 h-4 object-contain" />
+                      )}
+                      <span className="text-xs text-dark-500 truncate">{match.leagueName}</span>
+                    </div>
+                    <span className={`flex items-center gap-1 text-xs ${
+                      match.status === 'LIVE' ? 'text-red-500 font-bold' : 'text-primary-500'
+                    }`}>
                       <IoTimeOutline />
-                      {match.time}
+                      {getStatusDisplay(match.status, match.startTime)}
                     </span>
                   </div>
-                  <p className="font-semibold text-dark-900">{match.homeTeam} vs {match.awayTeam}</p>
-                  <p className="text-xs text-dark-400 mt-1">{match.status}</p>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 flex-1">
+                        {match.homeTeam.logo && (
+                          <img src={match.homeTeam.logo} alt="" className="w-6 h-6 object-contain" />
+                        )}
+                        <span className="font-semibold text-dark-900 text-sm truncate">
+                          {match.homeTeam.name}
+                        </span>
+                      </div>
+                      {match.status !== 'NS' && (
+                        <span className="font-bold text-dark-900 ml-2">{match.homeTeam.score}</span>
+                      )}
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 flex-1">
+                        {match.awayTeam.logo && (
+                          <img src={match.awayTeam.logo} alt="" className="w-6 h-6 object-contain" />
+                        )}
+                        <span className="font-semibold text-dark-900 text-sm truncate">
+                          {match.awayTeam.name}
+                        </span>
+                      </div>
+                      {match.status !== 'NS' && (
+                        <span className="font-bold text-dark-900 ml-2">{match.awayTeam.score}</span>
+                      )}
+                    </div>
+                  </div>
+                  {match.round && (
+                    <p className="text-xs text-dark-400 mt-2">{match.round}</p>
+                  )}
                 </div>
               ))
             ) : (
