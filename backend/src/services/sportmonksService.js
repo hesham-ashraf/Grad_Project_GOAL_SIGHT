@@ -36,9 +36,9 @@ const sportmonksService = {
             // Debug logging
             console.log('SportMonks API Response:', {
                 status: response.status,
-                dataCount: response.data ? .data ? .length || 0,
-                rateLimit: response.data ? .rate_limit,
-                subscription: response.data ? .subscription
+                dataCount: response.data?.data?.length || 0,
+                rateLimit: response.data?.rate_limit,
+                subscription: response.data?.subscription
             })
 
             // Normalize the API response
@@ -115,9 +115,9 @@ const sportmonksService = {
 
             console.log('SportMonks API Response:', {
                 status: response.status,
-                leaguesCount: response.data ? .data ? .length || 0,
-                hasData: !!response.data ? .data,
-                dataType: typeof response.data ? .data,
+                leaguesCount: response.data?.data?.length || 0,
+                hasData: !!response.data?.data,
+                dataType: typeof response.data?.data,
                 fullResponse: JSON.stringify(response.data).substring(0, 500),
             })
 
@@ -158,8 +158,8 @@ const sportmonksService = {
 function normalizeMatch(match) {
     // Extract participants
     const participants = match.participants || []
-    const homeTeam = participants.find((p) => p.meta ? .location === 'home') || {}
-    const awayTeam = participants.find((p) => p.meta ? .location === 'away') || {}
+    const homeTeam = participants.find((p) => p.meta?.location === 'home') || {}
+    const awayTeam = participants.find((p) => p.meta?.location === 'away') || {}
 
     // Extract scores
     const scores = match.scores || []
@@ -192,8 +192,8 @@ function normalizeMatch(match) {
     // Extract events (goals, cards, substitutions)
     const events = (match.events || []).map((event) => ({
         minute: event.minute || 0,
-        type: event.type ? .name || event.type,
-        player: event.player ? .display_name || 'Unknown',
+        type: event.type?.name || event.type,
+        player: event.player?.display_name || 'Unknown',
         team: event.participant_id === homeTeam.id ? 'home' : 'away',
         injuryTime: event.injury_time || null,
     }))
@@ -204,22 +204,22 @@ function normalizeMatch(match) {
     return {
         id: match.id,
         league: {
-            name: match.league ? .name || 'Unknown League',
-            country: match.league ? .country ? .name || 'Unknown',
-            logo: match.league ? .image_path || null,
+            name: match.league?.name || 'Unknown League',
+            country: match.league?.country?.name || 'Unknown',
+            logo: match.league?.image_path || null,
         },
-        round: match.round ? .name || match.round || 'Round 1',
+        round: match.round?.name || match.round || 'Round 1',
         home: {
             id: homeTeam.id,
             name: homeTeam.name || 'Home Team',
             logo: homeTeam.image_path || null,
-            score: homeScore ? .score ? .goals || 0,
+            score: homeScore?.score?.goals || 0,
         },
         away: {
             id: awayTeam.id,
             name: awayTeam.name || 'Away Team',
             logo: awayTeam.image_path || null,
-            score: awayScore ? .score ? .goals || 0,
+            score: awayScore?.score?.goals || 0,
         },
         status: status,
         minute: currentMinute,
@@ -236,8 +236,8 @@ function normalizeMatch(match) {
 function normalizeLeagueMatch(match) {
     // Extract participants
     const participants = match.participants || []
-    const homeTeam = participants.find((p) => p.meta ? .location === 'home') || {}
-    const awayTeam = participants.find((p) => p.meta ? .location === 'away') || {}
+    const homeTeam = participants.find((p) => p.meta?.location === 'home') || {}
+    const awayTeam = participants.find((p) => p.meta?.location === 'away') || {}
 
     // Extract scores
     const scores = match.scores || []
@@ -269,20 +269,20 @@ function normalizeLeagueMatch(match) {
             id: homeTeam.id,
             name: homeTeam.name || 'Home Team',
             logo: homeTeam.image_path || null,
-            score: homeScore ? .score ? .goals || 0,
+            score: homeScore?.score?.goals || 0,
         },
         awayTeam: {
             id: awayTeam.id,
             name: awayTeam.name || 'Away Team',
             logo: awayTeam.image_path || null,
-            score: awayScore ? .score ? .goals || 0,
+            score: awayScore?.score?.goals || 0,
         },
         status: status,
         startTime: match.starting_at || null,
         startTimestamp: match.starting_at_timestamp || null,
-        stage: match.stage ? .name || null,
-        round: match.round ? .name || null,
-        group: match.group ? .name || null,
+        stage: match.stage?.name || null,
+        round: match.round?.name || null,
+        group: match.group?.name || null,
         leg: match.leg || null,
     }
 }
