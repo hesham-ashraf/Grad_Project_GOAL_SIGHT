@@ -1,0 +1,14 @@
+.venv/
+.idea/
+
+__pycache__/
+*.py[cod]
+*.pt
+*.mp4
+
+runs/
+models/
+outputs/
+output_videos/
+
+stubs/*.pkl
