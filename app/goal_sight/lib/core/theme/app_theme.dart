@@ -62,7 +62,7 @@ class AppTheme {
         elevation: 0,
         foregroundColor: authText,
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: authCard,
         elevation: 0,
         shadowColor: Colors.black12,
@@ -125,7 +125,7 @@ class AppTheme {
         elevation: 0,
         foregroundColor: Colors.white,
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: fanCard,
         shadowColor: const Color(0x1A000000),
         elevation: 0,
