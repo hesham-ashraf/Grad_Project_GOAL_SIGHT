@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\build\windows\x64\CMakeFiles\734096cc5710d53ab4459440ae57be4b\flutter_windows.dll.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\build\windows\x64\CMakeFiles\dea4add0863d15604ff83fbb8bc2959a\flutter_assemble.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\windows\flutter\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\build\windows\x64\flutter\CMakeFiles\flutter_assemble" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{B93223EF-517E-301D-BB64-330D8B615F9A}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

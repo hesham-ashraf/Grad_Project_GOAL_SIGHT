@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\build\windows\x64\CMakeFiles\21059c8fb8891c80d89472ccd114009e\INSTALL_force.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{B93223EF-517E-301D-BB64-330D8B615F9A}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

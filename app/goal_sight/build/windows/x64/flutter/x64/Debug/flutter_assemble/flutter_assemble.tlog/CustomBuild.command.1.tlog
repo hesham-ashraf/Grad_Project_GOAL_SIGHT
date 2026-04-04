@@ -1,0 +1,28 @@
+^C:\USERS\ASUS\DOCUMENTS\GITHUB\GOAL_SIGHT-AI-FOOTBALL-ANALYSIS-SYSTEM\GOAL_SIGHT\BUILD\WINDOWS\X64\CMAKEFILES\734096CC5710D53AB4459440AE57BE4B\FLUTTER_WINDOWS.DLL.RULE
+setlocal
+"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E env FLUTTER_ROOT=C:\Tooling\flutter PROJECT_DIR=C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight FLUTTER_ROOT=C:\Tooling\flutter FLUTTER_EPHEMERAL_DIR=C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\windows\flutter\ephemeral PROJECT_DIR=C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight FLUTTER_TARGET=C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\lib\main.dart DART_DEFINES=RkxVVFRFUl9XRUJfQ0FOVkFTS0lUX1VSTD1odHRwczovL3d3dy5nc3RhdGljLmNvbS9mbHV0dGVyLWNhbnZhc2tpdC9lZGQ4NTQ2MTE2NDU3YmRmMWM1YmRmYjEzZWNiOTQ2M2QyYmI1ZWQ0Lw== DART_OBFUSCATION=false TRACK_WIDGET_CREATION=true TREE_SHAKE_ICONS=false PACKAGE_CONFIG=C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\.dart_tool\package_config.json C:/Tooling/flutter/packages/flutter_tools/bin/tool_backend.bat windows-x64 Debug
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\ASUS\DOCUMENTS\GITHUB\GOAL_SIGHT-AI-FOOTBALL-ANALYSIS-SYSTEM\GOAL_SIGHT\BUILD\WINDOWS\X64\CMAKEFILES\DEA4ADD0863D15604FF83FBB8BC2959A\FLUTTER_ASSEMBLE.RULE
+setlocal
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\ASUS\DOCUMENTS\GITHUB\GOAL_SIGHT-AI-FOOTBALL-ANALYSIS-SYSTEM\GOAL_SIGHT\WINDOWS\FLUTTER\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SC:/Users/asus/Documents/GitHub/Goal_Sight-Ai-Football-Analysis-System/goal_sight/windows -BC:/Users/asus/Documents/GitHub/Goal_Sight-Ai-Football-Analysis-System/goal_sight/build/windows/x64 --check-stamp-file C:/Users/asus/Documents/GitHub/Goal_Sight-Ai-Football-Analysis-System/goal_sight/build/windows/x64/flutter/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
