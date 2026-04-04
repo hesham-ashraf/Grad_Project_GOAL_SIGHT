@@ -1,0 +1,14 @@
+[
+    {
+        "merged": "io.flutter.plugins.firebase.core.firebase_core-merged_res-16:/layout/notification_template_part_chronometer.xml",
+        "source": "io.flutter.plugins.firebase.core.firebase_core-core-1.6.0-2:/layout/notification_template_part_chronometer.xml"
+    },
+    {
+        "merged": "io.flutter.plugins.firebase.core.firebase_core-merged_res-16:/layout/custom_dialog.xml",
+        "source": "io.flutter.plugins.firebase.core.firebase_core-core-1.6.0-2:/layout/custom_dialog.xml"
+    },
+    {
+        "merged": "io.flutter.plugins.firebase.core.firebase_core-merged_res-16:/layout/notification_template_part_time.xml",
+        "source": "io.flutter.plugins.firebase.core.firebase_core-core-1.6.0-2:/layout/notification_template_part_time.xml"
+    }
+]

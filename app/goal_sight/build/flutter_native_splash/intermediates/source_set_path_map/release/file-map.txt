@@ -1,0 +1,12 @@
+net.jonhanson.flutter_native_splash-core-1.6.0-0 C:\Users\asus\.gradle\caches\transforms-3\284a410c767ad6c7a2b0ffc8d8d85981\transformed\core-1.6.0\res
+net.jonhanson.flutter_native_splash-jetified-window-java-1.0.0-beta04-1 C:\Users\asus\.gradle\caches\transforms-3\2a215381204751055df81b6269e717b7\transformed\jetified-window-java-1.0.0-beta04\res
+net.jonhanson.flutter_native_splash-jetified-annotation-experimental-1.1.0-2 C:\Users\asus\.gradle\caches\transforms-3\3d2f03fc996c2e0aa3dee5cfa3002cd1\transformed\jetified-annotation-experimental-1.1.0\res
+net.jonhanson.flutter_native_splash-jetified-window-1.0.0-beta04-3 C:\Users\asus\.gradle\caches\transforms-3\f302e75fb7efd781bcf1a29281c188da\transformed\jetified-window-1.0.0-beta04\res
+net.jonhanson.flutter_native_splash-main-4 C:\Users\asus\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_native_splash-2.4.1\android\src\main\res
+net.jonhanson.flutter_native_splash-release-5 C:\Users\asus\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_native_splash-2.4.1\android\src\release\res
+net.jonhanson.flutter_native_splash-pngs-6 C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\build\flutter_native_splash\generated\res\pngs\release
+net.jonhanson.flutter_native_splash-resValues-7 C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\build\flutter_native_splash\generated\res\resValues\release
+net.jonhanson.flutter_native_splash-rs-8 C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\build\flutter_native_splash\generated\res\rs\release
+net.jonhanson.flutter_native_splash-mergeReleaseResources-9 C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\build\flutter_native_splash\intermediates\incremental\release\mergeReleaseResources\merged.dir
+net.jonhanson.flutter_native_splash-mergeReleaseResources-10 C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\build\flutter_native_splash\intermediates\incremental\release\mergeReleaseResources\stripped.dir
+net.jonhanson.flutter_native_splash-merged_res-11 C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\build\flutter_native_splash\intermediates\merged_res\release

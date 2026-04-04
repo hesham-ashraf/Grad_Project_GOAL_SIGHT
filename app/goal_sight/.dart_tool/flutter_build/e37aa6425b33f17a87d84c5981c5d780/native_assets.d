@@ -1,0 +1,1 @@
+ C:\\Users\\asus\\Documents\\GitHub\\Goal_Sight-Ai-Football-Analysis-System\\goal_sight\\.dart_tool\\flutter_build\\e37aa6425b33f17a87d84c5981c5d780\\native_assets.yaml: 

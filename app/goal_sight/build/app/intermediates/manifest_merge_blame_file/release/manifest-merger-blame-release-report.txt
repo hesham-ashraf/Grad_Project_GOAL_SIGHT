@@ -1,0 +1,306 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.example.goal_sight"
+4    android:versionCode="1"
+5    android:versionName="1.0.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="23"
+8-->C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\android\app\src\main\AndroidManifest.xml
+9        android:targetSdkVersion="34" />
+9-->C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\android\app\src\main\AndroidManifest.xml
+10
+11    <uses-permission android:name="android.permission.INTERNET" />
+11-->C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\android\app\src\main\AndroidManifest.xml:2:5-67
+11-->C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\android\app\src\main\AndroidManifest.xml:2:22-64
+12    <uses-permission android:name="android.permission.CAMERA" />
+12-->C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\android\app\src\main\AndroidManifest.xml:3:5-65
+12-->C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\android\app\src\main\AndroidManifest.xml:3:22-62
+13    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+13-->C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\android\app\src\main\AndroidManifest.xml:4:5-80
+13-->C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\android\app\src\main\AndroidManifest.xml:4:22-77
+14    <uses-permission
+14-->C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\android\app\src\main\AndroidManifest.xml:5:5-108
+15        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+15-->C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\android\app\src\main\AndroidManifest.xml:5:22-78
+16        android:maxSdkVersion="28" />
+16-->C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\android\app\src\main\AndroidManifest.xml:5:79-105
+17    <!--
+18         Required to query activities that can process text, see:
+19         https://developer.android.com/training/package-visibility and
+20         https://developer.android.com/reference/android/content/Intent#ACTION_PROCESS_TEXT.
+21
+22         In particular, this is used by the Flutter engine in io.flutter.plugin.text.ProcessTextPlugin.
+23    -->
+24    <queries>
+24-->C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\android\app\src\main\AndroidManifest.xml:43:5-48:15
+25        <intent>
+25-->C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\android\app\src\main\AndroidManifest.xml:44:9-47:18
+26            <action android:name="android.intent.action.PROCESS_TEXT" />
+26-->C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\android\app\src\main\AndroidManifest.xml:45:13-72
+26-->C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\android\app\src\main\AndroidManifest.xml:45:21-70
+27
+28            <data android:mimeType="text/plain" />
+28-->C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\android\app\src\main\AndroidManifest.xml:46:13-50
+28-->C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\android\app\src\main\AndroidManifest.xml:46:19-48
+29        </intent>
+30    </queries>
+31    <!-- Although the *SdkVersion is captured in gradle build files, this is required for non gradle builds -->
+32    <!-- <uses-sdk android:minSdkVersion="21" /> -->
+33    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+33-->[com.google.firebase:firebase-firestore:26.0.2] C:\Users\asus\.gradle\caches\transforms-3\ec7f6978bc6bc5f714aef300218540c1\transformed\jetified-firebase-firestore-26.0.2\AndroidManifest.xml:10:5-79
+33-->[com.google.firebase:firebase-firestore:26.0.2] C:\Users\asus\.gradle\caches\transforms-3\ec7f6978bc6bc5f714aef300218540c1\transformed\jetified-firebase-firestore-26.0.2\AndroidManifest.xml:10:22-76
+34
+35    <permission
+35-->[androidx.core:core:1.13.1] C:\Users\asus\.gradle\caches\transforms-3\2f6a5506f4dac22f7ab67b13b215ea43\transformed\core-1.13.1\AndroidManifest.xml:22:5-24:47
+36        android:name="com.example.goal_sight.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+36-->[androidx.core:core:1.13.1] C:\Users\asus\.gradle\caches\transforms-3\2f6a5506f4dac22f7ab67b13b215ea43\transformed\core-1.13.1\AndroidManifest.xml:23:9-81
+37        android:protectionLevel="signature" />
+37-->[androidx.core:core:1.13.1] C:\Users\asus\.gradle\caches\transforms-3\2f6a5506f4dac22f7ab67b13b215ea43\transformed\core-1.13.1\AndroidManifest.xml:24:9-44
+38
+39    <uses-permission android:name="com.example.goal_sight.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+39-->[androidx.core:core:1.13.1] C:\Users\asus\.gradle\caches\transforms-3\2f6a5506f4dac22f7ab67b13b215ea43\transformed\core-1.13.1\AndroidManifest.xml:26:5-97
+39-->[androidx.core:core:1.13.1] C:\Users\asus\.gradle\caches\transforms-3\2f6a5506f4dac22f7ab67b13b215ea43\transformed\core-1.13.1\AndroidManifest.xml:26:22-94
+40
+41    <application
+42        android:name="android.app.Application"
+42-->C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\android\app\src\main\AndroidManifest.xml:8:9-42
+43        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+43-->[androidx.core:core:1.13.1] C:\Users\asus\.gradle\caches\transforms-3\2f6a5506f4dac22f7ab67b13b215ea43\transformed\core-1.13.1\AndroidManifest.xml:28:18-86
+44        android:extractNativeLibs="false"
+45        android:icon="@mipmap/ic_launcher"
+45-->C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\android\app\src\main\AndroidManifest.xml:9:9-43
+46        android:label="goal_sight" >
+46-->C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\android\app\src\main\AndroidManifest.xml:7:9-35
+47        <activity
+47-->C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\android\app\src\main\AndroidManifest.xml:10:9-31:20
+48            android:name="com.example.goal_sight.MainActivity"
+48-->C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\android\app\src\main\AndroidManifest.xml:11:13-41
+49            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+49-->C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\android\app\src\main\AndroidManifest.xml:16:13-163
+50            android:exported="true"
+50-->C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\android\app\src\main\AndroidManifest.xml:12:13-36
+51            android:hardwareAccelerated="true"
+51-->C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\android\app\src\main\AndroidManifest.xml:17:13-47
+52            android:launchMode="singleTop"
+52-->C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\android\app\src\main\AndroidManifest.xml:13:13-43
+53            android:taskAffinity=""
+53-->C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\android\app\src\main\AndroidManifest.xml:14:13-36
+54            android:theme="@style/LaunchTheme"
+54-->C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\android\app\src\main\AndroidManifest.xml:15:13-47
+55            android:windowSoftInputMode="adjustResize" >
+55-->C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\android\app\src\main\AndroidManifest.xml:18:13-55
+56
+57            <!--
+58                 Specifies an Android theme to apply to this Activity as soon as
+59                 the Android process has started. This theme is visible to the user
+60                 while the Flutter UI initializes. After that, this theme continues
+61                 to determine the Window background behind the Flutter UI.
+62            -->
+63            <meta-data
+63-->C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\android\app\src\main\AndroidManifest.xml:23:13-26:17
+64                android:name="io.flutter.embedding.android.NormalTheme"
+64-->C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\android\app\src\main\AndroidManifest.xml:24:15-70
+65                android:resource="@style/NormalTheme" />
+65-->C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\android\app\src\main\AndroidManifest.xml:25:15-52
+66
+67            <intent-filter>
+67-->C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\android\app\src\main\AndroidManifest.xml:27:13-30:29
+68                <action android:name="android.intent.action.MAIN" />
+68-->C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\android\app\src\main\AndroidManifest.xml:28:17-68
+68-->C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\android\app\src\main\AndroidManifest.xml:28:25-66
+69
+70                <category android:name="android.intent.category.LAUNCHER" />
+70-->C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\android\app\src\main\AndroidManifest.xml:29:17-76
+70-->C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\android\app\src\main\AndroidManifest.xml:29:27-74
+71            </intent-filter>
+72        </activity>
+73        <!--
+74             Don't delete the meta-data below.
+75             This is used by the Flutter tool to generate GeneratedPluginRegistrant.java
+76        -->
+77        <meta-data
+77-->C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\android\app\src\main\AndroidManifest.xml:34:9-36:33
+78            android:name="flutterEmbedding"
+78-->C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\android\app\src\main\AndroidManifest.xml:35:13-44
+79            android:value="2" />
+79-->C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\android\app\src\main\AndroidManifest.xml:36:13-30
+80
+81        <service
+81-->[:cloud_firestore] C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\build\cloud_firestore\intermediates\merged_manifest\release\AndroidManifest.xml:10:9-14:19
+82            android:name="com.google.firebase.components.ComponentDiscoveryService"
+82-->[:cloud_firestore] C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\build\cloud_firestore\intermediates\merged_manifest\release\AndroidManifest.xml:10:18-89
+83            android:directBootAware="true"
+83-->[com.google.firebase:firebase-common:22.0.1] C:\Users\asus\.gradle\caches\transforms-3\89b20671a57f448107fa3360a29581dd\transformed\jetified-firebase-common-22.0.1\AndroidManifest.xml:32:13-43
+84            android:exported="false" >
+84-->[com.google.firebase:firebase-firestore:26.0.2] C:\Users\asus\.gradle\caches\transforms-3\ec7f6978bc6bc5f714aef300218540c1\transformed\jetified-firebase-firestore-26.0.2\AndroidManifest.xml:16:13-37
+85            <meta-data
+85-->[:cloud_firestore] C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\build\cloud_firestore\intermediates\merged_manifest\release\AndroidManifest.xml:11:13-13:85
+86                android:name="com.google.firebase.components:io.flutter.plugins.firebase.firestore.FlutterFirebaseFirestoreRegistrar"
+86-->[:cloud_firestore] C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\build\cloud_firestore\intermediates\merged_manifest\release\AndroidManifest.xml:12:17-134
+87                android:value="com.google.firebase.components.ComponentRegistrar" />
+87-->[:cloud_firestore] C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\build\cloud_firestore\intermediates\merged_manifest\release\AndroidManifest.xml:13:17-82
+88            <meta-data
+88-->[:firebase_core] C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\build\firebase_core\intermediates\merged_manifest\release\AndroidManifest.xml:11:13-13:85
+89                android:name="com.google.firebase.components:io.flutter.plugins.firebase.core.FlutterFirebaseCoreRegistrar"
+89-->[:firebase_core] C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\build\firebase_core\intermediates\merged_manifest\release\AndroidManifest.xml:12:17-124
+90                android:value="com.google.firebase.components.ComponentRegistrar" />
+90-->[:firebase_core] C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\build\firebase_core\intermediates\merged_manifest\release\AndroidManifest.xml:13:17-82
+91            <meta-data
+91-->[com.google.firebase:firebase-firestore:26.0.2] C:\Users\asus\.gradle\caches\transforms-3\ec7f6978bc6bc5f714aef300218540c1\transformed\jetified-firebase-firestore-26.0.2\AndroidManifest.xml:17:13-19:85
+92                android:name="com.google.firebase.components:com.google.firebase.firestore.FirebaseFirestoreKtxRegistrar"
+92-->[com.google.firebase:firebase-firestore:26.0.2] C:\Users\asus\.gradle\caches\transforms-3\ec7f6978bc6bc5f714aef300218540c1\transformed\jetified-firebase-firestore-26.0.2\AndroidManifest.xml:18:17-122
+93                android:value="com.google.firebase.components.ComponentRegistrar" />
+93-->[com.google.firebase:firebase-firestore:26.0.2] C:\Users\asus\.gradle\caches\transforms-3\ec7f6978bc6bc5f714aef300218540c1\transformed\jetified-firebase-firestore-26.0.2\AndroidManifest.xml:19:17-82
+94            <meta-data
+94-->[com.google.firebase:firebase-firestore:26.0.2] C:\Users\asus\.gradle\caches\transforms-3\ec7f6978bc6bc5f714aef300218540c1\transformed\jetified-firebase-firestore-26.0.2\AndroidManifest.xml:20:13-22:85
+95                android:name="com.google.firebase.components:com.google.firebase.firestore.FirestoreRegistrar"
+95-->[com.google.firebase:firebase-firestore:26.0.2] C:\Users\asus\.gradle\caches\transforms-3\ec7f6978bc6bc5f714aef300218540c1\transformed\jetified-firebase-firestore-26.0.2\AndroidManifest.xml:21:17-111
+96                android:value="com.google.firebase.components.ComponentRegistrar" />
+96-->[com.google.firebase:firebase-firestore:26.0.2] C:\Users\asus\.gradle\caches\transforms-3\ec7f6978bc6bc5f714aef300218540c1\transformed\jetified-firebase-firestore-26.0.2\AndroidManifest.xml:22:17-82
+97            <meta-data
+97-->[com.google.firebase:firebase-common:22.0.1] C:\Users\asus\.gradle\caches\transforms-3\89b20671a57f448107fa3360a29581dd\transformed\jetified-firebase-common-22.0.1\AndroidManifest.xml:35:13-37:85
+98                android:name="com.google.firebase.components:com.google.firebase.FirebaseCommonKtxRegistrar"
+98-->[com.google.firebase:firebase-common:22.0.1] C:\Users\asus\.gradle\caches\transforms-3\89b20671a57f448107fa3360a29581dd\transformed\jetified-firebase-common-22.0.1\AndroidManifest.xml:36:17-109
+99                android:value="com.google.firebase.components.ComponentRegistrar" />
+99-->[com.google.firebase:firebase-common:22.0.1] C:\Users\asus\.gradle\caches\transforms-3\89b20671a57f448107fa3360a29581dd\transformed\jetified-firebase-common-22.0.1\AndroidManifest.xml:37:17-82
+100        </service>
+101
+102        <provider
+102-->[:image_picker_android] C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\build\image_picker_android\intermediates\merged_manifest\release\AndroidManifest.xml:11:9-19:20
+103            android:name="io.flutter.plugins.imagepicker.ImagePickerFileProvider"
+103-->[:image_picker_android] C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\build\image_picker_android\intermediates\merged_manifest\release\AndroidManifest.xml:12:13-82
+104            android:authorities="com.example.goal_sight.flutter.image_provider"
+104-->[:image_picker_android] C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\build\image_picker_android\intermediates\merged_manifest\release\AndroidManifest.xml:13:13-74
+105            android:exported="false"
+105-->[:image_picker_android] C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\build\image_picker_android\intermediates\merged_manifest\release\AndroidManifest.xml:14:13-37
+106            android:grantUriPermissions="true" >
+106-->[:image_picker_android] C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\build\image_picker_android\intermediates\merged_manifest\release\AndroidManifest.xml:15:13-47
+107            <meta-data
+107-->[:image_picker_android] C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\build\image_picker_android\intermediates\merged_manifest\release\AndroidManifest.xml:16:13-18:75
+108                android:name="android.support.FILE_PROVIDER_PATHS"
+108-->[:image_picker_android] C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\build\image_picker_android\intermediates\merged_manifest\release\AndroidManifest.xml:17:17-67
+109                android:resource="@xml/flutter_image_picker_file_paths" />
+109-->[:image_picker_android] C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\build\image_picker_android\intermediates\merged_manifest\release\AndroidManifest.xml:18:17-72
+110        </provider> <!-- Trigger Google Play services to install the backported photo picker module. -->
+111        <service
+111-->[:image_picker_android] C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\build\image_picker_android\intermediates\merged_manifest\release\AndroidManifest.xml:21:9-33:19
+112            android:name="com.google.android.gms.metadata.ModuleDependencies"
+112-->[:image_picker_android] C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\build\image_picker_android\intermediates\merged_manifest\release\AndroidManifest.xml:22:13-78
+113            android:enabled="false"
+113-->[:image_picker_android] C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\build\image_picker_android\intermediates\merged_manifest\release\AndroidManifest.xml:23:13-36
+114            android:exported="false" >
+114-->[:image_picker_android] C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\build\image_picker_android\intermediates\merged_manifest\release\AndroidManifest.xml:24:13-37
+115            <intent-filter>
+115-->[:image_picker_android] C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\build\image_picker_android\intermediates\merged_manifest\release\AndroidManifest.xml:26:13-28:29
+116                <action android:name="com.google.android.gms.metadata.MODULE_DEPENDENCIES" />
+116-->[:image_picker_android] C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\build\image_picker_android\intermediates\merged_manifest\release\AndroidManifest.xml:27:17-94
+116-->[:image_picker_android] C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\build\image_picker_android\intermediates\merged_manifest\release\AndroidManifest.xml:27:25-91
+117            </intent-filter>
+118
+119            <meta-data
+119-->[:image_picker_android] C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\build\image_picker_android\intermediates\merged_manifest\release\AndroidManifest.xml:30:13-32:36
+120                android:name="photopicker_activity:0:required"
+120-->[:image_picker_android] C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\build\image_picker_android\intermediates\merged_manifest\release\AndroidManifest.xml:31:17-63
+121                android:value="" />
+121-->[:image_picker_android] C:\Users\asus\Documents\GitHub\Goal_Sight-Ai-Football-Analysis-System\goal_sight\build\image_picker_android\intermediates\merged_manifest\release\AndroidManifest.xml:32:17-33
+122        </service>
+123
+124        <provider
+124-->[com.google.firebase:firebase-common:22.0.1] C:\Users\asus\.gradle\caches\transforms-3\89b20671a57f448107fa3360a29581dd\transformed\jetified-firebase-common-22.0.1\AndroidManifest.xml:23:9-28:39
+125            android:name="com.google.firebase.provider.FirebaseInitProvider"
+125-->[com.google.firebase:firebase-common:22.0.1] C:\Users\asus\.gradle\caches\transforms-3\89b20671a57f448107fa3360a29581dd\transformed\jetified-firebase-common-22.0.1\AndroidManifest.xml:24:13-77
+126            android:authorities="com.example.goal_sight.firebaseinitprovider"
+126-->[com.google.firebase:firebase-common:22.0.1] C:\Users\asus\.gradle\caches\transforms-3\89b20671a57f448107fa3360a29581dd\transformed\jetified-firebase-common-22.0.1\AndroidManifest.xml:25:13-72
+127            android:directBootAware="true"
+127-->[com.google.firebase:firebase-common:22.0.1] C:\Users\asus\.gradle\caches\transforms-3\89b20671a57f448107fa3360a29581dd\transformed\jetified-firebase-common-22.0.1\AndroidManifest.xml:26:13-43
+128            android:exported="false"
+128-->[com.google.firebase:firebase-common:22.0.1] C:\Users\asus\.gradle\caches\transforms-3\89b20671a57f448107fa3360a29581dd\transformed\jetified-firebase-common-22.0.1\AndroidManifest.xml:27:13-37
+129            android:initOrder="100" />
+129-->[com.google.firebase:firebase-common:22.0.1] C:\Users\asus\.gradle\caches\transforms-3\89b20671a57f448107fa3360a29581dd\transformed\jetified-firebase-common-22.0.1\AndroidManifest.xml:28:13-36
+130
+131        <uses-library
+131-->[androidx.window:window:1.0.0-beta04] C:\Users\asus\.gradle\caches\transforms-3\f302e75fb7efd781bcf1a29281c188da\transformed\jetified-window-1.0.0-beta04\AndroidManifest.xml:25:9-27:40
+132            android:name="androidx.window.extensions"
+132-->[androidx.window:window:1.0.0-beta04] C:\Users\asus\.gradle\caches\transforms-3\f302e75fb7efd781bcf1a29281c188da\transformed\jetified-window-1.0.0-beta04\AndroidManifest.xml:26:13-54
+133            android:required="false" />
+133-->[androidx.window:window:1.0.0-beta04] C:\Users\asus\.gradle\caches\transforms-3\f302e75fb7efd781bcf1a29281c188da\transformed\jetified-window-1.0.0-beta04\AndroidManifest.xml:27:13-37
+134        <uses-library
+134-->[androidx.window:window:1.0.0-beta04] C:\Users\asus\.gradle\caches\transforms-3\f302e75fb7efd781bcf1a29281c188da\transformed\jetified-window-1.0.0-beta04\AndroidManifest.xml:28:9-30:40
+135            android:name="androidx.window.sidecar"
+135-->[androidx.window:window:1.0.0-beta04] C:\Users\asus\.gradle\caches\transforms-3\f302e75fb7efd781bcf1a29281c188da\transformed\jetified-window-1.0.0-beta04\AndroidManifest.xml:29:13-51
+136            android:required="false" />
+136-->[androidx.window:window:1.0.0-beta04] C:\Users\asus\.gradle\caches\transforms-3\f302e75fb7efd781bcf1a29281c188da\transformed\jetified-window-1.0.0-beta04\AndroidManifest.xml:30:13-37
+137
+138        <activity
+138-->[com.google.android.gms:play-services-base:18.1.0] C:\Users\asus\.gradle\caches\transforms-3\8317b5a063fd122ff8d590a6efaa0a4b\transformed\jetified-play-services-base-18.1.0\AndroidManifest.xml:20:9-22:45
+139            android:name="com.google.android.gms.common.api.GoogleApiActivity"
+139-->[com.google.android.gms:play-services-base:18.1.0] C:\Users\asus\.gradle\caches\transforms-3\8317b5a063fd122ff8d590a6efaa0a4b\transformed\jetified-play-services-base-18.1.0\AndroidManifest.xml:20:19-85
+140            android:exported="false"
+140-->[com.google.android.gms:play-services-base:18.1.0] C:\Users\asus\.gradle\caches\transforms-3\8317b5a063fd122ff8d590a6efaa0a4b\transformed\jetified-play-services-base-18.1.0\AndroidManifest.xml:22:19-43
+141            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+141-->[com.google.android.gms:play-services-base:18.1.0] C:\Users\asus\.gradle\caches\transforms-3\8317b5a063fd122ff8d590a6efaa0a4b\transformed\jetified-play-services-base-18.1.0\AndroidManifest.xml:21:19-78
+142
+143        <meta-data
+143-->[com.google.android.gms:play-services-basement:18.8.0] C:\Users\asus\.gradle\caches\transforms-3\1e8aa7ff2d62f8585b08fae360d2f65f\transformed\jetified-play-services-basement-18.8.0\AndroidManifest.xml:21:9-23:69
+144            android:name="com.google.android.gms.version"
+144-->[com.google.android.gms:play-services-basement:18.8.0] C:\Users\asus\.gradle\caches\transforms-3\1e8aa7ff2d62f8585b08fae360d2f65f\transformed\jetified-play-services-basement-18.8.0\AndroidManifest.xml:22:13-58
+145            android:value="@integer/google_play_services_version" />
+145-->[com.google.android.gms:play-services-basement:18.8.0] C:\Users\asus\.gradle\caches\transforms-3\1e8aa7ff2d62f8585b08fae360d2f65f\transformed\jetified-play-services-basement-18.8.0\AndroidManifest.xml:23:13-66
+146
+147        <provider
+147-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\asus\.gradle\caches\transforms-3\e852edee255e4ba7fa4d5b58ba237ddb\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:24:9-32:20
+148            android:name="androidx.startup.InitializationProvider"
+148-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\asus\.gradle\caches\transforms-3\e852edee255e4ba7fa4d5b58ba237ddb\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:25:13-67
+149            android:authorities="com.example.goal_sight.androidx-startup"
+149-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\asus\.gradle\caches\transforms-3\e852edee255e4ba7fa4d5b58ba237ddb\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:26:13-68
+150            android:exported="false" >
+150-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\asus\.gradle\caches\transforms-3\e852edee255e4ba7fa4d5b58ba237ddb\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:27:13-37
+151            <meta-data
+151-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\asus\.gradle\caches\transforms-3\e852edee255e4ba7fa4d5b58ba237ddb\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:29:13-31:52
+152                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+152-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\asus\.gradle\caches\transforms-3\e852edee255e4ba7fa4d5b58ba237ddb\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:30:17-85
+153                android:value="androidx.startup" />
+153-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\asus\.gradle\caches\transforms-3\e852edee255e4ba7fa4d5b58ba237ddb\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:31:17-49
+154        </provider>
+155
+156        <receiver
+156-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\asus\.gradle\caches\transforms-3\e852edee255e4ba7fa4d5b58ba237ddb\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:34:9-52:20
+157            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+157-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\asus\.gradle\caches\transforms-3\e852edee255e4ba7fa4d5b58ba237ddb\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:35:13-76
+158            android:directBootAware="false"
+158-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\asus\.gradle\caches\transforms-3\e852edee255e4ba7fa4d5b58ba237ddb\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:36:13-44
+159            android:enabled="true"
+159-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\asus\.gradle\caches\transforms-3\e852edee255e4ba7fa4d5b58ba237ddb\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:37:13-35
+160            android:exported="true"
+160-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\asus\.gradle\caches\transforms-3\e852edee255e4ba7fa4d5b58ba237ddb\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:38:13-36
+161            android:permission="android.permission.DUMP" >
+161-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\asus\.gradle\caches\transforms-3\e852edee255e4ba7fa4d5b58ba237ddb\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:39:13-57
+162            <intent-filter>
+162-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\asus\.gradle\caches\transforms-3\e852edee255e4ba7fa4d5b58ba237ddb\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:40:13-42:29
+163                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+163-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\asus\.gradle\caches\transforms-3\e852edee255e4ba7fa4d5b58ba237ddb\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:41:17-91
+163-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\asus\.gradle\caches\transforms-3\e852edee255e4ba7fa4d5b58ba237ddb\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:41:25-88
+164            </intent-filter>
+165            <intent-filter>
+165-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\asus\.gradle\caches\transforms-3\e852edee255e4ba7fa4d5b58ba237ddb\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:43:13-45:29
+166                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+166-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\asus\.gradle\caches\transforms-3\e852edee255e4ba7fa4d5b58ba237ddb\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:44:17-85
+166-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\asus\.gradle\caches\transforms-3\e852edee255e4ba7fa4d5b58ba237ddb\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:44:25-82
+167            </intent-filter>
+168            <intent-filter>
+168-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\asus\.gradle\caches\transforms-3\e852edee255e4ba7fa4d5b58ba237ddb\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:46:13-48:29
+169                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+169-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\asus\.gradle\caches\transforms-3\e852edee255e4ba7fa4d5b58ba237ddb\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:47:17-88
+169-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\asus\.gradle\caches\transforms-3\e852edee255e4ba7fa4d5b58ba237ddb\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:47:25-85
+170            </intent-filter>
+171            <intent-filter>
+171-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\asus\.gradle\caches\transforms-3\e852edee255e4ba7fa4d5b58ba237ddb\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:49:13-51:29
+172                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+172-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\asus\.gradle\caches\transforms-3\e852edee255e4ba7fa4d5b58ba237ddb\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:50:17-95
+172-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\asus\.gradle\caches\transforms-3\e852edee255e4ba7fa4d5b58ba237ddb\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:50:25-92
+173            </intent-filter>
+174        </receiver>
+175    </application>
+176
+177</manifest>
