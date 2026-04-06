@@ -1,2 +1,7 @@
-// AdminDashboard component
-// TODO: Implement dashboard overview with stats, charts, recent activity
+import DashboardPage from '../DashboardPage'
+
+function AdminDashboard() {
+	return <DashboardPage />
+}
+
+export default AdminDashboard

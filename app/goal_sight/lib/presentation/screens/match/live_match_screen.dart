@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/utils/responsive.dart';
 import '../../state_management/app_providers.dart';
 
 class LiveMatchScreen extends ConsumerWidget {
@@ -28,42 +29,44 @@ class LiveMatchScreen extends ConsumerWidget {
           ),
         ),
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: context.padAll(16),
           children: [
             Row(
               children: [
                 Icon(
                   Icons.circle,
-                  size: 12,
+                  size: context.rs(12, min: 10, max: 14),
                   color: liveState.connected
                       ? Colors.greenAccent
                       : Colors.orangeAccent,
                 ),
-                const SizedBox(width: 8),
-                Text(
-                  liveState.connected
-                      ? 'Connected to live feed'
-                      : 'Reconnecting...',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
+                SizedBox(width: context.rs(8, min: 6, max: 12)),
+                Expanded(
+                  child: Text(
+                    liveState.connected
+                        ? 'Connected to live feed'
+                        : 'Reconnecting...',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: context.sp(16, min: 13, max: 20),
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: context.rs(12, min: 8, max: 18)),
             const Text(
               'Real-time updates from WebSocket stream:',
               style: TextStyle(color: Color(0xFF8EA3CD)),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: context.rs(12, min: 8, max: 18)),
             if (liveState.updates.isEmpty)
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: context.padAll(16),
                 decoration: BoxDecoration(
                   color: const Color(0xFF13243F),
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(context.rs(16, min: 12, max: 22)),
                   border: Border.all(color: const Color(0xFF2C406D)),
                 ),
                 child: const Text(
@@ -74,16 +77,18 @@ class LiveMatchScreen extends ConsumerWidget {
             else
               ...liveState.updates.map(
                 (update) => Container(
-                  margin: const EdgeInsets.only(bottom: 10),
+                  margin: EdgeInsets.only(bottom: context.rs(10, min: 6, max: 14)),
                   decoration: BoxDecoration(
                     color: const Color(0xFF13243F),
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(context.rs(14, min: 10, max: 18)),
                     border: Border.all(color: const Color(0xFF2C406D)),
                   ),
                   child: ListTile(
                     leading: const Icon(Icons.bolt, color: Color(0xFF8AB8FF)),
                     title: Text(
                       update.message,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(color: Colors.white),
                     ),
                     subtitle: Text(

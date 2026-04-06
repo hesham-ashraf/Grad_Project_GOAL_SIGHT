@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
+import '../../../core/utils/responsive.dart';
 import 'tap_scale.dart';
 
 class DashboardCard extends StatelessWidget {
@@ -20,8 +21,10 @@ class DashboardCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final radius = context.rs(20, min: 14, max: 26);
+
     final card = ClipRRect(
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(radius),
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
         child: AnimatedContainer(
@@ -29,7 +32,7 @@ class DashboardCard extends StatelessWidget {
           padding: padding,
           decoration: BoxDecoration(
             color: const Color(0xFF15182B).withOpacity(0.94),
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(radius),
             border: Border.all(color: const Color(0xFF2A3156)),
             boxShadow: [
               const BoxShadow(

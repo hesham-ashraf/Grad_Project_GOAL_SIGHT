@@ -21,6 +21,15 @@ class GoalSightApp extends ConsumerWidget {
       theme: AppTheme.lightTheme(),
       darkTheme: AppTheme.darkTheme(),
       themeMode: ThemeMode.dark,
+      builder: (context, child) {
+        final mediaQuery = MediaQuery.of(context);
+        final scale = (mediaQuery.size.width / 390).clamp(0.92, 1.12);
+
+        return MediaQuery(
+          data: mediaQuery.copyWith(textScaler: TextScaler.linear(scale)),
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
       routerConfig: router,
     );
   }

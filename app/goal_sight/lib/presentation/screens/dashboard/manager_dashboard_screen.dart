@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/utils/responsive.dart';
 import '../../../features/match/match_state.dart';
 import '../../state_management/app_providers.dart';
 import '../../widgets/dashboard_card.dart';
@@ -82,6 +83,11 @@ class _ManagerDashboardScreenState
     final teamMembers = ref.watch(teamMembersProvider);
     final standings = ref.watch(leagueStandingsProvider);
     final teamName = ref.watch(coachTeamNameProvider);
+    final teamHealth = teamMembers.isEmpty
+      ? 0
+      : (teamMembers.fold<int>(0, (a, b) => a + b.stamina) /
+          teamMembers.length)
+        .round();
 
     return Scaffold(
       backgroundColor: const Color(0xFF040B1E),
@@ -114,55 +120,78 @@ class _ManagerDashboardScreenState
           onRefresh: () =>
               ref.read(matchControllerProvider.notifier).loadMatches(),
           child: ListView(
-            padding: const EdgeInsets.all(20),
+            padding: context.padAll(20),
             children: [
               Text(
                 'Coach View: ${auth.user?.name ?? 'Manager'}',
-                style: const TextStyle(
+                style: TextStyle(
                   color: Colors.white,
-                  fontSize: 28,
+                  fontSize: context.sp(28, min: 20, max: 36),
                   fontWeight: FontWeight.w700,
                 ),
               ),
-              const SizedBox(height: 4),
+              SizedBox(height: context.rs(4, min: 2, max: 8)),
               Text(
                 'Head coach of $teamName • track squad and match performance',
-                style: const TextStyle(color: Color(0xFFA2B0CF)),
+                style: TextStyle(
+                  color: const Color(0xFFA2B0CF),
+                  fontSize: context.sp(13, min: 11, max: 17),
+                ),
               ),
-              const SizedBox(height: 18),
-              GridView.count(
-                crossAxisCount: MediaQuery.of(context).size.width > 900 ? 4 : 2,
-                crossAxisSpacing: 14,
-                mainAxisSpacing: 14,
-                childAspectRatio: 1.5,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                children: [
-                  DashboardCard(
-                    title: 'MATCHES',
-                    value: '${state.matches.length}',
-                    icon: Icons.sports_soccer,
-                  ),
-                  DashboardCard(
-                    title: 'LIVE EVENTS',
-                    value:
-                        '${state.matches.where((m) => m.status == 'live').length}',
-                    icon: Icons.flash_on,
-                  ),
-                  const DashboardCard(
-                    title: 'PASS ACCURACY',
-                    value: '83%',
-                    icon: Icons.track_changes,
-                  ),
-                  DashboardCard(
-                    title: 'TEAM HEALTH',
-                    value:
-                        '${(teamMembers.fold<int>(0, (a, b) => a + b.stamina) / teamMembers.length).round()}%',
-                    icon: Icons.favorite,
-                  ),
-                ],
+              SizedBox(height: context.rs(18, min: 12, max: 24)),
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final cards = [
+                    DashboardCard(
+                      title: 'MATCHES',
+                      value: '${state.matches.length}',
+                      icon: Icons.sports_soccer,
+                    ),
+                    DashboardCard(
+                      title: 'LIVE EVENTS',
+                      value:
+                          '${state.matches.where((m) => m.status == 'live').length}',
+                      icon: Icons.flash_on,
+                    ),
+                    const DashboardCard(
+                      title: 'PASS ACCURACY',
+                      value: '83%',
+                      icon: Icons.track_changes,
+                    ),
+                    DashboardCard(
+                      title: 'TEAM HEALTH',
+                      value: '$teamHealth%',
+                      icon: Icons.favorite,
+                    ),
+                  ];
+
+                  const spacing = 14.0;
+                  final maxWidth = constraints.maxWidth;
+                  final columns = maxWidth >= 1200
+                      ? 4
+                      : maxWidth >= 900
+                          ? 3
+                          : maxWidth >= 560
+                              ? 2
+                              : 1;
+                  final cardWidth =
+                      (maxWidth - (spacing * (columns - 1))) / columns;
+
+                  return Wrap(
+                    spacing: spacing,
+                    runSpacing: spacing,
+                    children: cards
+                        .map(
+                          (card) => SizedBox(
+                            width: cardWidth,
+                            child: card,
+                          ),
+                        )
+                        .toList(),
+                  );
+                },
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: context.rs(16, min: 10, max: 22)),
               const Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
@@ -174,25 +203,26 @@ class _ManagerDashboardScreenState
                   ),
                 ),
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: context.rs(10, min: 7, max: 14)),
               SizedBox(
-                height: 172,
+                height: context.rs(188, min: 168, max: 208),
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
                   itemCount: teamMembers.length,
-                  separatorBuilder: (_, __) => const SizedBox(width: 10),
+                  separatorBuilder: (_, __) => SizedBox(width: context.rs(10, min: 6, max: 14)),
                   itemBuilder: (context, index) {
                     final player = teamMembers[index];
                     return TeamMemberCard(
                       player: player,
+                      width: context.rs(182, min: 158, max: 210),
                       onTap: () => context.push('/player/${player.id}'),
                     );
                   },
                 ),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: context.rs(16, min: 10, max: 22)),
               StandingsTableCard(standings: standings),
-              const SizedBox(height: 16),
+              SizedBox(height: context.rs(16, min: 10, max: 22)),
               Wrap(
                 spacing: 10,
                 runSpacing: 10,
@@ -213,21 +243,24 @@ class _ManagerDashboardScreenState
                   ),
                 ],
               ),
-              const SizedBox(height: 18),
-              const Text(
+              SizedBox(height: context.rs(18, min: 12, max: 24)),
+              Text(
                 'Matches Management',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 20,
+                  fontSize: context.sp(20, min: 16, max: 28),
                   fontWeight: FontWeight.w700,
                 ),
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: context.rs(10, min: 7, max: 14)),
               if (state.status == ViewStatus.loading)
-                const SizedBox(height: 220, child: LoadingState())
+                ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: context.rs(220, min: 180, max: 260)),
+                  child: const LoadingState(),
+                )
               else if (state.status == ViewStatus.error)
-                SizedBox(
-                  height: 220,
+                ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: context.rs(220, min: 180, max: 260)),
                   child: ErrorState(
                     message: state.errorMessage ?? 'Failed to load matches',
                     onRetry: () => ref

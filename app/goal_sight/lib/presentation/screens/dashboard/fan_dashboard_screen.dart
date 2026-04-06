@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/utils/responsive.dart';
 import '../../../data/models/match_model.dart';
 import '../../../features/fan/fan_highlight_model.dart';
 import '../../state_management/app_providers.dart';
@@ -79,7 +80,12 @@ class _FanDashboardScreenState extends ConsumerState<FanDashboardScreen> {
                     child: ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 1320),
                       child: Padding(
-                        padding: const EdgeInsets.fromLTRB(18, 10, 18, 26),
+                        padding: EdgeInsets.fromLTRB(
+                          context.rs(18, min: 12, max: 24),
+                          context.rs(10, min: 8, max: 14),
+                          context.rs(18, min: 12, max: 24),
+                          context.rs(26, min: 18, max: 34),
+                        ),
                         child: isWide
                             ? Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -94,7 +100,7 @@ class _FanDashboardScreenState extends ConsumerState<FanDashboardScreen> {
                                       recentResults: recentResults,
                                     ),
                                   ),
-                                  const SizedBox(width: 16),
+                                  SizedBox(width: context.rs(16, min: 10, max: 22)),
                                   Expanded(
                                     flex: 8,
                                     child: _HighlightsColumn(
@@ -113,7 +119,7 @@ class _FanDashboardScreenState extends ConsumerState<FanDashboardScreen> {
                                     todayMatches: todayMatches,
                                     recentResults: recentResults,
                                   ),
-                                  const SizedBox(height: 18),
+                                  SizedBox(height: context.rs(18, min: 12, max: 24)),
                                   _HighlightsColumn(
                                       highlightsAsync: highlightsAsync),
                                 ],
@@ -241,22 +247,22 @@ class _MainColumn extends StatelessWidget {
           delay: 70,
           child: _Header(userName: userName),
         ),
-        const SizedBox(height: 14),
+        SizedBox(height: context.rs(14, min: 10, max: 20)),
         _Reveal(
           delay: 130,
           child: _LiveMatchesSection(liveAsync: liveAsync),
         ),
-        const SizedBox(height: 14),
+        SizedBox(height: context.rs(14, min: 10, max: 20)),
         _Reveal(
           delay: 190,
           child: _FeaturedMatchCard(match: featuredMatch),
         ),
-        const SizedBox(height: 14),
+        SizedBox(height: context.rs(14, min: 10, max: 20)),
         _Reveal(
           delay: 250,
           child: _TodayMatchesSection(todayMatches: todayMatches),
         ),
-        const SizedBox(height: 14),
+        SizedBox(height: context.rs(14, min: 10, max: 20)),
         _Reveal(
           delay: 310,
           child: _RecentResultsSection(recentResults: recentResults),
@@ -274,6 +280,7 @@ class _Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final initial = userName.isEmpty ? 'F' : userName.trim().toUpperCase()[0];
+    final compact = context.screenWidth < 430;
 
     return DashboardCard(
       child: Row(
@@ -284,24 +291,32 @@ class _Header extends StatelessWidget {
               children: [
                 Text(
                   'Welcome back, $userName',
-                  style: const TextStyle(
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w800,
-                    fontSize: 22,
+                    fontSize: context.sp(22, min: 16, max: 30),
                     letterSpacing: 0.2,
                   ),
                 ),
-                const SizedBox(height: 5),
-                const Text(
+                SizedBox(height: context.rs(5, min: 3, max: 8)),
+                Text(
                   'Stay updated with the latest football action',
-                  style: TextStyle(color: Color(0xFF9CA8C8)),
+                  maxLines: compact ? 2 : 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: const Color(0xFF9CA8C8),
+                    fontSize: context.sp(13, min: 11, max: 16),
+                  ),
                 ),
               ],
             ),
           ),
+          SizedBox(width: context.rs(10, min: 8, max: 14)),
           Container(
-            width: 50,
-            height: 50,
+            width: context.rs(50, min: 40, max: 62),
+            height: context.rs(50, min: 40, max: 62),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               gradient: const LinearGradient(
@@ -318,9 +333,9 @@ class _Header extends StatelessWidget {
             child: Center(
               child: Text(
                 initial,
-                style: const TextStyle(
+                style: TextStyle(
                   color: Colors.white,
-                  fontSize: 20,
+                  fontSize: context.sp(20, min: 16, max: 26),
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -348,8 +363,7 @@ class _LiveMatchesSection extends ConsumerWidget {
             trailing: TapScale(
               onTap: () => ref.invalidate(fanLiveMatchesProvider),
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: context.padSym(h: 12, v: 6),
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
                     colors: [Color(0xFF7B61FF), Color(0xFF4DA1FF)],
@@ -374,7 +388,7 @@ class _LiveMatchesSection extends ConsumerWidget {
               ),
             ),
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: context.rs(10, min: 7, max: 14)),
           liveAsync.when(
             loading: () => const Column(
               children: [
@@ -471,9 +485,9 @@ class _FeaturedMatchCard extends StatelessWidget {
       glow: true,
       padding: EdgeInsets.zero,
       child: Container(
-        padding: const EdgeInsets.all(18),
+        padding: context.padAll(18),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(context.rs(20, min: 14, max: 24)),
           gradient: const LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -485,53 +499,92 @@ class _FeaturedMatchCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Text(
+                Text(
                   'Featured Match',
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w700,
-                    fontSize: 15,
+                    fontSize: context.sp(15, min: 12, max: 18),
                   ),
                 ),
                 const Spacer(),
                 const _LivePill(),
               ],
             ),
-            const SizedBox(height: 4),
-            const Text(
+            SizedBox(height: context.rs(4, min: 2, max: 8)),
+            Text(
               'Premier League',
-              style: TextStyle(color: Color(0xFFE4E8FF), fontSize: 12),
+              style: TextStyle(
+                color: const Color(0xFFE4E8FF),
+                fontSize: context.sp(12, min: 10, max: 15),
+              ),
             ),
-            const SizedBox(height: 18),
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    match!.homeTeam,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w700,
+            SizedBox(height: context.rs(18, min: 12, max: 24)),
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final compact = constraints.maxWidth < 370;
+                final teamStyle = TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                  fontSize: context.sp(14, min: 12, max: 18),
+                );
+
+                if (compact) {
+                  return Column(
+                    children: [
+                      Text(
+                        match!.homeTeam,
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: teamStyle,
+                      ),
+                      SizedBox(height: context.rs(8, min: 6, max: 12)),
+                      _AnimatedScore(homeScore: homeScore, awayScore: awayScore),
+                      SizedBox(height: context.rs(8, min: 6, max: 12)),
+                      Text(
+                        match!.awayTeam,
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: teamStyle,
+                      ),
+                    ],
+                  );
+                }
+
+                return Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        match!.homeTeam,
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: teamStyle,
+                      ),
                     ),
-                  ),
-                ),
-                _AnimatedScore(homeScore: homeScore, awayScore: awayScore),
-                Expanded(
-                  child: Text(
-                    match!.awayTeam,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w700,
+                    _AnimatedScore(homeScore: homeScore, awayScore: awayScore),
+                    Expanded(
+                      child: Text(
+                        match!.awayTeam,
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: teamStyle,
+                      ),
                     ),
-                  ),
-                ),
-              ],
+                  ],
+                );
+              },
             ),
-            const SizedBox(height: 14),
-            const Text(
+            SizedBox(height: context.rs(14, min: 10, max: 20)),
+            Text(
               'Old Trafford, 74:30',
-              style: TextStyle(color: Color(0xFFE6E9FF), fontSize: 12),
+              style: TextStyle(
+                color: const Color(0xFFE6E9FF),
+                fontSize: context.sp(12, min: 10, max: 15),
+              ),
             ),
           ],
         ),
@@ -655,28 +708,31 @@ class _AnimatedScoreState extends State<_AnimatedScore> {
       child: !_ready
           ? Container(
               key: const ValueKey('score-placeholder'),
-              width: 72,
-              height: 44,
+              width: context.rs(72, min: 58, max: 82),
+              height: context.rs(44, min: 34, max: 52),
               decoration: BoxDecoration(
                 color: const Color(0x44FFFFFF),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(context.rs(12, min: 10, max: 16)),
               ),
             )
           : Container(
               key: const ValueKey('score-value'),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              padding: context.padSym(h: 12, v: 6),
               decoration: BoxDecoration(
                 color: const Color(0x26FFFFFF),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(context.rs(12, min: 10, max: 16)),
                 border: Border.all(color: const Color(0x66FFFFFF)),
               ),
-              child: Text(
-                '${widget.homeScore} : ${widget.awayScore}',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 34,
-                  fontWeight: FontWeight.w800,
-                  height: 1,
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  '${widget.homeScore} : ${widget.awayScore}',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: context.sp(34, min: 22, max: 42),
+                    fontWeight: FontWeight.w800,
+                    height: 1,
+                  ),
                 ),
               ),
             ),
@@ -705,7 +761,7 @@ class _TodayMatchesSection extends StatelessWidget {
               child: const Text('See all'),
             ),
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: context.rs(10, min: 7, max: 14)),
           if (todayMatches.isEmpty)
             Container(
               width: double.infinity,
@@ -740,11 +796,11 @@ class _TodayMatchesSection extends StatelessWidget {
             )
           else
             SizedBox(
-              height: 120,
+              height: context.rs(120, min: 108, max: 136),
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 itemCount: todayMatches.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 10),
+                separatorBuilder: (_, __) => SizedBox(width: context.rs(10, min: 6, max: 14)),
                 itemBuilder: (context, index) {
                   final match = todayMatches[index];
                   return _TodayMatchChip(match: match);
@@ -766,11 +822,11 @@ class _TodayMatchChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return TapScale(
       child: Container(
-        width: 220,
-        padding: const EdgeInsets.all(12),
+        width: context.rs(220, min: 190, max: 250),
+        padding: context.padAll(12),
         decoration: BoxDecoration(
           color: const Color(0xFF111428),
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(context.rs(14, min: 10, max: 18)),
           border: Border.all(color: const Color(0xFF262D4D)),
         ),
         child: Column(
@@ -778,9 +834,9 @@ class _TodayMatchChip extends StatelessWidget {
           children: [
             Text(
               match.status.toUpperCase(),
-              style: const TextStyle(
+              style: TextStyle(
                 color: Color(0xFF9CA8C8),
-                fontSize: 11,
+                fontSize: context.sp(11, min: 10, max: 13),
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -789,17 +845,19 @@ class _TodayMatchChip extends StatelessWidget {
               '${match.homeTeam} vs ${match.awayTeam}',
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
+              style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w700,
+                fontSize: context.sp(13, min: 11, max: 16),
               ),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: context.rs(8, min: 5, max: 12)),
             Text(
               match.score,
-              style: const TextStyle(
+              style: TextStyle(
                 color: Color(0xFFBFD2FF),
                 fontWeight: FontWeight.w800,
+                fontSize: context.sp(14, min: 12, max: 18),
               ),
             ),
           ],
@@ -821,7 +879,7 @@ class _RecentResultsSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const _SectionTitle(title: 'Recent Results'),
-          const SizedBox(height: 10),
+          SizedBox(height: context.rs(10, min: 7, max: 14)),
           if (recentResults.isEmpty)
             const Text(
               'No recent results available.',
@@ -852,13 +910,14 @@ class _HighlightsColumn extends StatelessWidget {
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
     final crossAxisCount = fixedColumns ?? (width > 860 ? 2 : 1);
+    final ratio = width < 420 ? 1.08 : width < 860 ? 1.2 : 1.28;
 
     return DashboardCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const _SectionTitle(title: 'Video Highlights'),
-          const SizedBox(height: 12),
+          SizedBox(height: context.rs(12, min: 8, max: 18)),
           highlightsAsync.when(
             loading: () => FanHighlightsGridSkeleton(
               crossAxisCount: crossAxisCount,
@@ -883,7 +942,7 @@ class _HighlightsColumn extends StatelessWidget {
                 crossAxisCount: crossAxisCount,
                 crossAxisSpacing: 12,
                 mainAxisSpacing: 12,
-                childAspectRatio: 1.25,
+                childAspectRatio: ratio,
               ),
               itemBuilder: (context, index) {
                 final highlight = items[index];
@@ -917,17 +976,23 @@ class _SectionTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Text(
-          title,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 0.2,
+        Expanded(
+          child: Text(
+            title,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: context.sp(18, min: 14, max: 24),
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.2,
+            ),
           ),
         ),
-        const Spacer(),
-        if (trailing != null) trailing!,
+        if (trailing != null) ...[
+          SizedBox(width: context.rs(8, min: 6, max: 12)),
+          trailing!,
+        ],
       ],
     );
   }

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_roles.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/responsive.dart';
 import '../../../core/utils/validators.dart';
 import '../../../features/auth/auth_state.dart';
 import '../../state_management/app_providers.dart';
@@ -80,18 +81,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ),
           child: Center(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(18),
+              padding: context.padAll(18),
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 420),
                 child: Column(
                   children: [
-                    const GoalSightLogo(iconSize: 64),
-                    const SizedBox(height: 22),
+                    GoalSightLogo(iconSize: context.rs(64, min: 54, max: 80)),
+                    SizedBox(height: context.rs(22, min: 16, max: 28)),
                     Container(
-                      padding: const EdgeInsets.fromLTRB(24, 26, 24, 24),
+                      padding: context.padSym(h: 24, v: 24),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(context.rs(20, min: 14, max: 26)),
                         border: Border.all(color: const Color(0xFFDCE3F1)),
                         boxShadow: const [
                           BoxShadow(
@@ -109,13 +110,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             Text(
                               'Welcome to GOALSIGHT',
                               style: AppTheme.authTitleStyle(context),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            const SizedBox(height: 8),
+                            SizedBox(height: context.rs(8, min: 5, max: 12)),
                             Text(
                               'Enter your email address and password to use the application.',
                               style: AppTheme.authSubtitleStyle(context),
                             ),
-                            const SizedBox(height: 20),
+                            SizedBox(height: context.rs(20, min: 12, max: 28)),
                             AppTextField(
                               label: 'Email / Username',
                               hintText: 'Enter your email or username',
@@ -123,7 +126,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               keyboardType: TextInputType.emailAddress,
                               validator: Validators.email,
                             ),
-                            const SizedBox(height: 12),
+                            SizedBox(height: context.rs(12, min: 8, max: 16)),
                             AppTextField(
                               label: 'Password',
                               hintText: 'Enter your password',
@@ -135,7 +138,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 color: Color(0xFF8A97B6),
                               ),
                             ),
-                            const SizedBox(height: 12),
+                            SizedBox(height: context.rs(12, min: 8, max: 16)),
                             Row(
                               children: [
                                 SizedBox(
@@ -146,9 +149,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                         () => _rememberMe = value ?? false),
                                   ),
                                 ),
-                                const SizedBox(width: 8),
-                                const Text('Remember Me'),
-                                const Spacer(),
+                                SizedBox(width: context.rs(8, min: 6, max: 10)),
+                                Expanded(
+                                  child: Text(
+                                    'Remember Me',
+                                    style: TextStyle(
+                                      fontSize: context.sp(13, min: 12, max: 16),
+                                    ),
+                                  ),
+                                ),
                                 TextButton(
                                   onPressed: () {},
                                   child: const Text('Forget Password?'),
@@ -157,20 +166,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             ),
                             if (authState.status == AuthStatus.error &&
                                 authState.errorMessage != null) ...[
-                              const SizedBox(height: 8),
+                              SizedBox(height: context.rs(8, min: 5, max: 12)),
                               Text(
                                 authState.errorMessage!,
                                 style: const TextStyle(color: Colors.redAccent),
                               ),
                             ],
-                            const SizedBox(height: 10),
+                            SizedBox(height: context.rs(10, min: 7, max: 14)),
                             PrimaryButton(
                               label: 'SIGN IN',
                               loading: loading,
                               icon: Icons.login_rounded,
                               onPressed: _submit,
                             ),
-                            const SizedBox(height: 14),
+                            SizedBox(height: context.rs(14, min: 10, max: 18)),
                             Row(
                               children: const [
                                 Expanded(
@@ -186,7 +195,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                     child: Divider(color: Color(0xFFD8DFED))),
                               ],
                             ),
-                            const SizedBox(height: 14),
+                            SizedBox(height: context.rs(14, min: 10, max: 18)),
                             Row(
                               children: [
                                 Expanded(
@@ -197,7 +206,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                     label: const Text('Facebook'),
                                   ),
                                 ),
-                                const SizedBox(width: 10),
+                                SizedBox(width: context.rs(10, min: 6, max: 14)),
                                 Expanded(
                                   child: OutlinedButton.icon(
                                     onPressed: () {},
@@ -214,12 +223,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 14),
+                            SizedBox(height: context.rs(14, min: 10, max: 18)),
                             Container(
-                              padding: const EdgeInsets.all(10),
+                              padding: context.padAll(10),
                               decoration: BoxDecoration(
                                 color: const Color(0xFFF4F6FB),
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(context.rs(12, min: 10, max: 16)),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -232,7 +241,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
-                                  const SizedBox(height: 8),
+                                  SizedBox(height: context.rs(8, min: 5, max: 12)),
                                   Wrap(
                                     spacing: 8,
                                     runSpacing: 8,
@@ -260,7 +269,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 ],
                               ),
                             ),
-                            const SizedBox(height: 10),
+                            SizedBox(height: context.rs(10, min: 7, max: 14)),
                             Center(
                               child: TextButton(
                                 onPressed: () => context.push('/register'),
@@ -285,7 +294,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 14),
+                    SizedBox(height: context.rs(14, min: 10, max: 18)),
                     const Text(
                       '(c) 2026 GOALSIGHT. Premium Football Analytics Platform.',
                       style: TextStyle(color: Color(0xFF8A95B2), fontSize: 12),

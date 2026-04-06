@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/utils/responsive.dart';
 import '../../../features/match/match_state.dart';
 import '../../state_management/app_providers.dart';
 import '../../widgets/dashboard_card.dart';
@@ -121,22 +122,25 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
           onRefresh: () =>
               ref.read(adminControllerProvider.notifier).loadDashboard(),
           child: ListView(
-            padding: const EdgeInsets.all(20),
+            padding: context.padAll(20),
             children: [
               Text(
                 'Welcome ${auth.user?.name ?? 'Admin'}',
-                style: const TextStyle(
+                style: TextStyle(
                   color: Colors.white,
-                  fontSize: 28,
+                  fontSize: context.sp(28, min: 20, max: 36),
                   fontWeight: FontWeight.w700,
                 ),
               ),
-              const SizedBox(height: 4),
-              const Text(
+              SizedBox(height: context.rs(4, min: 2, max: 8)),
+              Text(
                 'Manage your platform from here',
-                style: TextStyle(color: Color(0xFFA2B0CF)),
+                style: TextStyle(
+                  color: const Color(0xFFA2B0CF),
+                  fontSize: context.sp(13, min: 11, max: 17),
+                ),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: context.rs(12, min: 8, max: 18)),
               Wrap(
                 spacing: 10,
                 runSpacing: 10,
@@ -158,12 +162,15 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 18),
+              SizedBox(height: context.rs(18, min: 12, max: 24)),
               if (adminState.status == ViewStatus.loading)
-                const SizedBox(height: 260, child: LoadingState())
+                ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: context.rs(260, min: 200, max: 300)),
+                  child: const LoadingState(),
+                )
               else if (adminState.status == ViewStatus.error)
-                SizedBox(
-                  height: 260,
+                ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: context.rs(260, min: 200, max: 300)),
                   child: ErrorState(
                     message:
                         adminState.errorMessage ?? 'Failed to load overview',
@@ -173,38 +180,58 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                   ),
                 )
               else ...[
-                GridView.count(
-                  crossAxisCount:
-                      MediaQuery.of(context).size.width > 900 ? 4 : 2,
-                  crossAxisSpacing: 14,
-                  mainAxisSpacing: 14,
-                  childAspectRatio: 1.5,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  children: [
-                    DashboardCard(
-                      title: 'TOTAL USERS',
-                      value: '${adminState.overview?.totalUsers ?? 0}',
-                      icon: Icons.people,
-                    ),
-                    DashboardCard(
-                      title: 'ACTIVE MATCHES',
-                      value: '${adminState.overview?.activeMatches ?? 0}',
-                      icon: Icons.wifi_tethering,
-                    ),
-                    DashboardCard(
-                      title: 'TOTAL MATCHES',
-                      value: '${adminState.overview?.totalMatches ?? 0}',
-                      icon: Icons.sports_soccer,
-                    ),
-                    const DashboardCard(
-                      title: 'SYSTEM STATUS',
-                      value: 'GOOD',
-                      icon: Icons.health_and_safety,
-                    ),
-                  ],
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final cards = [
+                      DashboardCard(
+                        title: 'TOTAL USERS',
+                        value: '${adminState.overview?.totalUsers ?? 0}',
+                        icon: Icons.people,
+                      ),
+                      DashboardCard(
+                        title: 'ACTIVE MATCHES',
+                        value: '${adminState.overview?.activeMatches ?? 0}',
+                        icon: Icons.wifi_tethering,
+                      ),
+                      DashboardCard(
+                        title: 'TOTAL MATCHES',
+                        value: '${adminState.overview?.totalMatches ?? 0}',
+                        icon: Icons.sports_soccer,
+                      ),
+                      const DashboardCard(
+                        title: 'SYSTEM STATUS',
+                        value: 'GOOD',
+                        icon: Icons.health_and_safety,
+                      ),
+                    ];
+
+                    const spacing = 14.0;
+                    final maxWidth = constraints.maxWidth;
+                    final columns = maxWidth >= 1200
+                        ? 4
+                        : maxWidth >= 900
+                            ? 3
+                            : maxWidth >= 560
+                                ? 2
+                                : 1;
+                    final cardWidth =
+                        (maxWidth - (spacing * (columns - 1))) / columns;
+
+                    return Wrap(
+                      spacing: spacing,
+                      runSpacing: spacing,
+                      children: cards
+                          .map(
+                            (card) => SizedBox(
+                              width: cardWidth,
+                              child: card,
+                            ),
+                          )
+                          .toList(),
+                    );
+                  },
                 ),
-                const SizedBox(height: 18),
+                SizedBox(height: context.rs(18, min: 12, max: 24)),
                 Container(
                   decoration: BoxDecoration(
                     color: const Color(0xFF13243F),
@@ -252,7 +279,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 18),
+                SizedBox(height: context.rs(18, min: 12, max: 24)),
                 Container(
                   decoration: BoxDecoration(
                     color: const Color(0xFF13243F),

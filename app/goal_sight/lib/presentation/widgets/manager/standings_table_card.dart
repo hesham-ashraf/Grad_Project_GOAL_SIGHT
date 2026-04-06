@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/utils/responsive.dart';
 import '../../../features/manager/standing_entry_model.dart';
 
 class StandingsTableCard extends StatelessWidget {
@@ -15,23 +16,23 @@ class StandingsTableCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFF13243F),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(context.rs(16, min: 12, max: 22)),
         border: Border.all(color: const Color(0xFF2C406D)),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(14),
+        padding: context.padAll(14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'League Standings',
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 18,
+                fontSize: context.sp(18, min: 14, max: 24),
                 fontWeight: FontWeight.w700,
               ),
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: context.rs(10, min: 7, max: 14)),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: DataTable(

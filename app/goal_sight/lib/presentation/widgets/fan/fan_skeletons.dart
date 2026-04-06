@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
+import '../../../core/utils/responsive.dart';
+
 class FanCardSkeleton extends StatelessWidget {
   const FanCardSkeleton({
     super.key,
-    this.height = 120,
+    this.height,
     this.borderRadius = 18,
   });
 
-  final double height;
+  final double? height;
   final double borderRadius;
 
   @override
@@ -16,11 +18,13 @@ class FanCardSkeleton extends StatelessWidget {
     return Shimmer.fromColors(
       baseColor: const Color(0xFF171A2D),
       highlightColor: const Color(0xFF252A45),
-      child: Container(
+      child: SizedBox(
         height: height,
-        decoration: BoxDecoration(
-          color: const Color(0xFF171A2D),
-          borderRadius: BorderRadius.circular(borderRadius),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: const Color(0xFF171A2D),
+            borderRadius: BorderRadius.circular(borderRadius),
+          ),
         ),
       ),
     );
@@ -34,6 +38,8 @@ class FanHighlightsGridSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ratio = context.isPhone ? 1.1 : 1.3;
+
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -42,10 +48,9 @@ class FanHighlightsGridSkeleton extends StatelessWidget {
         crossAxisCount: crossAxisCount,
         crossAxisSpacing: 12,
         mainAxisSpacing: 12,
-        childAspectRatio: 1.35,
+        childAspectRatio: ratio,
       ),
-      itemBuilder: (_, __) =>
-          const FanCardSkeleton(height: 160, borderRadius: 16),
+      itemBuilder: (_, __) => const FanCardSkeleton(borderRadius: 16),
     );
   }
 }

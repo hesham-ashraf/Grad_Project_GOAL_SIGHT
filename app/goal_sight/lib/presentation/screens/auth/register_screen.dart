@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_roles.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/responsive.dart';
 import '../../../core/utils/validators.dart';
 import '../../../features/auth/auth_state.dart';
 import '../../state_management/app_providers.dart';
@@ -73,18 +74,18 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           ),
           child: Center(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(18),
+              padding: context.padAll(18),
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 420),
                 child: Column(
                   children: [
-                    const GoalSightLogo(iconSize: 64),
-                    const SizedBox(height: 22),
+                    GoalSightLogo(iconSize: context.rs(64, min: 54, max: 80)),
+                    SizedBox(height: context.rs(22, min: 16, max: 28)),
                     Container(
-                      padding: const EdgeInsets.fromLTRB(24, 26, 24, 24),
+                      padding: context.padSym(h: 24, v: 24),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(context.rs(20, min: 14, max: 26)),
                         border: Border.all(color: const Color(0xFFDCE3F1)),
                         boxShadow: const [
                           BoxShadow(
@@ -102,15 +103,17 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             Text(
                               'Create Your Account',
                               style: AppTheme.authTitleStyle(context).copyWith(
-                                fontSize: 32,
+                                fontSize: context.sp(32, min: 24, max: 40),
                               ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            const SizedBox(height: 8),
+                            SizedBox(height: context.rs(8, min: 5, max: 12)),
                             Text(
                               'Join GOALSIGHT and start analyzing football matches like a pro.',
                               style: AppTheme.authSubtitleStyle(context),
                             ),
-                            const SizedBox(height: 16),
+                            SizedBox(height: context.rs(16, min: 10, max: 22)),
                             AppTextField(
                               label: 'Full Name',
                               hintText: 'Enter your full name',
@@ -118,7 +121,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               validator: (value) =>
                                   Validators.requiredField(value, 'Name'),
                             ),
-                            const SizedBox(height: 12),
+                            SizedBox(height: context.rs(12, min: 8, max: 16)),
                             AppTextField(
                               label: 'Email Address',
                               hintText: 'Enter your email',
@@ -126,7 +129,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               keyboardType: TextInputType.emailAddress,
                               validator: Validators.email,
                             ),
-                            const SizedBox(height: 12),
+                            SizedBox(height: context.rs(12, min: 8, max: 16)),
                             AppTextField(
                               label: 'Password',
                               hintText: 'Create a strong password',
@@ -138,7 +141,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                 color: Color(0xFF8A97B6),
                               ),
                             ),
-                            const SizedBox(height: 12),
+                            SizedBox(height: context.rs(12, min: 8, max: 16)),
                             AppTextField(
                               label: 'Confirm Password',
                               hintText: 'Re-enter your password',
@@ -158,7 +161,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                 color: Color(0xFF8A97B6),
                               ),
                             ),
-                            const SizedBox(height: 12),
+                            SizedBox(height: context.rs(12, min: 8, max: 16)),
                             const Text(
                               'Account Type',
                               style: TextStyle(
@@ -166,7 +169,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
-                            const SizedBox(height: 8),
+                            SizedBox(height: context.rs(8, min: 5, max: 12)),
                             Wrap(
                               spacing: 10,
                               runSpacing: 10,
@@ -194,7 +197,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 10),
+                            SizedBox(height: context.rs(10, min: 7, max: 14)),
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
@@ -207,7 +210,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                     ),
                                   ),
                                 ),
-                                const SizedBox(width: 8),
+                                SizedBox(width: context.rs(8, min: 6, max: 10)),
                                 const Expanded(
                                   child: Text.rich(
                                     TextSpan(
@@ -237,8 +240,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               ],
                             ),
                             if (!_acceptTerms)
-                              const Padding(
-                                padding: EdgeInsets.only(top: 4),
+                              Padding(
+                                padding: EdgeInsets.only(top: context.rs(4, min: 2, max: 8)),
                                 child: Text(
                                   'You need to accept terms to continue',
                                   style: TextStyle(color: Colors.redAccent),
@@ -246,20 +249,20 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               ),
                             if (authState.status == AuthStatus.error &&
                                 authState.errorMessage != null) ...[
-                              const SizedBox(height: 8),
+                              SizedBox(height: context.rs(8, min: 5, max: 12)),
                               Text(
                                 authState.errorMessage!,
                                 style: const TextStyle(color: Colors.redAccent),
                               ),
                             ],
-                            const SizedBox(height: 12),
+                            SizedBox(height: context.rs(12, min: 8, max: 16)),
                             PrimaryButton(
                               label: 'CREATE ACCOUNT',
                               loading: loading,
                               icon: Icons.person_add_alt_1_rounded,
                               onPressed: _submit,
                             ),
-                            const SizedBox(height: 14),
+                            SizedBox(height: context.rs(14, min: 10, max: 18)),
                             Row(
                               children: const [
                                 Expanded(
@@ -275,7 +278,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                     child: Divider(color: Color(0xFFD8DFED))),
                               ],
                             ),
-                            const SizedBox(height: 14),
+                            SizedBox(height: context.rs(14, min: 10, max: 18)),
                             Row(
                               children: [
                                 Expanded(
@@ -286,7 +289,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                     label: const Text('Facebook'),
                                   ),
                                 ),
-                                const SizedBox(width: 10),
+                                SizedBox(width: context.rs(10, min: 6, max: 14)),
                                 Expanded(
                                   child: OutlinedButton.icon(
                                     onPressed: () {},
@@ -303,7 +306,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 8),
+                            SizedBox(height: context.rs(8, min: 5, max: 12)),
                             Center(
                               child: TextButton(
                                 onPressed: () {

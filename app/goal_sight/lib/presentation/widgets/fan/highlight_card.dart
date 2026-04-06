@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../features/fan/fan_highlight_model.dart';
+import '../../../core/utils/responsive.dart';
 
 class HighlightCard extends StatefulWidget {
   const HighlightCard({
@@ -121,19 +122,23 @@ class _HighlightCardState extends State<HighlightCard> {
                         const SizedBox(height: 5),
                         Row(
                           children: [
-                            Text(
-                              widget.highlight.league,
-                              style: const TextStyle(
-                                color: Color(0xFFB8C2E1),
-                                fontSize: 11,
+                            Expanded(
+                              child: Text(
+                                widget.highlight.league,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: const Color(0xFFB8C2E1),
+                                  fontSize: context.sp(11, min: 10, max: 14),
+                                ),
                               ),
                             ),
-                            const Spacer(),
+                            SizedBox(width: context.rs(8, min: 4, max: 10)),
                             Text(
                               widget.highlight.views,
-                              style: const TextStyle(
-                                color: Color(0xFF95A0C1),
-                                fontSize: 11,
+                              style: TextStyle(
+                                color: const Color(0xFF95A0C1),
+                                fontSize: context.sp(11, min: 10, max: 14),
                               ),
                             ),
                           ],

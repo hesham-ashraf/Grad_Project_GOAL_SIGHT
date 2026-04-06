@@ -4,6 +4,8 @@ import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import HomePage from './pages/HomePage'
 import TodayMatchesPage from './pages/TodayMatchesPage'
+import DashboardPage from './pages/DashboardPage'
+import AnalysisPage from './pages/AnalysisPage'
 import MainLayout from './layouts/MainLayout'
 import ProtectedRoute from './components/ProtectedRoute'
 
@@ -29,18 +31,8 @@ function App() {
           }>
             <Route path="home" element={<HomePage />} />
             <Route path="today-matches" element={<TodayMatchesPage />} />
-            <Route path="dashboard" element={
-              <div className="p-6">
-                <h1 className="text-2xl font-bold text-dark-900">Dashboard</h1>
-                <p className="text-dark-500 mt-2">Coming soon...</p>
-              </div>
-            } />
-            <Route path="analysis" element={
-              <div className="p-6">
-                <h1 className="text-2xl font-bold text-dark-900">Analysis</h1>
-                <p className="text-dark-500 mt-2">Coming soon...</p>
-              </div>
-            } />
+            <Route path="dashboard" element={<DashboardPage />} />
+            <Route path="analysis" element={<AnalysisPage />} />
             <Route path="profile" element={
               <div className="p-6">
                 <h1 className="text-2xl font-bold text-dark-900">Profile</h1>

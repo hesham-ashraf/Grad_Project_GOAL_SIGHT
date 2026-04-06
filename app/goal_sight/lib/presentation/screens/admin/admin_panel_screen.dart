@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/constants/app_roles.dart';
+import '../../../core/utils/responsive.dart';
 import '../../../features/match/match_state.dart';
 import '../../state_management/app_providers.dart';
 import '../../widgets/error_state.dart';
@@ -195,11 +196,11 @@ class _ManagementTable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(18),
+      padding: context.padAll(18),
       child: Container(
         decoration: BoxDecoration(
           color: const Color(0xFF13243F),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(context.rs(16, min: 12, max: 22)),
           border: Border.all(color: const Color(0xFF2C406D)),
           boxShadow: const [
             BoxShadow(
@@ -210,25 +211,30 @@ class _ManagementTable extends StatelessWidget {
           ],
         ),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: context.padAll(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 title,
-                style: const TextStyle(
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
                   color: Colors.white,
-                  fontSize: 22,
+                  fontSize: context.sp(22, min: 16, max: 28),
                   fontWeight: FontWeight.w700,
                 ),
               ),
-              const SizedBox(height: 4),
+              SizedBox(height: context.rs(4, min: 2, max: 8)),
               Text(
                 subtitle,
-                style: const TextStyle(color: Color(0xFF8EA3CD)),
+                style: TextStyle(
+                  color: const Color(0xFF8EA3CD),
+                  fontSize: context.sp(13, min: 11, max: 16),
+                ),
               ),
               if (onAddPressed != null) ...[
-                const SizedBox(height: 10),
+                SizedBox(height: context.rs(10, min: 7, max: 14)),
                 Align(
                   alignment: Alignment.centerRight,
                   child: FilledButton.icon(
@@ -238,7 +244,7 @@ class _ManagementTable extends StatelessWidget {
                   ),
                 ),
               ],
-              const SizedBox(height: 14),
+              SizedBox(height: context.rs(14, min: 10, max: 20)),
               Expanded(
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
@@ -269,8 +275,9 @@ class _ManagementTable extends StatelessWidget {
                                   (cell) => DataCell(
                                     Text(
                                       cell,
-                                      style:
-                                          const TextStyle(color: Colors.white),
+                                      style: const TextStyle(color: Colors.white),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
                                 )

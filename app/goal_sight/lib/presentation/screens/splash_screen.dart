@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/utils/responsive.dart';
 import '../../core/theme/app_theme.dart';
 import '../../features/auth/auth_state.dart';
 import '../state_management/app_providers.dart';
@@ -46,8 +47,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const GoalSightLogo(iconSize: 74),
-              const SizedBox(height: 24),
+              GoalSightLogo(iconSize: context.rs(74, min: 58, max: 90)),
+              SizedBox(height: context.rs(24, min: 16, max: 32)),
               if (isLoading)
                 const CircularProgressIndicator(color: AppTheme.brandBlue),
             ],

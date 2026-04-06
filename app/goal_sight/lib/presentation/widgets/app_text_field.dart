@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../core/utils/responsive.dart';
+
 class AppTextField extends StatelessWidget {
   const AppTextField({
     super.key,
@@ -27,10 +29,13 @@ class AppTextField extends StatelessWidget {
       validator: validator,
       keyboardType: keyboardType,
       obscureText: obscureText,
+      style: TextStyle(fontSize: context.sp(15, min: 13, max: 19)),
       decoration: InputDecoration(
         labelText: label,
         hintText: hintText,
         suffixIcon: suffixIcon,
+        isDense: true,
+        contentPadding: context.padSym(h: 14, v: 14),
       ),
     );
   }

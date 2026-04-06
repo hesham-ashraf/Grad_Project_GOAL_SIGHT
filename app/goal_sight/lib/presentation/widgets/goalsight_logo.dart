@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/theme/app_theme.dart';
+import '../../core/utils/responsive.dart';
 
 class GoalSightLogo extends StatelessWidget {
   const GoalSightLogo({
@@ -14,14 +15,18 @@ class GoalSightLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final responsiveIconSize =
+        (iconSize * (context.isCompact ? 0.86 : context.isTablet ? 1.08 : 1))
+            .clamp(52.0, 96.0);
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          width: iconSize,
-          height: iconSize,
+          width: responsiveIconSize,
+          height: responsiveIconSize,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(iconSize * 0.26),
+            borderRadius: BorderRadius.circular(responsiveIconSize * 0.26),
             gradient: AppTheme.brandGradient,
             boxShadow: const [
               BoxShadow(
@@ -34,31 +39,36 @@ class GoalSightLogo extends StatelessWidget {
           child: Icon(
             Icons.sports_soccer_rounded,
             color: Colors.white,
-            size: iconSize * 0.46,
+            size: responsiveIconSize * 0.46,
           ),
         ),
-        const SizedBox(height: 12),
-        ShaderMask(
-          shaderCallback: (bounds) =>
-              AppTheme.brandGradient.createShader(bounds),
-          child: const Text(
-            'GOALSIGHT',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w800,
-              fontSize: 38,
-              letterSpacing: 0.6,
+        SizedBox(height: context.rs(12, min: 8, max: 16)),
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: ShaderMask(
+            shaderCallback: (bounds) =>
+                AppTheme.brandGradient.createShader(bounds),
+            child: Text(
+              'GOALSIGHT',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w800,
+                fontSize: context.sp(38, min: 26, max: 46),
+                letterSpacing: 0.6,
+              ),
             ),
           ),
         ),
         if (showSubtitle) ...[
-          const SizedBox(height: 4),
-          const Text(
+          SizedBox(height: context.rs(4, min: 2, max: 8)),
+          Text(
             'Football Analytics Platform',
             style: TextStyle(
               color: Color(0xFF617091),
               fontWeight: FontWeight.w500,
+              fontSize: context.sp(13, min: 11, max: 16),
             ),
+            textAlign: TextAlign.center,
           ),
         ],
       ],

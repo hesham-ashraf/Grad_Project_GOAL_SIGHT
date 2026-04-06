@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/utils/responsive.dart';
 import '../../state_management/app_providers.dart';
 
 class PlayerProfileScreen extends ConsumerWidget {
@@ -30,7 +31,7 @@ class PlayerProfileScreen extends ConsumerWidget {
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: context.padAll(16),
           child: player == null
               ? const Center(
                   child: Text(
@@ -38,60 +39,76 @@ class PlayerProfileScreen extends ConsumerWidget {
                     style: TextStyle(color: Colors.white),
                   ),
                 )
-              : Container(
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF13243F),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: const Color(0xFF2C406D)),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color(0x446F58F5),
-                        blurRadius: 18,
-                        offset: Offset(0, 5),
-                      ),
-                    ],
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          player.name,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 30,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Position: ${player.position}',
-                          style: const TextStyle(color: Color(0xFF8EA3CD)),
-                        ),
-                        const SizedBox(height: 14),
-                        const Text(
-                          'Performance Snapshot',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        const Text(
-                          '- Sprint speed: 8.9 m/s',
-                          style: TextStyle(color: Color(0xFFD4DFFF)),
-                        ),
-                        const Text(
-                          '- Pass completion: 84%',
-                          style: TextStyle(color: Color(0xFFD4DFFF)),
-                        ),
-                        const Text(
-                          '- Stamina index: 90/100',
-                          style: TextStyle(color: Color(0xFFD4DFFF)),
+              : SingleChildScrollView(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF13243F),
+                      borderRadius: BorderRadius.circular(context.rs(16, min: 12, max: 22)),
+                      border: Border.all(color: const Color(0xFF2C406D)),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color(0x446F58F5),
+                          blurRadius: 18,
+                          offset: Offset(0, 5),
                         ),
                       ],
+                    ),
+                    child: Padding(
+                      padding: context.padAll(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            player.name,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: context.sp(30, min: 22, max: 38),
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          SizedBox(height: context.rs(8, min: 5, max: 12)),
+                          Text(
+                            'Position: ${player.position}',
+                            style: TextStyle(
+                              color: const Color(0xFF8EA3CD),
+                              fontSize: context.sp(14, min: 12, max: 18),
+                            ),
+                          ),
+                          SizedBox(height: context.rs(14, min: 10, max: 20)),
+                          Text(
+                            'Performance Snapshot',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: context.sp(18, min: 14, max: 24),
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          SizedBox(height: context.rs(8, min: 5, max: 12)),
+                          Text(
+                            '- Sprint speed: 8.9 m/s',
+                            style: TextStyle(
+                              color: const Color(0xFFD4DFFF),
+                              fontSize: context.sp(14, min: 12, max: 18),
+                            ),
+                          ),
+                          Text(
+                            '- Pass completion: 84%',
+                            style: TextStyle(
+                              color: const Color(0xFFD4DFFF),
+                              fontSize: context.sp(14, min: 12, max: 18),
+                            ),
+                          ),
+                          Text(
+                            '- Stamina index: 90/100',
+                            style: TextStyle(
+                              color: const Color(0xFFD4DFFF),
+                              fontSize: context.sp(14, min: 12, max: 18),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
