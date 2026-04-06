@@ -37,3 +37,16 @@ coverage/
 .turbo
 .vercel
 .netlify
+
+# Flutter app (app/goal_sight)
+app/goal_sight/.dart_tool/
+app/goal_sight/.flutter-plugins-dependencies
+app/goal_sight/.pub/
+app/goal_sight/.pub-cache/
+app/goal_sight/build/
+app/goal_sight/coverage/
+app/goal_sight/**/doc/api/
+app/goal_sight/**/ios/Flutter/.last_build_id
+app/goal_sight/android/app/debug/
+app/goal_sight/android/app/profile/
+app/goal_sight/android/app/release/

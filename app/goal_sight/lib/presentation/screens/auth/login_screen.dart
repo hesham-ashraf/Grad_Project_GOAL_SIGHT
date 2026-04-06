@@ -64,6 +64,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     return Theme(
       data: AppTheme.lightTheme(),
       child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          surfaceTintColor: Colors.transparent,
+          foregroundColor: const Color(0xFF23304C),
+        ),
         body: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -257,7 +263,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             const SizedBox(height: 10),
                             Center(
                               child: TextButton(
-                                onPressed: () => context.go('/register'),
+                                onPressed: () => context.push('/register'),
                                 child: RichText(
                                   text: const TextSpan(
                                     style: TextStyle(color: Color(0xFF23304C)),

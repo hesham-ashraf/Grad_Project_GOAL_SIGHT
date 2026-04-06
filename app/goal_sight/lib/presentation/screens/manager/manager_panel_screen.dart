@@ -163,7 +163,7 @@ class ManagerPanelScreen extends ConsumerWidget {
                               ),
                               trailing: TextButton(
                                 onPressed: () =>
-                                    context.go('/player/${member.id}'),
+                                    context.push('/player/${member.id}'),
                                 child: const Text('View'),
                               ),
                             ),

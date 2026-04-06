@@ -185,7 +185,7 @@ class _ManagerDashboardScreenState
                     final player = teamMembers[index];
                     return TeamMemberCard(
                       player: player,
-                      onTap: () => context.go('/player/${player.id}'),
+                      onTap: () => context.push('/player/${player.id}'),
                     );
                   },
                 ),
@@ -203,7 +203,7 @@ class _ManagerDashboardScreenState
                     label: const Text('Upload Match'),
                   ),
                   OutlinedButton.icon(
-                    onPressed: () => context.go('/manager-panel'),
+                    onPressed: () => context.push('/manager-panel'),
                     icon: const Icon(Icons.analytics),
                     label: const Text('Open Analytics Panel'),
                     style: OutlinedButton.styleFrom(
@@ -297,13 +297,13 @@ class _ManagerDashboardScreenState
                                     children: [
                                       IconButton(
                                         onPressed: () =>
-                                            context.go('/match/${match.id}'),
+                                            context.push('/match/${match.id}'),
                                         icon: const Icon(Icons.edit_outlined),
                                         color: Colors.white,
                                       ),
                                       IconButton(
                                         onPressed: () => context
-                                            .go('/live-match/${match.id}'),
+                                            .push('/live-match/${match.id}'),
                                         icon: const Icon(Icons.wifi_tethering),
                                         color: Colors.white,
                                       ),

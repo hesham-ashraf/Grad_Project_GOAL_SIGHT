@@ -57,6 +57,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     return Theme(
       data: AppTheme.lightTheme(),
       child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          surfaceTintColor: Colors.transparent,
+          foregroundColor: const Color(0xFF23304C),
+        ),
         body: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -300,7 +306,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             const SizedBox(height: 8),
                             Center(
                               child: TextButton(
-                                onPressed: () => context.go('/login'),
+                                onPressed: () {
+                                  if (context.canPop()) {
+                                    context.pop();
+                                  } else {
+                                    context.push('/login');
+                                  }
+                                },
                                 child: RichText(
                                   text: const TextSpan(
                                     style: TextStyle(color: Color(0xFF23304C)),

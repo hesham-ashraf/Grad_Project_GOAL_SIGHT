@@ -98,7 +98,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
             tooltip: 'Add Match',
           ),
           TextButton.icon(
-            onPressed: () => context.go('/admin-panel'),
+            onPressed: () => context.push('/admin-panel'),
             icon: const Icon(Icons.manage_accounts, color: Colors.white),
             label: const Text('Manage', style: TextStyle(color: Colors.white)),
           ),
@@ -148,7 +148,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                     label: const Text('Create Match'),
                   ),
                   OutlinedButton.icon(
-                    onPressed: () => context.go('/admin-panel'),
+                    onPressed: () => context.push('/admin-panel'),
                     icon: const Icon(Icons.table_view),
                     label: const Text('Open Management Tables'),
                     style: OutlinedButton.styleFrom(
