@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
 import '../../../data/models/club_model.dart';
-import '../../state_management/fan_mock_providers.dart';
+import '../../state_management/clubs_provider.dart';
 import '../../widgets/fan/club_card.dart';
 
 class ClubsScreen extends ConsumerStatefulWidget {

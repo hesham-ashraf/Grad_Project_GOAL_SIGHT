@@ -131,6 +131,16 @@ class PlayerListTile extends StatelessWidget {
                     ),
                   ],
                 ),
+                if (player.performanceSummary.isNotEmpty) ...[
+                  SizedBox(height: context.rs(6, min: 4, max: 8)),
+                  Text(
+                    player.performanceSummary,
+                    style: AppTextStyles.caption(color: AppColors.textSecondary)
+                        .copyWith(fontStyle: FontStyle.italic, fontSize: 11),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ],
             ),
           ),
