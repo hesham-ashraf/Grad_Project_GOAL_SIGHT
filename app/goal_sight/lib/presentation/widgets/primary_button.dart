@@ -25,17 +25,11 @@ class PrimaryButton extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: loading
             ? const LinearGradient(
-                colors: [Color(0xFF9DA7BF), Color(0xFF8A95B5)],
+                colors: [AppColors.surfaceRaised, AppColors.surfaceElevated],
               )
             : AppTheme.brandGradient,
         borderRadius: BorderRadius.circular(radius),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x447057F5),
-            blurRadius: 14,
-            offset: Offset(0, 6),
-          ),
-        ],
+        boxShadow: AppShadows.buttonGlow,
       ),
       child: SizedBox(
         width: double.infinity,
@@ -68,7 +62,7 @@ class PrimaryButton extends StatelessWidget {
             ),
           ),
           style: TextButton.styleFrom(
-            padding: context.padSym(v: 14, h: 12),
+            padding: AppSpacing.button,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(radius),
             ),

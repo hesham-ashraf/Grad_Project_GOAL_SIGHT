@@ -1,0 +1,206 @@
+import 'dart:ui';
+
+import 'package:flutter/material.dart';
+
+import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/responsive.dart';
+import 'tap_scale.dart';
+
+class FanNavigationItem {
+  const FanNavigationItem({
+    required this.label,
+    required this.icon,
+    required this.activeIcon,
+  });
+
+  final String label;
+  final IconData icon;
+  final IconData activeIcon;
+}
+
+class FanBottomNavigationBar extends StatelessWidget {
+  const FanBottomNavigationBar({
+    super.key,
+    required this.items,
+    required this.currentIndex,
+    required this.onChanged,
+  });
+
+  static const double _horizontalPadding = 16;
+  static const double _verticalPadding = 10;
+  static const double _contentHeight = 72;
+  static const double _radius = 28;
+  static const Duration _animationDuration = Duration(milliseconds: 220);
+
+  final List<FanNavigationItem> items;
+  final int currentIndex;
+  final ValueChanged<int> onChanged;
+
+  static double totalHeight(BuildContext context) {
+    return MediaQuery.of(context).viewPadding.bottom +
+        (_verticalPadding * 2) +
+        _contentHeight;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bottomInset = MediaQuery.of(context).viewPadding.bottom;
+    final iconSize = context.isCompact ? 19.0 : 20.0;
+    final labelFontSize = context.isCompact ? 9.5 : 10.5;
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        _horizontalPadding,
+        0,
+        _horizontalPadding,
+        bottomInset + _verticalPadding,
+      ),
+      child: Align(
+        heightFactor: 1.0,
+        alignment: Alignment.center,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 680),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(_radius),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: AppColors.surface.withValues(alpha: 0.84),
+                  borderRadius: BorderRadius.circular(_radius),
+                  border: Border.all(
+                    color: AppColors.outlineSubtle.withValues(alpha: 0.95),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.3),
+                      blurRadius: 28,
+                      offset: const Offset(0, 12),
+                    ),
+                    BoxShadow(
+                      color: AppColors.primaryPurple.withValues(alpha: 0.07),
+                      blurRadius: 22,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: SizedBox(
+                  height: _contentHeight,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                    child: Row(
+                      children: List.generate(items.length, (index) {
+                        final item = items[index];
+                        final isSelected = index == currentIndex;
+                        final iconColor = isSelected
+                            ? Colors.white
+                            : AppColors.textMuted;
+
+                        return Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: context.rs(2, min: 1, max: 4),
+                            ),
+                            child: TapScale(
+                              onTap: () => onChanged(index),
+                              scaleDown: 0.97,
+                              duration: _animationDuration,
+                              child: Semantics(
+                                button: true,
+                                selected: isSelected,
+                                label: item.label,
+                                child: AnimatedContainer(
+                                  duration: _animationDuration,
+                                  curve: Curves.easeOutCubic,
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: context.rs(6, min: 4, max: 8),
+                                  ),
+                                  decoration: BoxDecoration(
+                                    gradient: isSelected
+                                        ? LinearGradient(
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomRight,
+                                            colors: [
+                                              AppColors.primaryPurple
+                                                  .withValues(alpha: 0.36),
+                                              AppColors.accentCyan
+                                                  .withValues(alpha: 0.2),
+                                            ],
+                                          )
+                                        : null,
+                                    color: isSelected
+                                        ? AppColors.primaryPurple
+                                            .withValues(alpha: 0.14)
+                                        : Colors.transparent,
+                                    borderRadius: BorderRadius.circular(22),
+                                    border: Border.all(
+                                      color: isSelected
+                                          ? Colors.white.withValues(alpha: 0.12)
+                                          : Colors.transparent,
+                                    ),
+                                    boxShadow: isSelected
+                                        ? [
+                                            BoxShadow(
+                                              color: AppColors.accentCyan
+                                                  .withValues(alpha: 0.18),
+                                              blurRadius: 20,
+                                              offset: const Offset(0, 8),
+                                            ),
+                                          ]
+                                        : const [],
+                                  ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      AnimatedScale(
+                                        scale: isSelected ? 1.0 : 0.92,
+                                        duration: _animationDuration,
+                                        curve: Curves.easeOutCubic,
+                                        child: Icon(
+                                          isSelected
+                                              ? item.activeIcon
+                                              : item.icon,
+                                          size: iconSize,
+                                          color: iconColor,
+                                        ),
+                                      ),
+                                      SizedBox(height: context.rs(4, min: 3, max: 5)),
+                                      AnimatedDefaultTextStyle(
+                                        duration: _animationDuration,
+                                        curve: Curves.easeOutCubic,
+                                        style: AppTextStyles.caption(
+                                          color: iconColor,
+                                        ).copyWith(
+                                          fontSize: labelFontSize,
+                                          fontWeight: isSelected
+                                              ? FontWeight.w700
+                                              : FontWeight.w600,
+                                          height: 1.05,
+                                        ),
+                                        child: Text(
+                                          item.label,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      }),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

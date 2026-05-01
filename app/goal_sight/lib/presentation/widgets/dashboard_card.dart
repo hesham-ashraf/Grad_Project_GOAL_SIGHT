@@ -16,21 +16,17 @@ class DashboardCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Container(
       decoration: BoxDecoration(
-        color: AppTheme.darkSurface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFF2A3A60)),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x4B6B57F5),
-            blurRadius: 18,
-            offset: Offset(0, 6),
-          ),
-        ],
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        border: Border.all(color: colorScheme.outline),
+        boxShadow: AppShadows.cardGlow,
       ),
       child: Padding(
-        padding: const EdgeInsets.all(14),
+        padding: AppSpacing.cardCompact,
         child: LayoutBuilder(
           builder: (context, constraints) {
             final compact = constraints.maxWidth < 150;
@@ -44,7 +40,8 @@ class DashboardCard extends StatelessWidget {
                   height: compact ? 30 : 34,
                   decoration: BoxDecoration(
                     gradient: AppTheme.brandGradient,
-                    borderRadius: BorderRadius.circular(compact ? 8 : 10),
+                    borderRadius: BorderRadius.circular(
+                        compact ? AppRadius.sm - 2 : AppRadius.sm),
                   ),
                   child: Icon(
                     icon,
@@ -58,7 +55,7 @@ class DashboardCard extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: const Color(0xFFA7B5D4),
+                    color: colorScheme.onSurfaceVariant,
                     fontSize: compact ? 11 : 12,
                     fontWeight: FontWeight.w500,
                     height: 1.2,
@@ -71,7 +68,7 @@ class DashboardCard extends StatelessWidget {
                   child: Text(
                     value,
                     style: TextStyle(
-                      color: Colors.white,
+                      color: colorScheme.onSurface,
                       fontSize: compact ? 22 : 26,
                       fontWeight: FontWeight.w800,
                     ),

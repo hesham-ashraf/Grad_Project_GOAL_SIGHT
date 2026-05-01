@@ -8,17 +8,18 @@ import '../screens/admin/admin_panel_screen.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/register_screen.dart';
 import '../screens/dashboard/admin_dashboard_screen.dart';
-import '../screens/dashboard/fan_dashboard_screen.dart';
 import '../screens/dashboard/manager_dashboard_screen.dart';
+import '../screens/fan/fan_navigation_screen.dart';
 import '../screens/manager/manager_panel_screen.dart';
 import '../screens/match/live_match_screen.dart';
 import '../screens/match/match_details_screen.dart';
 import '../screens/player/player_profile_screen.dart';
 import '../screens/splash_screen.dart';
+import '../screens/fan/match_analysis_screen.dart';
 import 'app_providers.dart';
 
 // Temporary: set to false when you finish Supabase testing.
-const bool kShowSupabaseTestPage = true;
+const bool kShowSupabaseTestPage = false;
 
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authControllerProvider);
@@ -93,11 +94,18 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/fan',
-        builder: (context, state) => const FanDashboardScreen(),
+        builder: (context, state) => const FanNavigationScreen(),
       ),
       GoRoute(
         path: '/admin',
         builder: (context, state) => const AdminDashboardScreen(),
+      ),
+      GoRoute(
+        path: '/fan-match-analysis',
+        builder: (context, state) {
+          // Extra parameters could be passed via state.extra if needed
+          return const MatchAnalysisScreen();
+        },
       ),
       GoRoute(
         path: '/manager-panel',

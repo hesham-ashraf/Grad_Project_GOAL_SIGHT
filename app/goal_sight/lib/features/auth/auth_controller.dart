@@ -1,38 +1,29 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/constants/app_roles.dart';
+import '../../data/models/user_model.dart';
 import '../../data/repositories/auth_repository.dart';
 import 'auth_state.dart';
 
 class AuthController extends StateNotifier<AuthState> {
-  AuthController(this._authRepository) : super(AuthState.initial());
+  AuthController(this._authRepository) : super(
+    const AuthState(
+      status: AuthStatus.authenticated,
+      user: UserModel(
+        id: 'mock_fan',
+        name: 'Fan User',
+        email: 'fan@example.com',
+        role: UserRole.fan,
+      ),
+      token: 'mock_token',
+    ),
+  );
 
   final IAuthRepository _authRepository;
 
   Future<void> restoreSession() async {
-    if (state.status == AuthStatus.loading) return;
-    state = state.copyWith(status: AuthStatus.loading, clearError: true);
-    try {
-      final user = await _authRepository.restoreSession();
-      final token = await _authRepository.getToken();
-
-      if (user == null || token == null) {
-        state = state.copyWith(status: AuthStatus.unauthenticated, user: null);
-        return;
-      }
-
-      state = state.copyWith(
-        status: AuthStatus.authenticated,
-        user: user,
-        token: token,
-        clearError: true,
-      );
-    } catch (error) {
-      state = state.copyWith(
-        status: AuthStatus.error,
-        errorMessage: error.toString(),
-      );
-    }
+    // Bypassing for UI work
+    return;
   }
 
   Future<void> login({required String email, required String password}) async {

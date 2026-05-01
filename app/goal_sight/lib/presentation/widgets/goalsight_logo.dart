@@ -15,9 +15,13 @@ class GoalSightLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final responsiveIconSize =
-        (iconSize * (context.isCompact ? 0.86 : context.isTablet ? 1.08 : 1))
-            .clamp(52.0, 96.0);
+    final responsiveIconSize = (iconSize *
+            (context.isCompact
+                ? 0.86
+                : context.isTablet
+                    ? 1.08
+                    : 1))
+        .clamp(52.0, 96.0);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -28,13 +32,7 @@ class GoalSightLogo extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(responsiveIconSize * 0.26),
             gradient: AppTheme.brandGradient,
-            boxShadow: const [
-              BoxShadow(
-                color: Color(0x4D705AF5),
-                blurRadius: 16,
-                offset: Offset(0, 6),
-              ),
-            ],
+            boxShadow: AppShadows.cardGlow,
           ),
           child: Icon(
             Icons.sports_soccer_rounded,
@@ -64,7 +62,7 @@ class GoalSightLogo extends StatelessWidget {
           Text(
             'Football Analytics Platform',
             style: TextStyle(
-              color: Color(0xFF617091),
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
               fontWeight: FontWeight.w500,
               fontSize: context.sp(13, min: 11, max: 16),
             ),
