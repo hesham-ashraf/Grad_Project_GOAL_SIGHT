@@ -1,17 +1,13 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
-
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
-import '../../../data/models/match_model.dart';
-import '../../widgets/fan/match_analysis_widgets.dart';
+import '../../../data/models/match_analysis_model.dart';
+import '../../widgets/fan/analysis_widgets.dart';
 
 class MatchAnalysisScreen extends StatefulWidget {
-  const MatchAnalysisScreen({
-    super.key,
-    required this.match,
-  });
-
-  final MatchModel match;
+  const MatchAnalysisScreen({super.key, required this.match});
+  final MatchAnalysisModel match;
 
   @override
   State<MatchAnalysisScreen> createState() => _MatchAnalysisScreenState();
@@ -19,242 +15,191 @@ class MatchAnalysisScreen extends StatefulWidget {
 
 class _MatchAnalysisScreenState extends State<MatchAnalysisScreen>
     with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-  late final Animation<double> _overviewFade;
-  late final Animation<Offset> _overviewSlide;
-  late final Animation<double> _playersFade;
-  late final Animation<Offset> _playersSlide;
-  late final Animation<double> _tacticalFade;
-  late final Animation<Offset> _tacticalSlide;
-  late final Animation<double> _listFade;
-  late final Animation<Offset> _listSlide;
+  late final AnimationController _ctrl;
+
+  Animation<double> _fade(double start, double end) => CurvedAnimation(
+        parent: _ctrl,
+        curve: Interval(start, end, curve: Curves.easeOutCubic),
+      );
+
+  Animation<Offset> _slide(Animation<double> fade) =>
+      Tween<Offset>(begin: const Offset(0, 0.06), end: Offset.zero).animate(fade);
+
+  late final Animation<double> _f0, _f1, _f2, _f3, _f4;
+  late final Animation<Offset> _s0, _s1, _s2, _s3, _s4;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1200),
-    )..forward();
-
-    _overviewFade = CurvedAnimation(
-      parent: _controller,
-      curve: const Interval(0.0, 0.3, curve: Curves.easeOutCubic),
-    );
-    _overviewSlide = Tween<Offset>(
-      begin: const Offset(0, 0.05),
-      end: Offset.zero,
-    ).animate(_overviewFade);
-
-    _playersFade = CurvedAnimation(
-      parent: _controller,
-      curve: const Interval(0.15, 0.45, curve: Curves.easeOutCubic),
-    );
-    _playersSlide = Tween<Offset>(
-      begin: const Offset(0, 0.05),
-      end: Offset.zero,
-    ).animate(_playersFade);
-
-    _tacticalFade = CurvedAnimation(
-      parent: _controller,
-      curve: const Interval(0.3, 0.6, curve: Curves.easeOutCubic),
-    );
-    _tacticalSlide = Tween<Offset>(
-      begin: const Offset(0, 0.05),
-      end: Offset.zero,
-    ).animate(_tacticalFade);
-
-    _listFade = CurvedAnimation(
-      parent: _controller,
-      curve: const Interval(0.45, 0.8, curve: Curves.easeOutCubic),
-    );
-    _listSlide = Tween<Offset>(
-      begin: const Offset(0, 0.05),
-      end: Offset.zero,
-    ).animate(_listFade);
+    _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 1100))..forward();
+    _f0 = _fade(0.0, 0.3); _s0 = _slide(_f0);
+    _f1 = _fade(0.15, 0.45); _s1 = _slide(_f1);
+    _f2 = _fade(0.3, 0.6); _s2 = _slide(_f2);
+    _f3 = _fade(0.5, 0.8); _s3 = _slide(_f3);
+    _f4 = _fade(0.7, 1.0); _s4 = _slide(_f4);
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _ctrl.dispose();
     super.dispose();
   }
+
+  Widget _animated(Animation<double> f, Animation<Offset> s, Widget child) =>
+      FadeTransition(opacity: f, child: SlideTransition(position: s, child: child));
 
   @override
   Widget build(BuildContext context) {
     final match = widget.match;
-    final bestPlayer = match.players.where((p) => p.isBest).firstOrNull;
-    final worstPlayer = match.players.where((p) => p.isWorst).firstOrNull;
+    final h = context.rs(20, min: 16, max: 24);
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text('Match Analysis'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-      ),
+      extendBodyBehindAppBar: true,
+      appBar: _buildAppBar(context, match),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
-        padding: EdgeInsets.all(context.rs(20, min: 16, max: 24)),
+        padding: EdgeInsets.fromLTRB(h, 0, h, context.rs(40, min: 32, max: 56)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Match Overview
-            FadeTransition(
-              opacity: _overviewFade,
-              child: SlideTransition(
-                position: _overviewSlide,
-                child: MatchOverviewCard(
-                  homeTeam: match.homeTeam,
-                  awayTeam: match.awayTeam,
-                  score: match.score,
-                  summary: match.summary.isNotEmpty ? match.summary : 'No summary available.',
-                  dominantTeam: match.dominantTeam.isNotEmpty ? match.dominantTeam : 'Balanced',
-                  homeColor: match.homeColor,
-                  awayColor: match.awayColor,
-                ),
-              ),
-            ),
-            SizedBox(height: context.rs(24, min: 20, max: 32)),
+            SizedBox(height: MediaQuery.of(context).padding.top + kToolbarHeight + 12),
 
-            // Key Players
-            if (bestPlayer != null || worstPlayer != null) ...[
-              FadeTransition(
-                opacity: _playersFade,
-                child: SlideTransition(
-                  position: _playersSlide,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Key Performers',
-                        style: AppTextStyles.title(color: AppColors.textPrimary),
-                      ),
-                      SizedBox(height: context.rs(16, min: 12, max: 20)),
-                      Row(
-                        children: [
-                          if (bestPlayer != null)
-                            Expanded(
-                              child: KeyPlayerCard(
-                                title: 'Man of the Match',
-                                playerName: bestPlayer.name,
-                                rating: bestPlayer.rating,
-                                insight: bestPlayer.insight,
-                                isBest: true,
-                              ),
-                            ),
-                          if (bestPlayer != null && worstPlayer != null)
-                            SizedBox(width: context.rs(12, min: 8, max: 16)),
-                          if (worstPlayer != null)
-                            Expanded(
-                              child: KeyPlayerCard(
-                                title: 'Needs Improvement',
-                                playerName: worstPlayer.name,
-                                rating: worstPlayer.rating,
-                                insight: worstPlayer.insight,
-                                isBest: false,
-                              ),
-                            ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              SizedBox(height: context.rs(24, min: 20, max: 32)),
+            // ── Overview ──────────────────────────────────────────────────
+            _animated(_f0, _s0, AnalysisOverviewCard(match: match)),
+            SizedBox(height: h),
+
+            // ── Key Moments ───────────────────────────────────────────────
+            if (match.summary.keyMoments.isNotEmpty) ...[
+              _animated(_f1, _s1, KeyMomentsCard(moments: match.summary.keyMoments)),
+              SizedBox(height: h),
             ],
 
-            // Tactical Analysis
-            if (match.tactics != null) ...[
-              FadeTransition(
-                opacity: _tacticalFade,
-                child: SlideTransition(
-                  position: _tacticalSlide,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Tactical Breakdown',
-                        style: AppTextStyles.title(color: AppColors.textPrimary),
-                      ),
-                      SizedBox(height: context.rs(16, min: 12, max: 20)),
-                      TacticalRow(
-                        possessionHome: match.tactics!.homePossession,
-                        styleHome: match.tactics!.homeStyle,
-                        pressureHome: match.tactics!.homePressure,
-                        styleAway: match.tactics!.awayStyle,
-                        pressureAway: match.tactics!.awayPressure,
-                        homeColor: match.homeColor,
-                        awayColor: match.awayColor,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              SizedBox(height: context.rs(24, min: 20, max: 32)),
+            // ── Key Performers ────────────────────────────────────────────
+            if (match.motm != null || match.worstPlayer != null) ...[
+              _animated(_f1, _s1, KeyPerformerRow(motm: match.motm, worst: match.worstPlayer)),
+              SizedBox(height: h),
             ],
 
-            // Player Performances
-            if (match.players.isNotEmpty) ...[
-              FadeTransition(
-                opacity: _listFade,
-                child: SlideTransition(
-                  position: _listSlide,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Squad Ratings',
-                        style: AppTextStyles.title(color: AppColors.textPrimary),
-                      ),
-                      SizedBox(height: context.rs(16, min: 12, max: 20)),
-                      ...match.players.map((p) => Padding(
-                            padding: EdgeInsets.only(bottom: context.rs(8, min: 4, max: 12)),
-                            child: PlayerListItem(
-                              name: p.name,
-                              rating: p.rating,
-                              insight: p.insight,
-                              isHighRated: p.rating >= 7.5,
-                            ),
-                          )),
-                    ],
-                  ),
-                ),
-              ),
-              SizedBox(height: context.rs(24, min: 20, max: 32)),
-            ],
+            // ── Tactical Analysis ─────────────────────────────────────────
+            _animated(_f2, _s2, TacticalAnalysisCard(match: match)),
+            SizedBox(height: h),
 
-            // AI Recommendations
-            if (match.recommendations.isNotEmpty) ...[
-              FadeTransition(
-                opacity: _listFade,
-                child: SlideTransition(
-                  position: _listSlide,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'AI Coach Recommendations',
-                        style: AppTextStyles.title(color: AppColors.textPrimary),
-                      ),
-                      SizedBox(height: context.rs(16, min: 12, max: 20)),
-                      ...match.recommendations.map((rec) => Padding(
-                            padding: EdgeInsets.only(bottom: context.rs(8, min: 4, max: 12)),
-                            child: RecommendationCard(
-                              recommendation: rec,
-                            ),
-                          )),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-            SizedBox(height: context.rs(40, min: 24, max: 60)), // Bottom padding
+            // ── Player List ───────────────────────────────────────────────
+            _animated(_f3, _s3, _PlayerListSection(players: match.players)),
+            SizedBox(height: h),
+
+            // ── Recommendations ───────────────────────────────────────────
+            if (match.recommendations.isNotEmpty)
+              _animated(_f4, _s4, RecommendationsCard(items: match.recommendations)),
           ],
         ),
       ),
+    );
+  }
+
+  PreferredSizeWidget _buildAppBar(BuildContext context, MatchAnalysisModel match) {
+    return AppBar(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      titleSpacing: 0,
+      leading: Padding(
+        padding: const EdgeInsets.all(8),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+            child: Container(
+              decoration: BoxDecoration(
+                color: AppColors.surface.withValues(alpha: 0.7),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.outlineSubtle),
+              ),
+              child: IconButton(
+                icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary, size: 18),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ),
+          ),
+        ),
+      ),
+      title: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('${match.homeTeam} vs ${match.awayTeam}',
+              style: AppTextStyles.body(color: AppColors.textPrimary)
+                  .copyWith(fontWeight: FontWeight.w700, fontSize: 13),
+              maxLines: 1, overflow: TextOverflow.ellipsis),
+          Text(match.date, style: AppTextStyles.caption(color: AppColors.textMuted)),
+        ],
+      ),
+      actions: [
+        Padding(
+          padding: const EdgeInsets.only(right: 12, top: 8, bottom: 8),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: AppColors.surface.withValues(alpha: 0.7),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.outlineSubtle),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      match.intensity >= 80 ? Icons.local_fire_department_rounded : Icons.sports_soccer_rounded,
+                      color: match.intensity >= 80 ? AppColors.danger : AppColors.accentCyan,
+                      size: 16,
+                    ),
+                    const SizedBox(width: 5),
+                    Text('${match.intensity}',
+                        style: AppTextStyles.caption(
+                          color: match.intensity >= 80 ? AppColors.danger : AppColors.accentCyan,
+                        ).copyWith(fontWeight: FontWeight.w700)),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ─── Player List Section ──────────────────────────────────────────────────────
+
+class _PlayerListSection extends StatelessWidget {
+  const _PlayerListSection({required this.players});
+  final List<PlayerModel> players;
+
+  @override
+  Widget build(BuildContext context) {
+    final sorted = [...players]..sort((a, b) => b.rating.compareTo(a.rating));
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            Container(width: 3, height: 20, decoration: BoxDecoration(color: AppColors.primaryBlue, borderRadius: BorderRadius.circular(2))),
+            const SizedBox(width: 10),
+            const Icon(Icons.people_alt_rounded, color: AppColors.primaryBlue, size: 18),
+            const SizedBox(width: 8),
+            Text('Player Ratings',
+                style: AppTextStyles.title(color: AppColors.textPrimary)
+                    .copyWith(fontSize: context.rs(16, min: 14, max: 18))),
+            const Spacer(),
+            Text('${players.length} players',
+                style: AppTextStyles.caption(color: AppColors.textMuted)),
+          ],
+        ),
+        SizedBox(height: context.rs(14, min: 10, max: 18)),
+        ...sorted.asMap().entries.map((e) => AnalysisPlayerTile(player: e.value, index: e.key)),
+      ],
     );
   }
 }

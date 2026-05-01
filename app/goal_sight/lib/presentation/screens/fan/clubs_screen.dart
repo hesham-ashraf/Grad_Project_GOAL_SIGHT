@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
+import '../../../data/models/club_model.dart';
 import '../../state_management/fan_mock_providers.dart';
 import '../../widgets/fan/club_card.dart';
 
@@ -13,7 +15,8 @@ class ClubsScreen extends ConsumerStatefulWidget {
   ConsumerState<ClubsScreen> createState() => _ClubsScreenState();
 }
 
-class _ClubsScreenState extends ConsumerState<ClubsScreen> with SingleTickerProviderStateMixin {
+class _ClubsScreenState extends ConsumerState<ClubsScreen>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _fadeAnimation;
   late final Animation<Offset> _slideAnimation;
@@ -56,7 +59,8 @@ class _ClubsScreenState extends ConsumerState<ClubsScreen> with SingleTickerProv
 
   @override
   Widget build(BuildContext context) {
-    final filteredClubs = ref.watch(mockClubsProvider).where((club) {
+    final allClubs = ref.watch(mockClubsProvider);
+    final filteredClubs = allClubs.where((club) {
       return club.name.toLowerCase().contains(_searchQuery);
     }).toList();
 
@@ -90,7 +94,7 @@ class _ClubsScreenState extends ConsumerState<ClubsScreen> with SingleTickerProv
                     style: AppTextStyles.body(color: AppColors.textSecondary),
                   ),
                   SizedBox(height: context.rs(20, min: 16, max: 24)),
-                  
+
                   // Search Bar
                   TextField(
                     controller: _searchController,
@@ -124,7 +128,7 @@ class _ClubsScreenState extends ConsumerState<ClubsScreen> with SingleTickerProv
                 ],
               ),
             ),
-            
+
             // Grid View
             Expanded(
               child: filteredClubs.isEmpty
@@ -143,11 +147,12 @@ class _ClubsScreenState extends ConsumerState<ClubsScreen> with SingleTickerProv
                             context.rs(20, min: 16, max: 24),
                             context.rs(8, min: 4, max: 12),
                             context.rs(20, min: 16, max: 24),
-                            context.rs(100, min: 80, max: 120), // Bottom padding for FanBottomNavigationBar
+                            context.rs(100, min: 80, max: 120),
                           ),
                           physics: const BouncingScrollPhysics(),
                           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: MediaQuery.of(context).size.width > 600 ? 3 : 2,
+                            crossAxisCount:
+                                MediaQuery.of(context).size.width > 600 ? 3 : 2,
                             childAspectRatio: 0.85,
                             crossAxisSpacing: context.rs(16, min: 12, max: 20),
                             mainAxisSpacing: context.rs(16, min: 12, max: 20),
@@ -158,12 +163,7 @@ class _ClubsScreenState extends ConsumerState<ClubsScreen> with SingleTickerProv
                             return ClubCard(
                               club: club,
                               onTap: () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('Opening ${club.name} details...'),
-                                    duration: const Duration(seconds: 1),
-                                  ),
-                                );
+                                context.push('/fan-club-details', extra: club);
                               },
                             );
                           },
@@ -177,3 +177,4 @@ class _ClubsScreenState extends ConsumerState<ClubsScreen> with SingleTickerProv
     );
   }
 }
+

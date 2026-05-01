@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_theme.dart';
+import '../../data/models/club_model.dart';
 import '../../data/models/match_model.dart';
-import '../widgets/fan/club_card.dart';
 import '../widgets/fan/standings_row.dart';
 
 // Matches
@@ -102,56 +102,124 @@ final mockMatchesProvider = Provider<List<MatchModel>>((ref) {
 });
 
 // Clubs
-final mockClubsProvider = Provider<List<FanClubItemData>>((ref) {
+final mockClubsProvider = Provider<List<ClubModel>>((ref) {
   return const [
-    FanClubItemData(
+    ClubModel(
       id: 'c1',
       name: 'GoalSight FC',
       stadium: 'GoalSight Arena',
+      league: 'GoalSight Premier League',
       primaryColor: AppColors.accentCyan,
+      foundedYear: 1998,
+      country: 'Egypt',
       isFavorite: true,
+      coach: 'Ahmed Nour',
+      stats: ClubStats(
+        matchesPlayed: 10, wins: 8, draws: 1, losses: 1,
+        goalsScored: 24, goalsConceded: 7, ranking: 1, points: 25,
+      ),
+      players: [
+        ClubPlayer(id: 'p1', name: 'Hassan Ali', position: 'CAM', rating: 8.9, nationality: '🇪🇬', age: 27, appearances: 10, goals: 6, assists: 8),
+        ClubPlayer(id: 'p2', name: 'Mostafa Samir', position: 'LW', rating: 8.4, nationality: '🇪🇬', age: 24, appearances: 10, goals: 7, assists: 3),
+        ClubPlayer(id: 'p3', name: 'Ziad Hamdy', position: 'CB', rating: 7.6, nationality: '🇪🇬', age: 29, appearances: 10, goals: 0, assists: 1),
+        ClubPlayer(id: 'p4', name: 'Tariq Ziad', position: 'DM', rating: 7.0, nationality: '🇪🇬', age: 26, appearances: 8, goals: 1, assists: 2),
+        ClubPlayer(id: 'p5', name: 'Karim Wael', position: 'GK', rating: 7.8, nationality: '🇪🇬', age: 31, appearances: 10, goals: 0, assists: 0),
+        ClubPlayer(id: 'p6', name: 'Omar Fathy', position: 'RB', rating: 7.2, nationality: '🇪🇬', age: 23, appearances: 9, goals: 0, assists: 3),
+      ],
     ),
-    FanClubItemData(
+    ClubModel(
       id: 'c2',
       name: 'Falcons United',
       stadium: 'Sky Stadium',
+      league: 'GoalSight Premier League',
       primaryColor: AppColors.primaryPurple,
+      foundedYear: 2003,
+      country: 'Egypt',
+      coach: 'Samy Hassan',
+      stats: ClubStats(
+        matchesPlayed: 10, wins: 6, draws: 4, losses: 0,
+        goalsScored: 18, goalsConceded: 9, ranking: 2, points: 22,
+      ),
+      players: [
+        ClubPlayer(id: 'p7', name: 'Adel Ragab', position: 'ST', rating: 8.1, nationality: '🇪🇬', age: 25, appearances: 10, goals: 9, assists: 2),
+        ClubPlayer(id: 'p8', name: 'Youssef Ahmed', position: 'CM', rating: 7.5, nationality: '🇪🇬', age: 28, appearances: 10, goals: 2, assists: 4),
+        ClubPlayer(id: 'p9', name: 'Nasser Ibrahim', position: 'CB', rating: 7.8, nationality: '🇪🇬', age: 30, appearances: 10, goals: 1, assists: 0),
+        ClubPlayer(id: 'p10', name: 'Sherif Gamal', position: 'LB', rating: 6.9, nationality: '🇪🇬', age: 22, appearances: 9, goals: 0, assists: 2),
+        ClubPlayer(id: 'p11', name: 'Mahmoud Saif', position: 'GK', rating: 7.4, nationality: '🇪🇬', age: 33, appearances: 10, goals: 0, assists: 0),
+      ],
     ),
-    FanClubItemData(
+    ClubModel(
       id: 'c3',
       name: 'Lions City',
       stadium: 'The Den',
+      league: 'GoalSight Premier League',
       primaryColor: AppColors.warning,
+      foundedYear: 1995,
+      country: 'Egypt',
+      coach: 'Khalid Mostafa',
+      stats: ClubStats(
+        matchesPlayed: 10, wins: 5, draws: 4, losses: 1,
+        goalsScored: 16, goalsConceded: 11, ranking: 3, points: 19,
+      ),
+      players: [
+        ClubPlayer(id: 'p12', name: 'Tamer Said', position: 'ST', rating: 7.9, nationality: '🇪🇬', age: 26, appearances: 10, goals: 7, assists: 1),
+        ClubPlayer(id: 'p13', name: 'Amr Khaled', position: 'AM', rating: 7.3, nationality: '🇪🇬', age: 24, appearances: 9, goals: 3, assists: 5),
+        ClubPlayer(id: 'p14', name: 'Walid Nour', position: 'CB', rating: 7.0, nationality: '🇪🇬', age: 32, appearances: 10, goals: 0, assists: 0),
+      ],
     ),
-    FanClubItemData(
+    ClubModel(
       id: 'c4',
       name: 'Sharks FC',
       stadium: 'Oceanic Park',
+      league: 'GoalSight Premier League',
       primaryColor: AppColors.primaryBlue,
+      foundedYear: 2008,
+      country: 'Egypt',
+      coach: 'Hany Zakaria',
+      stats: ClubStats(
+        matchesPlayed: 10, wins: 4, draws: 4, losses: 2,
+        goalsScored: 13, goalsConceded: 12, ranking: 4, points: 16,
+      ),
+      players: [
+        ClubPlayer(id: 'p15', name: 'Bassem Nabil', position: 'RW', rating: 7.7, nationality: '🇪🇬', age: 23, appearances: 10, goals: 5, assists: 3),
+        ClubPlayer(id: 'p16', name: 'Ibrahim Sameh', position: 'CB', rating: 7.2, nationality: '🇪🇬', age: 28, appearances: 10, goals: 1, assists: 0),
+      ],
     ),
-    FanClubItemData(
+    ClubModel(
       id: 'c5',
       name: 'Eagles Club',
       stadium: 'High Peak Arena',
+      league: 'GoalSight Premier League',
       primaryColor: AppColors.danger,
+      foundedYear: 2001,
+      country: 'Egypt',
+      coach: 'Ramy Fares',
+      stats: ClubStats(
+        matchesPlayed: 10, wins: 3, draws: 5, losses: 2,
+        goalsScored: 11, goalsConceded: 13, ranking: 5, points: 14,
+      ),
+      players: [
+        ClubPlayer(id: 'p17', name: 'Saad Magdy', position: 'ST', rating: 7.1, nationality: '🇪🇬', age: 27, appearances: 10, goals: 5, assists: 1),
+        ClubPlayer(id: 'p18', name: 'Fady Emam', position: 'CM', rating: 6.8, nationality: '🇪🇬', age: 25, appearances: 9, goals: 1, assists: 4),
+      ],
     ),
-    FanClubItemData(
+    ClubModel(
       id: 'c6',
       name: 'Panthers',
       stadium: 'Jungle Stadium',
+      league: 'GoalSight Premier League',
       primaryColor: AppColors.accentGreen,
-    ),
-    FanClubItemData(
-      id: 'c7',
-      name: 'Bulls',
-      stadium: 'Red Arena',
-      primaryColor: AppColors.textMuted,
-    ),
-    FanClubItemData(
-      id: 'c8',
-      name: 'Wolves',
-      stadium: 'Moonlight Ground',
-      primaryColor: AppColors.outline,
+      foundedYear: 2010,
+      country: 'Egypt',
+      coach: 'Nader Ali',
+      stats: ClubStats(
+        matchesPlayed: 10, wins: 3, draws: 2, losses: 5,
+        goalsScored: 10, goalsConceded: 14, ranking: 6, points: 11,
+      ),
+      players: [
+        ClubPlayer(id: 'p19', name: 'George Maher', position: 'LW', rating: 7.0, nationality: '🇪🇬', age: 22, appearances: 10, goals: 4, assists: 2),
+        ClubPlayer(id: 'p20', name: 'Andrew Nabil', position: 'GK', rating: 6.5, nationality: '🇪🇬', age: 30, appearances: 10, goals: 0, assists: 0),
+      ],
     ),
   ];
 });

@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
-import '../../state_management/fan_mock_providers.dart';
+import '../../state_management/match_analysis_providers.dart';
 import '../../widgets/fan/match_list_card.dart';
 
 class MatchesScreen extends ConsumerStatefulWidget {
@@ -20,13 +20,13 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final matches = ref.watch(mockMatchesProvider);
-    
+    final matches = ref.watch(mockAnalysisMatchesProvider);
+
     // Basic filtering mock logic
     final filteredMatches = matches.where((m) {
-      if (_selectedFilter == 'Top Matches') return m.isTopMatch;
-      if (_selectedFilter == 'Recent') return m.date != 'Today, 20:00';
-      if (_selectedFilter == 'Live') return false; // Mocking no live matches right now
+      if (_selectedFilter == 'Top Matches') return m.intensity >= 80;
+      if (_selectedFilter == 'Recent') return m.date != 'May 2, 2026 · 20:00';
+      if (_selectedFilter == 'Live') return m.status == 'LIVE';
       return true;
     }).toList();
 

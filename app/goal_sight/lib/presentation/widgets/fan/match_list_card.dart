@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
-import '../../../data/models/match_model.dart';
+import '../../../data/models/match_analysis_model.dart';
 import 'tap_scale.dart';
 
 class MatchListCard extends StatelessWidget {
@@ -12,26 +12,27 @@ class MatchListCard extends StatelessWidget {
     this.onTap,
   });
 
-  final MatchModel match;
+  final MatchAnalysisModel match;
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
+    final isTopMatch = match.intensity >= 80;
     final innerCard = Container(
       decoration: BoxDecoration(
-        color: match.isTopMatch
+        color: isTopMatch
             ? AppColors.surfaceElevated.withValues(alpha: 0.96)
             : AppColors.surfaceElevated.withValues(alpha: 0.6),
         borderRadius: AppRadius.cardLarge,
         border: Border.all(
-          color: match.isTopMatch
-              ? match.homeColor.withValues(alpha: 0.28)
+          color: isTopMatch
+              ? AppColors.accentCyan.withValues(alpha: 0.28)
               : AppColors.outlineSubtle,
         ),
-        boxShadow: match.isTopMatch
+        boxShadow: isTopMatch
             ? [
                 BoxShadow(
-                  color: match.homeColor.withValues(alpha: 0.08),
+                  color: AppColors.accentCyan.withValues(alpha: 0.08),
                   blurRadius: 24,
                   offset: const Offset(0, 8),
                 ),
@@ -53,7 +54,7 @@ class MatchListCard extends StatelessWidget {
         borderRadius: AppRadius.cardLarge,
         child: Stack(
           children: [
-            if (match.isTopMatch)
+            if (isTopMatch)
               Positioned(
                 top: -60,
                 right: -60,
@@ -64,7 +65,7 @@ class MatchListCard extends StatelessWidget {
                     shape: BoxShape.circle,
                     gradient: RadialGradient(
                       colors: [
-                        match.homeColor.withValues(alpha: 0.15),
+                        AppColors.accentCyan.withValues(alpha: 0.15),
                         Colors.transparent,
                       ],
                     ),
@@ -150,7 +151,7 @@ class MatchListCard extends StatelessWidget {
                       Expanded(
                         child: _TeamInfo(
                           teamName: match.homeTeam,
-                          color: match.homeColor,
+                          color: AppColors.accentCyan,
                           alignEnd: false,
                         ),
                       ),
@@ -198,7 +199,7 @@ class MatchListCard extends StatelessWidget {
                       Expanded(
                         child: _TeamInfo(
                           teamName: match.awayTeam,
-                          color: match.awayColor,
+                          color: AppColors.primaryPurple,
                           alignEnd: true,
                         ),
                       ),
@@ -214,7 +215,7 @@ class MatchListCard extends StatelessWidget {
                         vertical: context.rs(8, min: 6, max: 10),
                       ),
                       decoration: BoxDecoration(
-                        color: match.homeColor.withValues(alpha: 0.08),
+                        color: AppColors.accentCyan.withValues(alpha: 0.08),
                         borderRadius: AppRadius.button,
                       ),
                       child: Row(
@@ -222,7 +223,7 @@ class MatchListCard extends StatelessWidget {
                           Icon(
                             Icons.auto_awesome_rounded,
                             size: context.rs(16, min: 14, max: 18),
-                            color: match.homeColor,
+                            color: AppColors.accentCyan,
                           ),
                           SizedBox(width: context.rs(8, min: 6, max: 10)),
                           Expanded(

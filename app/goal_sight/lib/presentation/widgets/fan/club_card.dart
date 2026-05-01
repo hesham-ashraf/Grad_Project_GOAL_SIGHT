@@ -2,23 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
+import '../../../data/models/club_model.dart';
 import 'tap_scale.dart';
-
-class FanClubItemData {
-  const FanClubItemData({
-    required this.id,
-    required this.name,
-    required this.stadium,
-    required this.primaryColor,
-    this.isFavorite = false,
-  });
-
-  final String id;
-  final String name;
-  final String stadium;
-  final Color primaryColor;
-  final bool isFavorite;
-}
 
 class ClubCard extends StatelessWidget {
   const ClubCard({
@@ -27,7 +12,7 @@ class ClubCard extends StatelessWidget {
     this.onTap,
   });
 
-  final FanClubItemData club;
+  final ClubModel club;
   final VoidCallback? onTap;
 
   @override

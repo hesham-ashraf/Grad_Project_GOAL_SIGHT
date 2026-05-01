@@ -43,7 +43,7 @@ class MatchModel {
     required this.awayTeam,
     required this.status,
     required this.score,
-    required this.date,
+    this.date = 'TBD',
     this.intensity = 0,
     this.homeColor = Colors.grey,
     this.awayColor = Colors.blueGrey,
