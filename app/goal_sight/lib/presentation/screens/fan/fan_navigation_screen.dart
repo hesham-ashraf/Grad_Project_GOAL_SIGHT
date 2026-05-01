@@ -99,9 +99,6 @@ class _FanNavigationScreenState extends State<FanNavigationScreen>
 
   @override
   Widget build(BuildContext context) {
-    final bottomPadding =
-        FanBottomNavigationBar.totalHeight(context) + context.rs(12, min: 10, max: 16);
-
     return Scaffold(
       extendBody: true,
       backgroundColor: AppColors.background,
@@ -111,16 +108,13 @@ class _FanNavigationScreenState extends State<FanNavigationScreen>
           Positioned.fill(
             child: SafeArea(
               bottom: false,
-              child: Padding(
-                padding: EdgeInsets.only(bottom: bottomPadding),
-                child: FadeTransition(
-                  opacity: _fadeAnimation,
-                  child: SlideTransition(
-                    position: _slideAnimation,
-                    child: IndexedStack(
-                      index: _selectedIndex,
-                      children: _screens,
-                    ),
+              child: FadeTransition(
+                opacity: _fadeAnimation,
+                child: SlideTransition(
+                  position: _slideAnimation,
+                  child: IndexedStack(
+                    index: _selectedIndex,
+                    children: _screens,
                   ),
                 ),
               ),
