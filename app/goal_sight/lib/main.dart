@@ -1,10 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'core/theme/app_theme.dart';
 import 'presentation/state_management/router_provider.dart';
 
-void main() {
+// TODO: Paste your Supabase Project URL here (from Supabase Settings -> API).
+const String supabaseUrl = 'YOUR_SUPABASE_PROJECT_URL';
+
+// TODO: Paste your Supabase anon public key here (safe for client use).
+// Do NOT use the service_role key in a client app.
+const String supabaseAnonKey = 'YOUR_SUPABASE_ANON_KEY';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Supabase once before the app starts.
+  await Supabase.initialize(
+    url: supabaseUrl,
+    anonKey: supabaseAnonKey,
+  );
+
   runApp(const ProviderScope(child: GoalSightApp()));
 }
 

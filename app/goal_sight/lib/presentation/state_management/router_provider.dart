@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/constants/app_roles.dart';
 import '../../features/auth/auth_state.dart';
+import '../../features/supabase_test/test_supabase_page.dart';
 import '../screens/admin/admin_panel_screen.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/register_screen.dart';
@@ -16,19 +17,26 @@ import '../screens/player/player_profile_screen.dart';
 import '../screens/splash_screen.dart';
 import 'app_providers.dart';
 
+// Temporary: set to false when you finish Supabase testing.
+const bool kShowSupabaseTestPage = true;
+
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authControllerProvider);
 
   return GoRouter(
-    initialLocation: '/splash',
+    initialLocation: kShowSupabaseTestPage ? '/supabase-test' : '/splash',
     redirect: (context, state) {
       final location = state.matchedLocation;
       final isAuthPage = location == '/login' || location == '/register';
       final isSplash = location == '/splash';
+      final isSupabaseTest = location == '/supabase-test';
       final isAdminRoute =
           location.startsWith('/admin') || location == '/admin-panel';
       final isManagerRoute = location.startsWith('/manager');
       final isFanRoute = location.startsWith('/fan');
+
+      // Allow the test page without auth redirects.
+      if (isSupabaseTest) return null;
 
       if (authState.status == AuthStatus.initial ||
           authState.status == AuthStatus.loading) {
@@ -74,6 +82,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/register',
         builder: (context, state) => const RegisterScreen(),
+      ),
+      GoRoute(
+        path: '/supabase-test',
+        builder: (context, state) => const TestSupabasePage(),
       ),
       GoRoute(
         path: '/manager',
