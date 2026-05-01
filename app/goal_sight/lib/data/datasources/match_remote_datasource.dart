@@ -24,6 +24,7 @@ class MatchRemoteDataSource {
           awayTeam: 'Eagles FC',
           status: 'live',
           score: '1 - 0',
+          date: 'TBD',
         ),
         MatchModel(
           id: 'm2',
@@ -31,6 +32,7 @@ class MatchRemoteDataSource {
           awayTeam: 'Sharks FC',
           status: 'scheduled',
           score: '0 - 0',
+          date: 'TBD',
         ),
       ];
     }
@@ -49,6 +51,7 @@ class MatchRemoteDataSource {
         awayTeam: 'Eagles FC',
         status: 'live',
         score: '1 - 0',
+        date: 'TBD',
       );
     }
   }

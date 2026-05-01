@@ -51,6 +51,7 @@ class AdminController extends StateNotifier<AdminState> {
         awayTeam: awayTeam.trim(),
         status: 'scheduled',
         score: '0 - 0',
+        date: 'TBD',
       );
 
       final updatedMatches = [inserted, ...state.matches];

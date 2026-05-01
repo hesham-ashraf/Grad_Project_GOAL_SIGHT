@@ -1,87 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
+import '../../state_management/fan_mock_providers.dart';
 import '../../widgets/fan/standings_row.dart';
 
-class StandingsScreen extends StatefulWidget {
+class StandingsScreen extends ConsumerStatefulWidget {
   const StandingsScreen({super.key});
 
   @override
-  State<StandingsScreen> createState() => _StandingsScreenState();
+  ConsumerState<StandingsScreen> createState() => _StandingsScreenState();
 }
 
-class _StandingsScreenState extends State<StandingsScreen> {
-  static const List<StandingTeamData> _mockStandings = [
-    StandingTeamData(
-      rank: 1,
-      teamName: 'GoalSight FC',
-      matchesPlayed: 10,
-      goalDifference: 14,
-      points: 25,
-      teamColor: AppColors.accentCyan,
-      isHighlighted: true,
-    ),
-    StandingTeamData(
-      rank: 2,
-      teamName: 'Falcons United',
-      matchesPlayed: 10,
-      goalDifference: 11,
-      points: 22,
-      teamColor: AppColors.primaryPurple,
-    ),
-    StandingTeamData(
-      rank: 3,
-      teamName: 'Lions City',
-      matchesPlayed: 10,
-      goalDifference: 8,
-      points: 19,
-      teamColor: AppColors.warning,
-    ),
-    StandingTeamData(
-      rank: 4,
-      teamName: 'Sharks FC',
-      matchesPlayed: 10,
-      goalDifference: 2,
-      points: 16,
-      teamColor: AppColors.primaryBlue,
-    ),
-    StandingTeamData(
-      rank: 5,
-      teamName: 'Eagles Club',
-      matchesPlayed: 10,
-      goalDifference: -1,
-      points: 14,
-      teamColor: AppColors.danger,
-    ),
-    StandingTeamData(
-      rank: 6,
-      teamName: 'Panthers',
-      matchesPlayed: 10,
-      goalDifference: -3,
-      points: 11,
-      teamColor: AppColors.accentGreen,
-    ),
-    StandingTeamData(
-      rank: 7,
-      teamName: 'Bulls',
-      matchesPlayed: 10,
-      goalDifference: -8,
-      points: 8,
-      teamColor: AppColors.textMuted,
-    ),
-    StandingTeamData(
-      rank: 8,
-      teamName: 'Wolves',
-      matchesPlayed: 10,
-      goalDifference: -12,
-      points: 5,
-      teamColor: AppColors.outline,
-    ),
-  ];
+class _StandingsScreenState extends ConsumerState<StandingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final standings = ref.watch(mockStandingsProvider);
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: SafeArea(
@@ -131,9 +68,9 @@ class _StandingsScreenState extends State<StandingsScreen> {
                   context.rs(100, min: 80, max: 120), // Bottom padding for FanBottomNavigationBar
                 ),
                 physics: const BouncingScrollPhysics(),
-                itemCount: _mockStandings.length,
+                itemCount: standings.length,
                 itemBuilder: (context, index) {
-                  final team = _mockStandings[index];
+                  final team = standings[index];
                   return StandingsRow(
                     team: team,
                     onTap: () {

@@ -2,10 +2,16 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
+import '../../../data/models/match_model.dart';
 import '../../widgets/fan/match_analysis_widgets.dart';
 
 class MatchAnalysisScreen extends StatefulWidget {
-  const MatchAnalysisScreen({super.key});
+  const MatchAnalysisScreen({
+    super.key,
+    required this.match,
+  });
+
+  final MatchModel match;
 
   @override
   State<MatchAnalysisScreen> createState() => _MatchAnalysisScreenState();
@@ -76,6 +82,10 @@ class _MatchAnalysisScreenState extends State<MatchAnalysisScreen>
 
   @override
   Widget build(BuildContext context) {
+    final match = widget.match;
+    final bestPlayer = match.players.where((p) => p.isBest).firstOrNull;
+    final worstPlayer = match.players.where((p) => p.isWorst).firstOrNull;
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -96,156 +106,151 @@ class _MatchAnalysisScreenState extends State<MatchAnalysisScreen>
               opacity: _overviewFade,
               child: SlideTransition(
                 position: _overviewSlide,
-                child: const MatchOverviewCard(
-                  homeTeam: 'GoalSight FC',
-                  awayTeam: 'Falcons United',
-                  score: '3 - 1',
-                  summary:
-                      'GoalSight FC dominated the midfield with quick passing transitions, overpowering Falcons United who struggled to break the high press.',
-                  dominantTeam: 'GoalSight FC',
-                  homeColor: AppColors.accentCyan,
-                  awayColor: AppColors.primaryPurple,
+                child: MatchOverviewCard(
+                  homeTeam: match.homeTeam,
+                  awayTeam: match.awayTeam,
+                  score: match.score,
+                  summary: match.summary.isNotEmpty ? match.summary : 'No summary available.',
+                  dominantTeam: match.dominantTeam.isNotEmpty ? match.dominantTeam : 'Balanced',
+                  homeColor: match.homeColor,
+                  awayColor: match.awayColor,
                 ),
               ),
             ),
             SizedBox(height: context.rs(24, min: 20, max: 32)),
 
             // Key Players
-            FadeTransition(
-              opacity: _playersFade,
-              child: SlideTransition(
-                position: _playersSlide,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Key Performers',
-                      style: AppTextStyles.title(color: AppColors.textPrimary),
-                    ),
-                    SizedBox(height: context.rs(16, min: 12, max: 20)),
-                    Row(
-                      children: [
-                        const Expanded(
-                          child: KeyPlayerCard(
-                            title: 'Man of the Match',
-                            playerName: 'Hassan Ali',
-                            rating: 8.9,
-                            insight: 'Controlled the tempo and provided 2 key assists.',
-                            isBest: true,
-                          ),
-                        ),
-                        SizedBox(width: context.rs(12, min: 8, max: 16)),
-                        const Expanded(
-                          child: KeyPlayerCard(
-                            title: 'Needs Improvement',
-                            playerName: 'Tariq Ziad',
-                            rating: 5.4,
-                            insight: 'Lost possession 6 times in dangerous areas.',
-                            isBest: false,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+            if (bestPlayer != null || worstPlayer != null) ...[
+              FadeTransition(
+                opacity: _playersFade,
+                child: SlideTransition(
+                  position: _playersSlide,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Key Performers',
+                        style: AppTextStyles.title(color: AppColors.textPrimary),
+                      ),
+                      SizedBox(height: context.rs(16, min: 12, max: 20)),
+                      Row(
+                        children: [
+                          if (bestPlayer != null)
+                            Expanded(
+                              child: KeyPlayerCard(
+                                title: 'Man of the Match',
+                                playerName: bestPlayer.name,
+                                rating: bestPlayer.rating,
+                                insight: bestPlayer.insight,
+                                isBest: true,
+                              ),
+                            ),
+                          if (bestPlayer != null && worstPlayer != null)
+                            SizedBox(width: context.rs(12, min: 8, max: 16)),
+                          if (worstPlayer != null)
+                            Expanded(
+                              child: KeyPlayerCard(
+                                title: 'Needs Improvement',
+                                playerName: worstPlayer.name,
+                                rating: worstPlayer.rating,
+                                insight: worstPlayer.insight,
+                                isBest: false,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            SizedBox(height: context.rs(24, min: 20, max: 32)),
+              SizedBox(height: context.rs(24, min: 20, max: 32)),
+            ],
 
             // Tactical Analysis
-            FadeTransition(
-              opacity: _tacticalFade,
-              child: SlideTransition(
-                position: _tacticalSlide,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Tactical Breakdown',
-                      style: AppTextStyles.title(color: AppColors.textPrimary),
-                    ),
-                    SizedBox(height: context.rs(16, min: 12, max: 20)),
-                    const TacticalRow(
-                      possessionHome: 64,
-                      styleHome: 'Possession-based',
-                      pressureHome: 'High Press',
-                      styleAway: 'Counter-attack',
-                      pressureAway: 'Low Block',
-                      homeColor: AppColors.accentCyan,
-                      awayColor: AppColors.primaryPurple,
-                    ),
-                  ],
+            if (match.tactics != null) ...[
+              FadeTransition(
+                opacity: _tacticalFade,
+                child: SlideTransition(
+                  position: _tacticalSlide,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Tactical Breakdown',
+                        style: AppTextStyles.title(color: AppColors.textPrimary),
+                      ),
+                      SizedBox(height: context.rs(16, min: 12, max: 20)),
+                      TacticalRow(
+                        possessionHome: match.tactics!.homePossession,
+                        styleHome: match.tactics!.homeStyle,
+                        pressureHome: match.tactics!.homePressure,
+                        styleAway: match.tactics!.awayStyle,
+                        pressureAway: match.tactics!.awayPressure,
+                        homeColor: match.homeColor,
+                        awayColor: match.awayColor,
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            SizedBox(height: context.rs(24, min: 20, max: 32)),
+              SizedBox(height: context.rs(24, min: 20, max: 32)),
+            ],
 
             // Player Performances
-            FadeTransition(
-              opacity: _listFade,
-              child: SlideTransition(
-                position: _listSlide,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Squad Ratings',
-                      style: AppTextStyles.title(color: AppColors.textPrimary),
-                    ),
-                    SizedBox(height: context.rs(16, min: 12, max: 20)),
-                    const PlayerListItem(
-                      name: 'Hassan Ali',
-                      rating: 8.9,
-                      insight: 'Exceptional vision and passing accuracy.',
-                      isHighRated: true,
-                    ),
-                    const PlayerListItem(
-                      name: 'Mostafa Samir',
-                      rating: 8.4,
-                      insight: 'Constant threat on the wing. 1 Goal.',
-                      isHighRated: true,
-                    ),
-                    const PlayerListItem(
-                      name: 'Ziad Hamdy',
-                      rating: 7.6,
-                      insight: 'Solid defensive work rate.',
-                      isHighRated: false,
-                    ),
-                    const PlayerListItem(
-                      name: 'Omar Fathy',
-                      rating: 7.1,
-                      insight: 'Quiet game, minimal impact in final third.',
-                      isHighRated: false,
-                    ),
-                  ],
+            if (match.players.isNotEmpty) ...[
+              FadeTransition(
+                opacity: _listFade,
+                child: SlideTransition(
+                  position: _listSlide,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Squad Ratings',
+                        style: AppTextStyles.title(color: AppColors.textPrimary),
+                      ),
+                      SizedBox(height: context.rs(16, min: 12, max: 20)),
+                      ...match.players.map((p) => Padding(
+                            padding: EdgeInsets.only(bottom: context.rs(8, min: 4, max: 12)),
+                            child: PlayerListItem(
+                              name: p.name,
+                              rating: p.rating,
+                              insight: p.insight,
+                              isHighRated: p.rating >= 7.5,
+                            ),
+                          )),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            SizedBox(height: context.rs(24, min: 20, max: 32)),
+              SizedBox(height: context.rs(24, min: 20, max: 32)),
+            ],
 
             // AI Recommendations
-            FadeTransition(
-              opacity: _listFade,
-              child: SlideTransition(
-                position: _listSlide,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'AI Coach Recommendations',
-                      style: AppTextStyles.title(color: AppColors.textPrimary),
-                    ),
-                    SizedBox(height: context.rs(16, min: 12, max: 20)),
-                    const RecommendationCard(
-                      recommendation: 'Maintain high pressing intensity to exploit Falcons United\'s weak build-up play.',
-                    ),
-                    const RecommendationCard(
-                      recommendation: 'Consider resting Hassan Ali in the 70th minute to prevent fatigue injuries.',
-                    ),
-                  ],
+            if (match.recommendations.isNotEmpty) ...[
+              FadeTransition(
+                opacity: _listFade,
+                child: SlideTransition(
+                  position: _listSlide,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'AI Coach Recommendations',
+                        style: AppTextStyles.title(color: AppColors.textPrimary),
+                      ),
+                      SizedBox(height: context.rs(16, min: 12, max: 20)),
+                      ...match.recommendations.map((rec) => Padding(
+                            padding: EdgeInsets.only(bottom: context.rs(8, min: 4, max: 12)),
+                            child: RecommendationCard(
+                              recommendation: rec,
+                            ),
+                          )),
+                    ],
+                  ),
                 ),
               ),
-            ),
+            ],
             SizedBox(height: context.rs(40, min: 24, max: 60)), // Bottom padding
           ],
         ),

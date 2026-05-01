@@ -1,88 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
+import '../../state_management/fan_mock_providers.dart';
 import '../../widgets/fan/match_list_card.dart';
 
-class MatchesScreen extends StatefulWidget {
+class MatchesScreen extends ConsumerStatefulWidget {
   const MatchesScreen({super.key});
 
   @override
-  State<MatchesScreen> createState() => _MatchesScreenState();
+  ConsumerState<MatchesScreen> createState() => _MatchesScreenState();
 }
 
-class _MatchesScreenState extends State<MatchesScreen> {
+class _MatchesScreenState extends ConsumerState<MatchesScreen> {
   static const List<String> _filters = ['All', 'Live', 'Top Matches', 'Recent'];
   String _selectedFilter = 'All';
 
-  // Mock data for the matches list
-  static const List<FanMatchItemData> _mockMatches = [
-    FanMatchItemData(
-      id: 'm1',
-      homeTeam: 'GoalSight FC',
-      awayTeam: 'Falcons United',
-      score: '3 - 1',
-      date: 'Today, 20:00',
-      status: 'FT',
-      intensity: 91,
-      homeColor: AppColors.accentCyan,
-      awayColor: AppColors.primaryPurple,
-      highlightText: 'High intensity match',
-      isTopMatch: true,
-    ),
-    FanMatchItemData(
-      id: 'm2',
-      homeTeam: 'Sharks FC',
-      awayTeam: 'Eagles Club',
-      score: '0 - 0',
-      date: 'Yesterday',
-      status: 'FT',
-      intensity: 65,
-      homeColor: AppColors.primaryBlue,
-      awayColor: AppColors.danger,
-    ),
-    FanMatchItemData(
-      id: 'm3',
-      homeTeam: 'Lions City',
-      awayTeam: 'GoalSight FC',
-      score: '1 - 2',
-      date: 'Oct 12',
-      status: 'FT',
-      intensity: 85,
-      homeColor: AppColors.warning,
-      awayColor: AppColors.accentCyan,
-      highlightText: 'Last minute winner',
-    ),
-    FanMatchItemData(
-      id: 'm4',
-      homeTeam: 'Panthers',
-      awayTeam: 'Bulls',
-      score: '2 - 2',
-      date: 'Oct 10',
-      status: 'FT',
-      intensity: 88,
-      homeColor: AppColors.accentGreen,
-      awayColor: AppColors.primaryPurple,
-      isTopMatch: true,
-    ),
-    FanMatchItemData(
-      id: 'm5',
-      homeTeam: 'Wolves',
-      awayTeam: 'GoalSight FC',
-      score: '1 - 4',
-      date: 'Oct 5',
-      status: 'FT',
-      intensity: 72,
-      homeColor: AppColors.textMuted,
-      awayColor: AppColors.accentCyan,
-    ),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final matches = ref.watch(mockMatchesProvider);
+    
     // Basic filtering mock logic
-    final filteredMatches = _mockMatches.where((m) {
+    final filteredMatches = matches.where((m) {
       if (_selectedFilter == 'Top Matches') return m.isTopMatch;
       if (_selectedFilter == 'Recent') return m.date != 'Today, 20:00';
       if (_selectedFilter == 'Live') return false; // Mocking no live matches right now
@@ -204,7 +145,7 @@ class _MatchesScreenState extends State<MatchesScreen> {
                         return MatchListCard(
                           match: filteredMatches[index],
                           onTap: () {
-                            context.push('/fan-match-analysis');
+                            context.push('/fan-match-analysis', extra: filteredMatches[index]);
                           },
                         );
                       },

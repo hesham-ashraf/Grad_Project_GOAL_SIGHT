@@ -2,35 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
+import '../../../data/models/match_model.dart';
 import 'tap_scale.dart';
-
-class FanMatchItemData {
-  const FanMatchItemData({
-    required this.id,
-    required this.homeTeam,
-    required this.awayTeam,
-    required this.score,
-    required this.date,
-    required this.status,
-    required this.intensity,
-    required this.homeColor,
-    required this.awayColor,
-    this.highlightText,
-    this.isTopMatch = false,
-  });
-
-  final String id;
-  final String homeTeam;
-  final String awayTeam;
-  final String score;
-  final String date;
-  final String status;
-  final int intensity;
-  final Color homeColor;
-  final Color awayColor;
-  final String? highlightText;
-  final bool isTopMatch;
-}
 
 class MatchListCard extends StatelessWidget {
   const MatchListCard({
@@ -39,7 +12,7 @@ class MatchListCard extends StatelessWidget {
     this.onTap,
   });
 
-  final FanMatchItemData match;
+  final MatchModel match;
   final VoidCallback? onTap;
 
   @override

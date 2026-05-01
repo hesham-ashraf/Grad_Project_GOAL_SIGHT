@@ -203,11 +203,15 @@ class KeyPlayerCard extends StatelessWidget {
             children: [
               Icon(icon, color: color, size: context.rs(18, min: 16, max: 20)),
               SizedBox(width: context.rs(8, min: 6, max: 10)),
-              Text(
-                title,
-                style: AppTextStyles.caption(color: color).copyWith(
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.5,
+              Expanded(
+                child: Text(
+                  title,
+                  style: AppTextStyles.caption(color: color).copyWith(
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.5,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
@@ -216,10 +220,14 @@ class KeyPlayerCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                playerName,
-                style: AppTextStyles.title(color: AppColors.textPrimary).copyWith(
-                  fontSize: context.rs(18, min: 16, max: 20),
+              Expanded(
+                child: Text(
+                  playerName,
+                  style: AppTextStyles.title(color: AppColors.textPrimary).copyWith(
+                    fontSize: context.rs(18, min: 16, max: 20),
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
               Container(

@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/constants/app_roles.dart';
 import '../../features/auth/auth_state.dart';
+import '../../data/models/match_model.dart';
 import '../../features/supabase_test/test_supabase_page.dart';
 import '../screens/admin/admin_panel_screen.dart';
 import '../screens/auth/login_screen.dart';
@@ -103,8 +104,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/fan-match-analysis',
         builder: (context, state) {
-          // Extra parameters could be passed via state.extra if needed
-          return const MatchAnalysisScreen();
+          final match = state.extra as MatchModel;
+          return MatchAnalysisScreen(match: match);
         },
       ),
       GoRoute(

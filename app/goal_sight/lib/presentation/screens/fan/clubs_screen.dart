@@ -1,75 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
+import '../../state_management/fan_mock_providers.dart';
 import '../../widgets/fan/club_card.dart';
 
-class ClubsScreen extends StatefulWidget {
+class ClubsScreen extends ConsumerStatefulWidget {
   const ClubsScreen({super.key});
 
   @override
-  State<ClubsScreen> createState() => _ClubsScreenState();
+  ConsumerState<ClubsScreen> createState() => _ClubsScreenState();
 }
 
-class _ClubsScreenState extends State<ClubsScreen> with SingleTickerProviderStateMixin {
+class _ClubsScreenState extends ConsumerState<ClubsScreen> with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _fadeAnimation;
   late final Animation<Offset> _slideAnimation;
 
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
-
-  static const List<FanClubItemData> _mockClubs = [
-    FanClubItemData(
-      id: 'c1',
-      name: 'GoalSight FC',
-      stadium: 'GoalSight Arena',
-      primaryColor: AppColors.accentCyan,
-      isFavorite: true,
-    ),
-    FanClubItemData(
-      id: 'c2',
-      name: 'Falcons United',
-      stadium: 'Sky Stadium',
-      primaryColor: AppColors.primaryPurple,
-    ),
-    FanClubItemData(
-      id: 'c3',
-      name: 'Lions City',
-      stadium: 'The Den',
-      primaryColor: AppColors.warning,
-    ),
-    FanClubItemData(
-      id: 'c4',
-      name: 'Sharks FC',
-      stadium: 'Oceanic Park',
-      primaryColor: AppColors.primaryBlue,
-    ),
-    FanClubItemData(
-      id: 'c5',
-      name: 'Eagles Club',
-      stadium: 'High Peak Arena',
-      primaryColor: AppColors.danger,
-    ),
-    FanClubItemData(
-      id: 'c6',
-      name: 'Panthers',
-      stadium: 'Jungle Stadium',
-      primaryColor: AppColors.accentGreen,
-    ),
-    FanClubItemData(
-      id: 'c7',
-      name: 'Bulls',
-      stadium: 'Red Arena',
-      primaryColor: AppColors.textMuted,
-    ),
-    FanClubItemData(
-      id: 'c8',
-      name: 'Wolves',
-      stadium: 'Moonlight Ground',
-      primaryColor: AppColors.outline,
-    ),
-  ];
 
   @override
   void initState() {
@@ -106,7 +56,7 @@ class _ClubsScreenState extends State<ClubsScreen> with SingleTickerProviderStat
 
   @override
   Widget build(BuildContext context) {
-    final filteredClubs = _mockClubs.where((club) {
+    final filteredClubs = ref.watch(mockClubsProvider).where((club) {
       return club.name.toLowerCase().contains(_searchQuery);
     }).toList();
 

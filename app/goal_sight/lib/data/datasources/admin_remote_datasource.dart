@@ -67,6 +67,7 @@ class AdminRemoteDataSource {
           awayTeam: 'Eagles FC',
           status: 'live',
           score: '1 - 0',
+          date: 'TBD',
         ),
       ];
     }
