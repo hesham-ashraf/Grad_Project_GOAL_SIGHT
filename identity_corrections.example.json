@@ -1,0 +1,125 @@
+{
+  "version": 2,
+  "video_path": "08fd33_4.mp4",
+  "updated_at": "2026-04-13T00:00:00Z",
+  "teams": {
+    "1": "Team Red",
+    "2": "Team Blue"
+  },
+  "player_registry": {
+    "player_1": {
+      "canonical_id": "player_1",
+      "object_type": "player",
+      "name": "Mohamed Salah",
+      "display_name": "Mohamed Salah",
+      "jersey_number": "11",
+      "team": 2,
+      "locked": true,
+      "identity_confidence": 1.0,
+      "source": "manual"
+    },
+    "ref_1": {
+      "canonical_id": "ref_1",
+      "object_type": "referee",
+      "name": "Main Referee",
+      "display_name": "Main Referee",
+      "jersey_number": null,
+      "team": null,
+      "locked": true,
+      "identity_confidence": 1.0,
+      "source": "manual"
+    }
+  },
+  "canonical_anchor_state": {
+    "player_1": {
+      "object_type": "player",
+      "locked": true,
+      "source": "manual",
+      "name": "Mohamed Salah",
+      "team": 2,
+      "initial_pitch_position": [
+        42.3,
+        18.7
+      ],
+      "initial_image_position": [
+        1025.0,
+        622.0
+      ],
+      "initial_frame": 12,
+      "last_pitch_position": [
+        43.1,
+        19.4
+      ],
+      "last_pitch_frame": 38
+    },
+    "ref_1": {
+      "object_type": "referee",
+      "locked": true,
+      "source": "manual",
+      "name": "Main Referee",
+      "initial_pitch_position": [
+        50.1,
+        31.0
+      ],
+      "initial_image_position": [
+        884.0,
+        587.0
+      ],
+      "initial_frame": 12,
+      "last_pitch_position": [
+        50.4,
+        31.2
+      ],
+      "last_pitch_frame": 38
+    }
+  },
+  "annotations": [
+    {
+      "frame_num": 12,
+      "track_id": 8,
+      "object_type": "player",
+      "canonical_id": "player_1",
+      "name": "Mohamed Salah",
+      "jersey_number": "11",
+      "team": 2,
+      "locked": true,
+      "propagate_forward": true,
+      "initial_pitch_position": [42.3, 18.7],
+      "initial_image_position": [1025.0, 622.0],
+      "appearance_signature": [15.2, 178.4, 204.1],
+      "initial_frame": 12,
+      "source": "manual"
+    },
+    {
+      "frame_num": 12,
+      "track_id": 21,
+      "object_type": "referee",
+      "canonical_id": "ref_1",
+      "name": "Main Referee",
+      "jersey_number": null,
+      "team": null,
+      "locked": true,
+      "propagate_forward": true,
+      "initial_pitch_position": [50.1, 31.0],
+      "initial_image_position": [884.0, 587.0],
+      "appearance_signature": [31.0, 49.2, 205.8],
+      "initial_frame": 12,
+      "source": "manual"
+    },
+    {
+      "frame_num": 12,
+      "track_id": 34,
+      "object_type": "ignore",
+      "canonical_id": null,
+      "name": "",
+      "jersey_number": null,
+      "team": null,
+      "locked": false,
+      "propagate_forward": false,
+      "initial_pitch_position": [10.4, 4.8],
+      "initial_image_position": [221.0, 690.0],
+      "initial_frame": 12,
+      "source": "manual"
+    }
+  ]
+}
