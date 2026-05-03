@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/constants/app_roles.dart';
 import '../../features/auth/auth_state.dart';
+import '../../features/manager/screens/manager_navigation_screen.dart';
 import '../../data/models/club_model.dart';
 import '../../data/models/match_analysis_model.dart';
 import '../../features/supabase_test/test_supabase_page.dart';
@@ -10,7 +11,6 @@ import '../screens/admin/admin_panel_screen.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/register_screen.dart';
 import '../screens/dashboard/admin_dashboard_screen.dart';
-import '../screens/dashboard/manager_dashboard_screen.dart';
 import '../screens/fan/club_details_screen.dart';
 import '../screens/fan/fan_navigation_screen.dart';
 import '../screens/manager/manager_panel_screen.dart';
@@ -93,7 +93,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/manager',
-        builder: (context, state) => const ManagerDashboardScreen(),
+        builder: (context, state) => const ManagerNavigationScreen(),
       ),
       GoRoute(
         path: '/fan',
