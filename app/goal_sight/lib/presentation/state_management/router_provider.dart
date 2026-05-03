@@ -28,7 +28,7 @@ final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authControllerProvider);
 
   return GoRouter(
-    initialLocation: kShowSupabaseTestPage ? '/supabase-test' : '/splash',
+    initialLocation: kShowSupabaseTestPage ? '/supabase-test' : '/login',
     redirect: (context, state) {
       final location = state.matchedLocation;
       final isAuthPage = location == '/login' || location == '/register';
@@ -44,7 +44,7 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       if (authState.status == AuthStatus.initial ||
           authState.status == AuthStatus.loading) {
-        return isSplash ? null : '/splash';
+        return isAuthPage ? null : '/login';
       }
 
       if (authState.status != AuthStatus.authenticated ||

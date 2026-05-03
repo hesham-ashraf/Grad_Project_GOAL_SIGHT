@@ -7,17 +7,8 @@ import 'auth_state.dart';
 
 class AuthController extends StateNotifier<AuthState> {
   AuthController(this._authRepository) : super(
-    const AuthState(
-      status: AuthStatus.authenticated,
-      user: UserModel(
-        id: 'mock_fan',
-        name: 'Fan User',
-        email: 'fan@example.com',
-        role: UserRole.fan,
-      ),
-      token: 'mock_token',
-    ),
-  );
+          const AuthState(status: AuthStatus.unauthenticated),
+        );
 
   final IAuthRepository _authRepository;
 
