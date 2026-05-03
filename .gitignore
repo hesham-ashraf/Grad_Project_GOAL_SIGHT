@@ -50,3 +50,25 @@ app/goal_sight/**/ios/Flutter/.last_build_id
 app/goal_sight/android/app/debug/
 app/goal_sight/android/app/profile/
 app/goal_sight/android/app/release/
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+
+# Model and media artifacts
+*.pt
+*.pth
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.pkl
+
+runs/
+
+output_videos/*
+!output_videos/.gitkeep
+
+stubs/*.pkl
