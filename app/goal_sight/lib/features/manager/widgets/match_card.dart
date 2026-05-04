@@ -19,21 +19,17 @@ class MatchCard extends StatelessWidget {
     final surface = AppTheme.darkSurface;
     final accent = AppTheme.accentCyan;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8.0),
       child: Material(
         color: surface,
         elevation: 2,
-        borderRadius: AppRadius.card,
+        shape: RoundedRectangleBorder(borderRadius: AppRadius.card),
         child: InkWell(
           borderRadius: AppRadius.card,
           onTap: onTap,
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: AppRadius.card,
-              boxShadow: AppShadows.card,
-            ),
-            padding: const EdgeInsets.all(14),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             child: Row(
               children: [
                 // left: teams and score
