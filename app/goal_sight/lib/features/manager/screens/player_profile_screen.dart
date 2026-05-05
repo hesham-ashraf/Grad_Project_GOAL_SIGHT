@@ -99,7 +99,7 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
           icon: Icon(
             Icons.arrow_back_ios_rounded,
             color: AppColors.textPrimary,
-            size: 20.rs(context),
+            size: context.rs(20, min: 18, max: 24),
           ),
           onPressed: () => Navigator.of(context).pop(),
         ),
@@ -117,58 +117,58 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
           child: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
             child: Padding(
-              padding: EdgeInsets.all(AppSpacing.lg.rs(context)),
+              padding: EdgeInsets.all(context.rs(AppSpacing.lg)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Header Card
                   _buildHeaderCard(context),
-                  SizedBox(height: AppSpacing.xl.rs(context)),
+                  SizedBox(height: context.rs(AppSpacing.xl)),
 
                   // Performance Overview Section
                   _buildSectionTitle('Performance Overview', context),
-                  SizedBox(height: AppSpacing.lg.rs(context)),
+                  SizedBox(height: context.rs(AppSpacing.lg)),
                   _buildPerformanceGrid(context),
-                  SizedBox(height: AppSpacing.xl.rs(context)),
+                  SizedBox(height: context.rs(AppSpacing.xl)),
 
                   // Contribution Section
                   _buildSectionTitle('Contribution Profile', context),
-                  SizedBox(height: AppSpacing.lg.rs(context)),
+                  SizedBox(height: context.rs(AppSpacing.lg)),
                   _buildContributionCards(context),
-                  SizedBox(height: AppSpacing.xl.rs(context)),
+                  SizedBox(height: context.rs(AppSpacing.xl)),
 
                   // Performance Trend Section
                   _buildSectionTitle('Performance Trend', context),
-                  SizedBox(height: AppSpacing.lg.rs(context)),
+                  SizedBox(height: context.rs(AppSpacing.lg)),
                   _buildTrendCard(context),
-                  SizedBox(height: AppSpacing.xl.rs(context)),
+                  SizedBox(height: context.rs(AppSpacing.xl)),
 
                   // Match History Section
                   _buildSectionTitle(
                     'Recent Matches (${widget.player.matchHistory.length})',
                     context,
                   ),
-                  SizedBox(height: AppSpacing.lg.rs(context)),
+                  SizedBox(height: context.rs(AppSpacing.lg)),
                   Column(
                     children: widget.player.matchHistory.map((match) {
                       return PlayerMatchHistoryItem(match: match);
                     }).toList(),
                   ),
-                  SizedBox(height: AppSpacing.xl.rs(context)),
+                  SizedBox(height: context.rs(AppSpacing.xl)),
 
                   // Insights Section
                   if (widget.player.insights.isNotEmpty) ...[
                     _buildSectionTitle('AI Insights', context),
-                    SizedBox(height: AppSpacing.lg.rs(context)),
+                    SizedBox(height: context.rs(AppSpacing.lg)),
                     _buildInsightsCards(context),
-                    SizedBox(height: AppSpacing.xl.rs(context)),
+                    SizedBox(height: context.rs(AppSpacing.xl)),
                   ],
 
                   // Statistics Section
                   _buildSectionTitle('Season Statistics', context),
-                  SizedBox(height: AppSpacing.lg.rs(context)),
+                  SizedBox(height: context.rs(AppSpacing.lg)),
                   _buildStatsGrid(context),
-                  SizedBox(height: AppSpacing.xl.rs(context)),
+                  SizedBox(height: context.rs(AppSpacing.xl)),
                 ],
               ),
             ),
@@ -194,9 +194,9 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
           width: 1,
         ),
         borderRadius: BorderRadius.circular(AppRadius.xxl),
-        boxShadow: [AppShadows.cardGlow],
+        boxShadow: AppShadows.cardGlow,
       ),
-      padding: EdgeInsets.all(AppSpacing.xl.rs(context)),
+      padding: EdgeInsets.all(context.rs(AppSpacing.xl)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -215,13 +215,13 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
-                    SizedBox(height: AppSpacing.sm.rs(context)),
+                    SizedBox(height: context.rs(AppSpacing.sm)),
                     Row(
                       children: [
                         Container(
                           padding: EdgeInsets.symmetric(
-                            horizontal: AppSpacing.sm.rs(context),
-                            vertical: AppSpacing.xs.rs(context),
+                            horizontal: context.rs(AppSpacing.sm),
+                            vertical: context.rs(AppSpacing.xs),
                           ),
                           decoration: BoxDecoration(
                             color: AppColors.primaryPurple.withOpacity(0.2),
@@ -245,7 +245,7 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
               ),
               // Rating Badge
               Container(
-                padding: EdgeInsets.all(AppSpacing.lg.rs(context)),
+                padding: EdgeInsets.all(context.rs(AppSpacing.lg)),
                 decoration: BoxDecoration(
                   color: _getRatingColor().withOpacity(0.15),
                   border: Border.all(
@@ -273,16 +273,18 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
               ),
             ],
           ),
-          SizedBox(height: AppSpacing.lg.rs(context)),
+          SizedBox(height: context.rs(AppSpacing.lg)),
 
-          // Status and Trend
-          Row(
+          // Status and Trend - Use Wrap to prevent overflow
+          Wrap(
+            spacing: context.rs(AppSpacing.md),
+            runSpacing: context.rs(AppSpacing.sm),
             children: [
               // Status Badge
               Container(
                 padding: EdgeInsets.symmetric(
-                  horizontal: AppSpacing.md.rs(context),
-                  vertical: AppSpacing.sm.rs(context),
+                  horizontal: context.rs(AppSpacing.md),
+                  vertical: context.rs(AppSpacing.sm),
                 ),
                 decoration: BoxDecoration(
                   color: widget.player.status == 'Explosive Form'
@@ -307,19 +309,19 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
                   ),
                 ),
               ),
-              SizedBox(width: AppSpacing.md.rs(context)),
 
               // Trend Badge
               Container(
                 padding: EdgeInsets.symmetric(
-                  horizontal: AppSpacing.md.rs(context),
-                  vertical: AppSpacing.sm.rs(context),
+                  horizontal: context.rs(AppSpacing.md),
+                  vertical: context.rs(AppSpacing.sm),
                 ),
                 decoration: BoxDecoration(
                   color: _getTrendColor().withOpacity(0.15),
                   borderRadius: BorderRadius.circular(AppRadius.md),
                 ),
                 child: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       _getTrendIcon(),
@@ -327,7 +329,7 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
                         color: _getTrendColor(),
                       ),
                     ),
-                    SizedBox(width: AppSpacing.xs.rs(context)),
+                    SizedBox(width: context.rs(AppSpacing.xs)),
                     Text(
                       '${widget.player.trendLabel} (${widget.player.improvementRate > 0 ? '+' : ''}${widget.player.improvementRate.toStringAsFixed(1)}%)',
                       style: AppTextStyles.caption(
@@ -347,8 +349,8 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
   Widget _buildPerformanceGrid(BuildContext context) {
     return GridView.count(
       crossAxisCount: 2,
-      crossAxisSpacing: AppSpacing.md.rs(context),
-      mainAxisSpacing: AppSpacing.md.rs(context),
+      crossAxisSpacing: context.rs(AppSpacing.md),
+      mainAxisSpacing: context.rs(AppSpacing.md),
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       children: [
@@ -401,7 +403,7 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
               ),
               borderRadius: BorderRadius.circular(AppRadius.lg),
             ),
-            padding: EdgeInsets.all(AppSpacing.lg.rs(context)),
+            padding: EdgeInsets.all(context.rs(AppSpacing.lg)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -410,9 +412,9 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
                     Icon(
                       Icons.trending_up,
                       color: AppColors.accentGreen,
-                      size: 18.rs(context),
+                      size: context.rs(18),
                     ),
-                    SizedBox(width: AppSpacing.sm.rs(context)),
+                    SizedBox(width: context.rs(AppSpacing.sm)),
                     Text(
                       'Primary',
                       style: AppTextStyles.caption(
@@ -421,7 +423,7 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
                     ),
                   ],
                 ),
-                SizedBox(height: AppSpacing.md.rs(context)),
+                SizedBox(height: context.rs(AppSpacing.md)),
                 Text(
                   widget.player.primaryContribution,
                   style: AppTextStyles.title(
@@ -432,7 +434,7 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
             ),
           ),
         ),
-        SizedBox(width: AppSpacing.md.rs(context)),
+        SizedBox(width: context.rs(AppSpacing.md)),
         Expanded(
           child: Container(
             decoration: BoxDecoration(
@@ -443,7 +445,7 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
               ),
               borderRadius: BorderRadius.circular(AppRadius.lg),
             ),
-            padding: EdgeInsets.all(AppSpacing.lg.rs(context)),
+            padding: EdgeInsets.all(context.rs(AppSpacing.lg)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -452,9 +454,9 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
                     Icon(
                       Icons.trending_down,
                       color: AppColors.accentCyan,
-                      size: 18.rs(context),
+                      size: context.rs(18),
                     ),
-                    SizedBox(width: AppSpacing.sm.rs(context)),
+                    SizedBox(width: context.rs(AppSpacing.sm)),
                     Text(
                       'Secondary',
                       style: AppTextStyles.caption(
@@ -463,7 +465,7 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
                     ),
                   ],
                 ),
-                SizedBox(height: AppSpacing.md.rs(context)),
+                SizedBox(height: context.rs(AppSpacing.md)),
                 Text(
                   widget.player.secondaryContribution,
                   style: AppTextStyles.title(
@@ -492,7 +494,7 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
         ),
         borderRadius: BorderRadius.circular(AppRadius.lg),
       ),
-      padding: EdgeInsets.all(AppSpacing.lg.rs(context)),
+      padding: EdgeInsets.all(context.rs(AppSpacing.lg)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -513,11 +515,11 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
               ),
             ],
           ),
-          SizedBox(height: AppSpacing.lg.rs(context)),
+          SizedBox(height: context.rs(AppSpacing.lg)),
 
           // Mini Line Chart (simplified)
           SizedBox(
-            height: 60.rs(context),
+            height: context.rs(60),
             child: CustomPaint(
               painter: _TrendChartPainter(
                 ratings: ratings,
@@ -528,7 +530,7 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
               size: Size.infinite,
             ),
           ),
-          SizedBox(height: AppSpacing.md.rs(context)),
+          SizedBox(height: context.rs(AppSpacing.md)),
 
           // Stats
           Row(
@@ -593,7 +595,7 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
     return Column(
       children: widget.player.insights.map((insight) {
         return Container(
-          margin: EdgeInsets.only(bottom: AppSpacing.md.rs(context)),
+          margin: EdgeInsets.only(bottom: context.rs(AppSpacing.md)),
           decoration: BoxDecoration(
             color: AppColors.surfaceElevated,
             border: Border.all(
@@ -602,15 +604,15 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
             ),
             borderRadius: BorderRadius.circular(AppRadius.lg),
           ),
-          padding: EdgeInsets.all(AppSpacing.lg.rs(context)),
+          padding: EdgeInsets.all(context.rs(AppSpacing.lg)),
           child: Row(
             children: [
               Icon(
                 Icons.lightbulb_rounded,
                 color: AppColors.primaryBlue,
-                size: 20.rs(context),
+                size: context.rs(20),
               ),
-              SizedBox(width: AppSpacing.md.rs(context)),
+              SizedBox(width: context.rs(AppSpacing.md)),
               Expanded(
                 child: Text(
                   insight,
@@ -629,8 +631,8 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
   Widget _buildStatsGrid(BuildContext context) {
     return GridView.count(
       crossAxisCount: 2,
-      crossAxisSpacing: AppSpacing.md.rs(context),
-      mainAxisSpacing: AppSpacing.md.rs(context),
+      crossAxisSpacing: context.rs(AppSpacing.md),
+      mainAxisSpacing: context.rs(AppSpacing.md),
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       children: [
@@ -687,7 +689,7 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
         ),
         borderRadius: BorderRadius.circular(AppRadius.lg),
       ),
-      padding: EdgeInsets.all(AppSpacing.lg.rs(context)),
+      padding: EdgeInsets.all(context.rs(AppSpacing.lg)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -695,7 +697,7 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
           Icon(
             icon,
             color: color,
-            size: 24.rs(context),
+            size: context.rs(24),
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -704,22 +706,24 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
                 value,
                 style: AppTextStyles.title(
                   color: color,
-                  fontSize: 20.sp(context),
+                ).copyWith(
+                  fontSize: context.sp(20),
                 ),
               ),
-              SizedBox(height: AppSpacing.xs.rs(context)),
+              SizedBox(height: context.rs(AppSpacing.xs)),
               Text(
                 label,
                 style: AppTextStyles.caption(
                   color: AppColors.textSecondary,
                 ),
               ),
-              SizedBox(height: AppSpacing.xxs.rs(context)),
+              SizedBox(height: context.rs(AppSpacing.xxs)),
               Text(
                 subtext,
                 style: AppTextStyles.caption(
                   color: AppColors.textMuted,
-                  fontSize: 10.sp(context),
+                ).copyWith(
+                  fontSize: context.sp(10),
                 ),
               ),
             ],

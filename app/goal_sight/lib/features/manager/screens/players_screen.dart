@@ -3,53 +3,30 @@
 ///
 /// Displays a list of all players under the manager's club.
 /// Features: filtering by position, sorting by rating, navigation to profiles.
+/// Loads real player data from club roster (no mock data).
 /// ---------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:goal_sight/core/theme/app_theme.dart';
 import 'package:goal_sight/core/utils/responsive.dart';
 import 'package:goal_sight/data/models/player_profile_model.dart';
-import 'package:goal_sight/features/manager/players_mock_data.dart';
 import 'package:goal_sight/features/manager/widgets/player_list_card.dart';
+import 'package:goal_sight/presentation/state_management/manager_players_provider.dart';
 
-class PlayersScreen extends StatefulWidget {
+class PlayersScreen extends ConsumerStatefulWidget {
   const PlayersScreen({Key? key}) : super(key: key);
 
   @override
-  State<PlayersScreen> createState() => _PlayersScreenState();
+  ConsumerState<PlayersScreen> createState() => _PlayersScreenState();
 }
 
-class _PlayersScreenState extends State<PlayersScreen> {
-  late String _selectedPosition;
-  late List<PlayerProfileModel> _allPlayers;
-  late List<PlayerProfileModel> _filteredPlayers;
-
-  @override
-  void initState() {
-    super.initState();
-    _allPlayers = List.from(kManagerMockPlayers);
-    _selectedPosition = 'All';
-    _applyFilter();
-  }
-
-  void _applyFilter() {
-    if (_selectedPosition == 'All') {
-      _filteredPlayers = List.from(_allPlayers);
-    } else {
-      _filteredPlayers = _allPlayers
-          .where((p) => p.position.contains(_selectedPosition))
-          .toList();
-    }
-    // Sort by current rating (highest first)
-    _filteredPlayers.sort((a, b) => b.currentRating.compareTo(a.currentRating));
-  }
+class _PlayersScreenState extends ConsumerState<PlayersScreen> {
+  String _selectedPosition = 'All';
 
   void _setPositionFilter(String position) {
-    setState(() {
-      _selectedPosition = position;
-      _applyFilter();
-    });
+    setState(() => _selectedPosition = position);
   }
 
   void _openPlayerProfile(PlayerProfileModel player) {
@@ -58,6 +35,18 @@ class _PlayersScreenState extends State<PlayersScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Get all players from manager's club
+    final allPlayers = ref.watch(managerPlayersProvider);
+
+    // Compute filtered list locally to avoid late-init state issues
+    final List<PlayerProfileModel> filteredPlayers =
+        (_selectedPosition == 'All')
+            ? List.from(allPlayers)
+            : allPlayers
+                .where((p) => p.position.contains(_selectedPosition))
+                .toList();
+    filteredPlayers.sort((a, b) => b.currentRating.compareTo(a.currentRating));
+    
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -75,7 +64,7 @@ class _PlayersScreenState extends State<PlayersScreen> {
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
           child: Padding(
-            padding: EdgeInsets.all(AppSpacing.lg.rs(context)),
+            padding: EdgeInsets.all(context.rs(AppSpacing.lg)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -92,9 +81,9 @@ class _PlayersScreenState extends State<PlayersScreen> {
                             color: AppColors.textPrimary,
                           ),
                         ),
-                        SizedBox(height: AppSpacing.xs.rs(context)),
+                        SizedBox(height: context.rs(AppSpacing.xs)),
                         Text(
-                          '${_filteredPlayers.length} players',
+                          '${filteredPlayers.length} players',
                           style: AppTextStyles.body(
                             color: AppColors.textMuted,
                           ),
@@ -103,8 +92,8 @@ class _PlayersScreenState extends State<PlayersScreen> {
                     ),
                     Container(
                       padding: EdgeInsets.symmetric(
-                        horizontal: AppSpacing.md.rs(context),
-                        vertical: AppSpacing.sm.rs(context),
+                        horizontal: context.rs(AppSpacing.md),
+                        vertical: context.rs(AppSpacing.sm),
                       ),
                       decoration: BoxDecoration(
                         color: AppColors.surfaceElevated,
@@ -118,11 +107,11 @@ class _PlayersScreenState extends State<PlayersScreen> {
                           Icon(
                             Icons.star,
                             color: AppColors.warning,
-                            size: 16.rs(context),
+                            size: context.rs(16),
                           ),
-                          SizedBox(width: AppSpacing.xs.rs(context)),
+                          SizedBox(width: context.rs(AppSpacing.xs)),
                           Text(
-                            'Avg: ${(_allPlayers.map((p) => p.currentRating).reduce((a, b) => a + b) / _allPlayers.length).toStringAsFixed(2)}',
+                            'Avg: ${allPlayers.isEmpty ? '0.00' : (allPlayers.map((p) => p.currentRating).reduce((a, b) => a + b) / allPlayers.length).toStringAsFixed(2)}',
                             style: AppTextStyles.caption(
                               color: AppColors.warning,
                             ),
@@ -132,7 +121,7 @@ class _PlayersScreenState extends State<PlayersScreen> {
                     ),
                   ],
                 ),
-                SizedBox(height: AppSpacing.lg.rs(context)),
+                SizedBox(height: context.rs(AppSpacing.lg)),
 
                 // Position Filter Chips
                 SingleChildScrollView(
@@ -141,34 +130,34 @@ class _PlayersScreenState extends State<PlayersScreen> {
                   child: Row(
                     children: [
                       _buildFilterChip('All', _selectedPosition == 'All'),
-                      SizedBox(width: AppSpacing.sm.rs(context)),
+                      SizedBox(width: context.rs(AppSpacing.sm)),
                       _buildFilterChip('DEF', _selectedPosition == 'DEF'),
-                      SizedBox(width: AppSpacing.sm.rs(context)),
+                      SizedBox(width: context.rs(AppSpacing.sm)),
                       _buildFilterChip('MID', _selectedPosition == 'MID'),
-                      SizedBox(width: AppSpacing.sm.rs(context)),
+                      SizedBox(width: context.rs(AppSpacing.sm)),
                       _buildFilterChip('ATT', _selectedPosition == 'ATT'),
-                      SizedBox(width: AppSpacing.sm.rs(context)),
+                      SizedBox(width: context.rs(AppSpacing.sm)),
                       _buildFilterChip('GK', _selectedPosition == 'GK'),
                     ],
                   ),
                 ),
-                SizedBox(height: AppSpacing.lg.rs(context)),
+                SizedBox(height: context.rs(AppSpacing.lg)),
 
                 // Players List
-                if (_filteredPlayers.isEmpty)
+                if (filteredPlayers.isEmpty)
                   Center(
                     child: Padding(
                       padding: EdgeInsets.symmetric(
-                        vertical: AppSpacing.xxl.rs(context),
+                        vertical: context.rs(AppSpacing.xxl),
                       ),
                       child: Column(
                         children: [
                           Icon(
                             Icons.person_off_outlined,
                             color: AppColors.textMuted,
-                            size: 48.rs(context),
+                            size: context.rs(48),
                           ),
-                          SizedBox(height: AppSpacing.md.rs(context)),
+                          SizedBox(height: context.rs(AppSpacing.md)),
                           Text(
                             'No players found',
                             style: AppTextStyles.body(
@@ -181,14 +170,14 @@ class _PlayersScreenState extends State<PlayersScreen> {
                   )
                 else
                   Column(
-                    children: _filteredPlayers.map((player) {
+                    children: filteredPlayers.map((player) {
                       return PlayerListCard(
                         player: player,
                         onTap: () => _openPlayerProfile(player),
                       );
                     }).toList(),
                   ),
-                SizedBox(height: AppSpacing.lg.rs(context)),
+                SizedBox(height: context.rs(AppSpacing.lg)),
               ],
             ),
           ),
@@ -202,8 +191,8 @@ class _PlayersScreenState extends State<PlayersScreen> {
       onTap: () => _setPositionFilter(label),
       child: Container(
         padding: EdgeInsets.symmetric(
-          horizontal: AppSpacing.md.rs(context),
-          vertical: AppSpacing.sm.rs(context),
+          horizontal: context.rs(AppSpacing.md),
+          vertical: context.rs(AppSpacing.sm),
         ),
         decoration: BoxDecoration(
           color: isSelected

@@ -60,7 +60,7 @@ class PlayerMatchHistoryItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(bottom: AppSpacing.md.rs(context)),
+      margin: EdgeInsets.only(bottom: context.rs(AppSpacing.md)),
       decoration: BoxDecoration(
         color: AppColors.surfaceElevated,
         border: Border.all(
@@ -69,7 +69,7 @@ class PlayerMatchHistoryItem extends StatelessWidget {
         ),
         borderRadius: BorderRadius.circular(AppRadius.lg),
       ),
-      padding: EdgeInsets.all(AppSpacing.lg.rs(context)),
+      padding: EdgeInsets.all(context.rs(AppSpacing.lg)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -85,11 +85,12 @@ class PlayerMatchHistoryItem extends StatelessWidget {
                       '${match.homeTeam} vs ${match.awayTeam}',
                       style: AppTextStyles.title(
                         color: AppColors.textPrimary,
-                        fontSize: 15.sp(context),
+                      ).copyWith(
+                        fontSize: context.sp(15),
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
-                    SizedBox(height: AppSpacing.xs.rs(context)),
+                    SizedBox(height: context.rs(AppSpacing.xs)),
                     Text(
                       _formatDate(match.matchDate),
                       style: AppTextStyles.caption(
@@ -99,13 +100,13 @@ class PlayerMatchHistoryItem extends StatelessWidget {
                   ],
                 ),
               ),
-              SizedBox(width: AppSpacing.md.rs(context)),
+              SizedBox(width: context.rs(AppSpacing.md)),
 
               // Rating Badge
               Container(
                 padding: EdgeInsets.symmetric(
-                  horizontal: AppSpacing.md.rs(context),
-                  vertical: AppSpacing.sm.rs(context),
+                  horizontal: context.rs(AppSpacing.md),
+                  vertical: context.rs(AppSpacing.sm),
                 ),
                 decoration: BoxDecoration(
                   color: _getPerformanceColor().withOpacity(0.15),
@@ -121,7 +122,8 @@ class PlayerMatchHistoryItem extends StatelessWidget {
                       '${match.playerRating.toStringAsFixed(1)}',
                       style: AppTextStyles.title(
                         color: _getPerformanceColor(),
-                        fontSize: 16.sp(context),
+                      ).copyWith(
+                        fontSize: context.sp(16),
                       ),
                     ),
                     Text(
@@ -135,7 +137,7 @@ class PlayerMatchHistoryItem extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: AppSpacing.md.rs(context)),
+          SizedBox(height: context.rs(AppSpacing.md)),
 
           // Stats Grid
           Container(
@@ -143,7 +145,7 @@ class PlayerMatchHistoryItem extends StatelessWidget {
               color: AppColors.background.withOpacity(0.5),
               borderRadius: BorderRadius.circular(AppRadius.md),
             ),
-            padding: EdgeInsets.all(AppSpacing.md.rs(context)),
+            padding: EdgeInsets.all(context.rs(AppSpacing.md)),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -205,17 +207,18 @@ class _StatBadge extends StatelessWidget {
         Icon(
           icon,
           color: AppColors.accentCyan,
-          size: 18.rs(this.context),
+          size: context.rs(18),
         ),
-        SizedBox(height: AppSpacing.xs.rs(this.context)),
+        SizedBox(height: context.rs(AppSpacing.xs)),
         Text(
           value,
           style: AppTextStyles.title(
             color: AppColors.textPrimary,
-            fontSize: 14.sp(this.context),
+          ).copyWith(
+            fontSize: context.sp(14),
           ),
         ),
-        SizedBox(height: AppSpacing.xxs.rs(this.context)),
+        SizedBox(height: context.rs(AppSpacing.xxs)),
         Text(
           label,
           style: AppTextStyles.caption(

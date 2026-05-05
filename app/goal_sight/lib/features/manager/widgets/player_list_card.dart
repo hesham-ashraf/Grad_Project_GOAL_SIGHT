@@ -57,7 +57,7 @@ class PlayerListCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(bottom: AppSpacing.md.rs(context)),
+      margin: EdgeInsets.only(bottom: context.rs(AppSpacing.md)),
       child: Material(
         color: Colors.transparent,
         elevation: 0,
@@ -72,11 +72,11 @@ class PlayerListCard extends StatelessWidget {
                 width: 1,
               ),
               borderRadius: BorderRadius.circular(AppRadius.lg),
-              boxShadow: [AppShadows.card],
+              boxShadow: AppShadows.card,
             ),
             padding: EdgeInsets.symmetric(
-              horizontal: AppSpacing.lg.rs(context),
-              vertical: AppSpacing.md.rs(context),
+              horizontal: context.rs(AppSpacing.lg),
+              vertical: context.rs(AppSpacing.md),
             ),
             child: Row(
               children: [
@@ -93,16 +93,17 @@ class PlayerListCard extends StatelessWidget {
                               player.name,
                               style: AppTextStyles.title(
                                 color: AppColors.textPrimary,
-                                fontSize: 16.sp(context),
+                              ).copyWith(
+                                fontSize: context.sp(16),
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          SizedBox(width: AppSpacing.sm.rs(context)),
+                          SizedBox(width: context.rs(AppSpacing.sm)),
                           Container(
                             padding: EdgeInsets.symmetric(
-                              horizontal: AppSpacing.xs.rs(context),
-                              vertical: AppSpacing.xxs.rs(context),
+                              horizontal: context.rs(AppSpacing.xs),
+                              vertical: context.rs(AppSpacing.xxs),
                             ),
                             decoration: BoxDecoration(
                               color: AppColors.primaryPurple.withOpacity(0.2),
@@ -121,7 +122,7 @@ class PlayerListCard extends StatelessWidget {
                           ),
                         ],
                       ),
-                      SizedBox(height: AppSpacing.xs.rs(context)),
+                      SizedBox(height: context.rs(AppSpacing.xs)),
 
                       // Rating and Trend Row
                       Row(
@@ -136,21 +137,22 @@ class PlayerListCard extends StatelessWidget {
                                   color: AppColors.textMuted,
                                 ),
                               ),
-                              SizedBox(height: AppSpacing.xxs.rs(context)),
+                              SizedBox(height: context.rs(AppSpacing.xxs)),
                               Row(
                                 children: [
                                   Text(
                                     '${player.currentRating.toStringAsFixed(1)}',
                                     style: AppTextStyles.title(
                                       color: _getRatingColor(),
-                                      fontSize: 18.sp(context),
+                                    ).copyWith(
+                                      fontSize: context.sp(18),
                                     ),
                                   ),
-                                  SizedBox(width: AppSpacing.xs.rs(context)),
+                                  SizedBox(width: context.rs(AppSpacing.xs)),
                                   Container(
                                     padding: EdgeInsets.symmetric(
-                                      horizontal: AppSpacing.xs.rs(context),
-                                      vertical: AppSpacing.xxs.rs(context),
+                                      horizontal: context.rs(AppSpacing.xs),
+                                      vertical: context.rs(AppSpacing.xxs),
                                     ),
                                     decoration: BoxDecoration(
                                       color: _getTrendColor().withOpacity(0.15),
@@ -167,13 +169,13 @@ class PlayerListCard extends StatelessWidget {
                               ),
                             ],
                           ),
-                          SizedBox(width: AppSpacing.lg.rs(context)),
+                          SizedBox(width: context.rs(AppSpacing.lg)),
 
                           // Status Badge
                           Container(
                             padding: EdgeInsets.symmetric(
-                              horizontal: AppSpacing.sm.rs(context),
-                              vertical: AppSpacing.xs.rs(context),
+                              horizontal: context.rs(AppSpacing.sm),
+                              vertical: context.rs(AppSpacing.xs),
                             ),
                             decoration: BoxDecoration(
                               color: player.status == 'Explosive Form'
@@ -200,7 +202,7 @@ class PlayerListCard extends StatelessWidget {
                           ),
                         ],
                       ),
-                      SizedBox(height: AppSpacing.xs.rs(context)),
+                      SizedBox(height: context.rs(AppSpacing.xs)),
 
                       // Quick Stats
                       Text(
@@ -213,13 +215,13 @@ class PlayerListCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                SizedBox(width: AppSpacing.md.rs(context)),
+                SizedBox(width: context.rs(AppSpacing.md)),
 
                 // Chevron
                 Icon(
                   Icons.chevron_right_rounded,
                   color: AppColors.textSecondary,
-                  size: 24.rs(context),
+                  size: context.rs(24),
                 ),
               ],
             ),

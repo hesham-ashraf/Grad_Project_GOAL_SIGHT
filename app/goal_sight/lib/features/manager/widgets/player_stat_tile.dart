@@ -40,7 +40,7 @@ class PlayerStatTile extends StatelessWidget {
         ),
         borderRadius: BorderRadius.circular(AppRadius.lg),
       ),
-      padding: EdgeInsets.all(AppSpacing.lg.rs(context)),
+      padding: EdgeInsets.all(context.rs(AppSpacing.lg)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -48,8 +48,8 @@ class PlayerStatTile extends StatelessWidget {
           Row(
             children: [
               Container(
-                width: 40.rs(context),
-                height: 40.rs(context),
+                width: context.rs(40),
+                height: context.rs(40),
                 decoration: BoxDecoration(
                   color: color.withOpacity(0.15),
                   border: Border.all(
@@ -61,10 +61,10 @@ class PlayerStatTile extends StatelessWidget {
                 child: Icon(
                   icon,
                   color: color,
-                  size: 20.rs(context),
+                  size: context.rs(20),
                 ),
               ),
-              SizedBox(width: AppSpacing.md.rs(context)),
+              SizedBox(width: context.rs(AppSpacing.md)),
               Expanded(
                 child: Text(
                   label,
@@ -75,24 +75,25 @@ class PlayerStatTile extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: AppSpacing.md.rs(context)),
+          SizedBox(height: context.rs(AppSpacing.md)),
 
           // Value Display
           Text(
             '${value.toStringAsFixed(value == value.toInt() ? 0 : 1)}$unit',
             style: AppTextStyles.title(
               color: color,
-              fontSize: 24.sp(context),
+            ).copyWith(
+              fontSize: context.sp(24),
             ),
           ),
-          SizedBox(height: AppSpacing.sm.rs(context)),
+          SizedBox(height: context.rs(AppSpacing.sm)),
 
           // Progress Bar
           ClipRRect(
             borderRadius: BorderRadius.circular(AppRadius.sm),
             child: LinearProgressIndicator(
               value: percentage,
-              minHeight: 6.rs(context),
+              minHeight: context.rs(6),
               backgroundColor: AppColors.outline.withOpacity(0.2),
               valueColor: AlwaysStoppedAnimation<Color>(color),
             ),

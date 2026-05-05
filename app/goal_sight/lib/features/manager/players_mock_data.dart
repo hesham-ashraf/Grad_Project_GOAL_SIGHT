@@ -8,7 +8,7 @@
 
 import 'package:goal_sight/data/models/player_profile_model.dart';
 
-const List<PlayerProfileModel> kManagerMockPlayers = [
+final List<PlayerProfileModel> kManagerMockPlayers = [
   // Defender
   PlayerProfileModel(
     id: 'p001',
