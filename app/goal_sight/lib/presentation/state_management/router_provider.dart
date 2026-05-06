@@ -3,20 +3,22 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/constants/app_roles.dart';
 import '../../features/auth/auth_state.dart';
+import '../../features/manager/screens/manager_navigation_screen.dart';
+import '../../features/manager/screens/player_profile_screen.dart';
 import '../../data/models/club_model.dart';
 import '../../data/models/match_analysis_model.dart';
+import '../../data/models/player_profile_model.dart';
 import '../../features/supabase_test/test_supabase_page.dart';
 import '../screens/admin/admin_panel_screen.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/register_screen.dart';
 import '../screens/dashboard/admin_dashboard_screen.dart';
-import '../screens/dashboard/manager_dashboard_screen.dart';
 import '../screens/fan/club_details_screen.dart';
 import '../screens/fan/fan_navigation_screen.dart';
 import '../screens/manager/manager_panel_screen.dart';
 import '../screens/match/live_match_screen.dart';
 import '../screens/match/match_details_screen.dart';
-import '../screens/player/player_profile_screen.dart';
+import '../screens/player/player_profile_screen.dart' as fan_player_profile;
 import '../screens/splash_screen.dart';
 import '../screens/fan/match_analysis_screen.dart';
 import 'app_providers.dart';
@@ -28,7 +30,7 @@ final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authControllerProvider);
 
   return GoRouter(
-    initialLocation: kShowSupabaseTestPage ? '/supabase-test' : '/splash',
+    initialLocation: kShowSupabaseTestPage ? '/supabase-test' : '/login',
     redirect: (context, state) {
       final location = state.matchedLocation;
       final isAuthPage = location == '/login' || location == '/register';
@@ -44,7 +46,7 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       if (authState.status == AuthStatus.initial ||
           authState.status == AuthStatus.loading) {
-        return isSplash ? null : '/splash';
+        return isAuthPage ? null : '/login';
       }
 
       if (authState.status != AuthStatus.authenticated ||
@@ -93,7 +95,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/manager',
-        builder: (context, state) => const ManagerDashboardScreen(),
+        builder: (context, state) => const ManagerNavigationScreen(),
       ),
       GoRoute(
         path: '/fan',
@@ -122,6 +124,13 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const ManagerPanelScreen(),
       ),
       GoRoute(
+        path: '/manager-player-profile',
+        builder: (context, state) {
+          final player = state.extra as PlayerProfileModel;
+          return PlayerProfileScreen(player: player);
+        },
+      ),
+      GoRoute(
         path: '/admin-panel',
         builder: (context, state) => const AdminPanelScreen(),
       ),
@@ -140,7 +149,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/player/:playerId',
         builder: (context, state) {
-          return PlayerProfileScreen(
+          return fan_player_profile.PlayerProfileScreen(
               playerId: state.pathParameters['playerId']!);
         },
       ),

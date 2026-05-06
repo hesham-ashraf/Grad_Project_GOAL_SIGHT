@@ -13,6 +13,10 @@ class AuthRemoteDataSource {
     required String email,
     required String password,
   }) async {
+    if (ApiConstants.enableMockFallback) {
+      return _mockLoginResponse(email: email);
+    }
+
     try {
       final response = await _dio.post(
         ApiConstants.loginEndpoint,
@@ -52,6 +56,18 @@ class AuthRemoteDataSource {
     required String password,
     required UserRole role,
   }) async {
+    if (ApiConstants.enableMockFallback) {
+      return AuthResponseModel.fromJson({
+        'token': 'mock-jwt-token',
+        'user': {
+          'id': '2',
+          'name': name,
+          'email': email,
+          'role': role.value,
+        },
+      });
+    }
+
     try {
       final response = await _dio.post(
         ApiConstants.registerEndpoint,
@@ -75,5 +91,28 @@ class AuthRemoteDataSource {
         },
       });
     }
+  }
+
+  AuthResponseModel _mockLoginResponse({required String email}) {
+    final normalizedEmail = email.toLowerCase();
+    final role = normalizedEmail.contains('admin')
+        ? UserRole.admin
+        : normalizedEmail.contains('manager')
+            ? UserRole.manager
+            : UserRole.fan;
+
+    return AuthResponseModel.fromJson({
+      'token': 'mock-jwt-token',
+      'user': {
+        'id': '1',
+        'name': role == UserRole.admin
+            ? 'Admin User'
+            : role == UserRole.manager
+                ? 'Manager User'
+                : 'Fan User',
+        'email': email,
+        'role': role.value,
+      },
+    });
   }
 }
