@@ -6,6 +6,8 @@ import 'package:goal_sight/features/manager/widgets/profile_header.dart';
 import 'package:goal_sight/features/manager/widgets/info_tile.dart';
 import 'package:goal_sight/features/manager/widgets/action_tile.dart';
 
+import '../../../presentation/state_management/app_providers.dart';
+
 class ManagerProfileScreen extends ConsumerWidget {
   const ManagerProfileScreen({Key? key}) : super(key: key);
 
@@ -124,7 +126,9 @@ class ManagerProfileScreen extends ConsumerWidget {
                               label: 'Logout',
                               icon: Icons.logout,
                               destructive: true,
-                              onTap: () {},
+                              onTap: () => ref
+                                  .read(authControllerProvider.notifier)
+                                  .logout(),
                             ),
                           ],
                         ),

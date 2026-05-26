@@ -6,15 +6,29 @@ import '../../data/repositories/auth_repository.dart';
 import 'auth_state.dart';
 
 class AuthController extends StateNotifier<AuthState> {
-  AuthController(this._authRepository) : super(
-          const AuthState(status: AuthStatus.unauthenticated),
-        );
+  AuthController(this._authRepository) : super(AuthState.initial());
 
   final IAuthRepository _authRepository;
 
   Future<void> restoreSession() async {
-    // Bypassing for UI work
-    return;
+    state = state.copyWith(status: AuthStatus.loading, clearError: true);
+    try {
+      final user = await _authRepository.restoreSession();
+      final token = await _authRepository.getToken();
+      state = user == null
+          ? const AuthState(status: AuthStatus.unauthenticated)
+          : state.copyWith(
+              status: AuthStatus.authenticated,
+              user: user,
+              token: token,
+              clearError: true,
+            );
+    } catch (error) {
+      state = state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: 'Session restore failed. ${error.toString()}',
+      );
+    }
   }
 
   Future<void> login({required String email, required String password}) async {
@@ -53,7 +67,7 @@ class AuthController extends StateNotifier<AuthState> {
       );
       final token = await _authRepository.getToken();
       state = state.copyWith(
-        status: AuthStatus.authenticated,
+        status: AuthStatus.emailVerificationRequired,
         user: user,
         token: token,
         clearError: true,
@@ -67,7 +81,31 @@ class AuthController extends StateNotifier<AuthState> {
   }
 
   Future<void> logout() async {
+    state = state.copyWith(status: AuthStatus.loading, clearError: true);
     await _authRepository.logout();
     state = const AuthState(status: AuthStatus.unauthenticated);
+  }
+
+  Future<void> verifyEmail({required String code}) async {
+    state = state.copyWith(status: AuthStatus.loading, clearError: true);
+    await Future<void>.delayed(const Duration(milliseconds: 700));
+
+    if (code.trim().length < 4) {
+      state = state.copyWith(
+        status: AuthStatus.emailVerificationRequired,
+        errorMessage: 'Enter the verification code sent to your email.',
+      );
+      return;
+    }
+
+    state = state.copyWith(
+      status: AuthStatus.authenticated,
+      clearError: true,
+    );
+  }
+
+  Future<void> resendVerificationEmail() async {
+    state = state.copyWith(clearError: true);
+    await Future<void>.delayed(const Duration(milliseconds: 500));
   }
 }

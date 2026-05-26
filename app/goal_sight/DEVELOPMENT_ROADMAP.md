@@ -46,14 +46,14 @@ Finish the ENTIRE Flutter application visually and functionally using realistic 
 ### 1. AUTHENTICATION FLOW
 
 #### Remaining Tasks
-- [ ] Build Forget Password flow
-- [ ] Build Email Verification flow
-- [ ] Add Splash Screen
-- [ ] Add Session Loading Screen
-- [ ] Add Logout Flow
-- [ ] Add Better Error States
-- [ ] Add Better Loading States
-- [ ] Add Route Protection UX
+- [ 1] Build Forget Password flow
+- [ 1] Build Email Verification flow
+- [ 1] Add Splash Screen
+- [ 1] Add Session Loading Screen
+- [ 1] Add Logout Flow
+- [ 1] Add Better Error States
+- [ 1] Add Better Loading States
+- [ 1] Add Route Protection UX
 - [ ] Add Onboarding Flow (optional)
 
 ### 2. GLOBAL UI/DESIGN SYSTEM

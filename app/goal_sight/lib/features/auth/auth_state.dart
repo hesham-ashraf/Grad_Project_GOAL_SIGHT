@@ -1,6 +1,13 @@
 import '../../data/models/user_model.dart';
 
-enum AuthStatus { initial, loading, authenticated, unauthenticated, error }
+enum AuthStatus {
+  initial,
+  loading,
+  authenticated,
+  unauthenticated,
+  emailVerificationRequired,
+  error,
+}
 
 class AuthState {
   const AuthState({

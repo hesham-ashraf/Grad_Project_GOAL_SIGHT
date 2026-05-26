@@ -15,6 +15,8 @@ import '../screens/auth/register_screen.dart';
 import '../screens/admin/admin_navigation_screen.dart';
 import '../screens/admin/manager_details_page.dart';
 import '../screens/admin/player_intelligence_page.dart';
+import '../screens/auth/email_verification_screen.dart';
+import '../screens/auth/forgot_password_screen.dart';
 import '../screens/fan/club_details_screen.dart';
 import '../screens/fan/fan_navigation_screen.dart';
 import '../screens/manager/manager_panel_screen.dart';
@@ -32,11 +34,15 @@ final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authControllerProvider);
 
   return GoRouter(
-    initialLocation: kShowSupabaseTestPage ? '/supabase-test' : '/login',
+    initialLocation: kShowSupabaseTestPage ? '/supabase-test' : '/splash',
     redirect: (context, state) {
       final location = state.matchedLocation;
-      final isAuthPage = location == '/login' || location == '/register';
+      final isAuthPage = location == '/login' ||
+          location == '/register' ||
+          location == '/forgot-password' ||
+          location == '/email-verification';
       final isSplash = location == '/splash';
+      final isEmailVerification = location == '/email-verification';
       final isSupabaseTest = location == '/supabase-test';
       final isAdminRoute =
           location.startsWith('/admin') || location == '/admin-panel';
@@ -46,9 +52,17 @@ final routerProvider = Provider<GoRouter>((ref) {
       // Allow the test page without auth redirects.
       if (isSupabaseTest) return null;
 
-      if (authState.status == AuthStatus.initial ||
-          authState.status == AuthStatus.loading) {
-        return isAuthPage ? null : '/login';
+      if (authState.status == AuthStatus.initial) {
+        return isSplash ? null : '/splash';
+      }
+
+      if (authState.status == AuthStatus.loading) {
+        if (isAuthPage) return null;
+        return isSplash ? null : '/splash';
+      }
+
+      if (authState.status == AuthStatus.emailVerificationRequired) {
+        return isEmailVerification ? null : '/email-verification';
       }
 
       if (authState.status != AuthStatus.authenticated ||
@@ -90,6 +104,14 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/register',
         builder: (context, state) => const RegisterScreen(),
+      ),
+      GoRoute(
+        path: '/forgot-password',
+        builder: (context, state) => const ForgotPasswordScreen(),
+      ),
+      GoRoute(
+        path: '/email-verification',
+        builder: (context, state) => const EmailVerificationScreen(),
       ),
       GoRoute(
         path: '/supabase-test',
