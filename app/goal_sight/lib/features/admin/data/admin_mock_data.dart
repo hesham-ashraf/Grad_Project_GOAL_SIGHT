@@ -1,0 +1,161 @@
+import '../../../data/models/manager_model.dart';
+import '../../../data/models/player_analysis_model.dart';
+import '../../../data/models/tactical_insight_model.dart';
+import '../../../data/models/activity_model.dart';
+
+class AdminMockData {
+  static final List<ManagerModel> managers = [
+    ManagerModel(
+      id: 'm1',
+      name: 'Jurgen Klopp',
+      email: 'jurgen@liverpool.com',
+      imageUrl: 'https://i.pravatar.cc/150?u=jurgen',
+      uploadCount: 142,
+      lastActive: DateTime.now().subtract(const Duration(hours: 2)),
+      isActive: true,
+      matchesAnalyzed: 89,
+      tacticalRating: 9.2,
+    ),
+    ManagerModel(
+      id: 'm2',
+      name: 'Pep Guardiola',
+      email: 'pep@mancity.com',
+      imageUrl: 'https://i.pravatar.cc/150?u=pep',
+      uploadCount: 210,
+      lastActive: DateTime.now().subtract(const Duration(minutes: 15)),
+      isActive: true,
+      matchesAnalyzed: 156,
+      tacticalRating: 9.5,
+    ),
+    ManagerModel(
+      id: 'm3',
+      name: 'Mikel Arteta',
+      email: 'mikel@arsenal.com',
+      imageUrl: 'https://i.pravatar.cc/150?u=mikel',
+      uploadCount: 87,
+      lastActive: DateTime.now().subtract(const Duration(days: 1)),
+      isActive: false,
+      matchesAnalyzed: 45,
+      tacticalRating: 8.7,
+    ),
+  ];
+
+  static final List<PlayerAnalysisModel> squad = [
+    PlayerAnalysisModel(
+      id: 'p1',
+      name: 'Mo Salah',
+      position: 'RW',
+      imageUrl: 'https://i.pravatar.cc/150?u=salah',
+      overallRating: 9.1,
+      fatigueLevel: 65.0,
+      injuryRisk: 15.0,
+      workRate: 85.0,
+      tacticalImpact: 92.0,
+      keyStrengths: ['Pace', 'Finishing', 'Dribbling'],
+      weaknesses: ['Defensive Contribution'],
+      recentRatings: {'Match 1': 8.5, 'Match 2': 9.2, 'Match 3': 7.8},
+    ),
+    PlayerAnalysisModel(
+      id: 'p2',
+      name: 'Kevin De Bruyne',
+      position: 'CM',
+      imageUrl: 'https://i.pravatar.cc/150?u=kdb',
+      overallRating: 9.3,
+      fatigueLevel: 78.0,
+      injuryRisk: 40.0,
+      workRate: 80.0,
+      tacticalImpact: 96.0,
+      keyStrengths: ['Passing', 'Vision', 'Long Shots'],
+      weaknesses: ['Pace'],
+      recentRatings: {'Match 1': 9.0, 'Match 2': 8.8, 'Match 3': 9.5},
+    ),
+    PlayerAnalysisModel(
+      id: 'p3',
+      name: 'Virgil van Dijk',
+      position: 'CB',
+      imageUrl: 'https://i.pravatar.cc/150?u=vvd',
+      overallRating: 8.9,
+      fatigueLevel: 45.0,
+      injuryRisk: 10.0,
+      workRate: 75.0,
+      tacticalImpact: 90.0,
+      keyStrengths: ['Aerial Ability', 'Tackling', 'Leadership'],
+      weaknesses: ['Acceleration'],
+      recentRatings: {'Match 1': 8.0, 'Match 2': 8.5, 'Match 3': 8.2},
+    ),
+    PlayerAnalysisModel(
+      id: 'p4',
+      name: 'Bukayo Saka',
+      position: 'RW',
+      imageUrl: 'https://i.pravatar.cc/150?u=saka',
+      overallRating: 8.7,
+      fatigueLevel: 85.0,
+      injuryRisk: 60.0,
+      workRate: 95.0,
+      tacticalImpact: 88.0,
+      keyStrengths: ['Dribbling', 'Work Rate', 'Crossing'],
+      weaknesses: ['Weak Foot'],
+      recentRatings: {'Match 1': 8.2, 'Match 2': 7.5, 'Match 3': 8.9},
+    ),
+  ];
+
+  static final List<TacticalInsightModel> tacticalInsights = [
+    TacticalInsightModel(
+      id: 'ti1',
+      title: 'Vulnerability on Counter-Attacks',
+      description: 'High defensive line leaves large spaces behind. 40% of conceded goals came from quick transitions.',
+      category: 'Weakness',
+      impactScore: 8.5,
+      generatedAt: DateTime.now().subtract(const Duration(hours: 5)),
+      relatedMatchId: 'm1',
+    ),
+    TacticalInsightModel(
+      id: 'ti2',
+      title: 'Strong Left Flank Overloads',
+      description: 'Excellent combinations between LB and LW creating numerous crossing opportunities.',
+      category: 'Strength',
+      impactScore: 7.8,
+      generatedAt: DateTime.now().subtract(const Duration(days: 1)),
+      relatedMatchId: 'm2',
+    ),
+    TacticalInsightModel(
+      id: 'ti3',
+      title: 'Exploit Space Between CBs',
+      description: 'Opponent\'s center backs struggle with runners from deep midfield.',
+      category: 'Opportunity',
+      impactScore: 9.0,
+      generatedAt: DateTime.now().subtract(const Duration(hours: 12)),
+      relatedMatchId: 'm3',
+    ),
+  ];
+
+  static final List<ActivityModel> recentActivity = [
+    ActivityModel(
+      id: 'a1',
+      userId: 'm1',
+      userName: 'Jurgen Klopp',
+      userRole: 'Manager',
+      action: 'Analyzed Match',
+      description: 'Completed tactical analysis for Match vs Chelsea',
+      timestamp: DateTime.now().subtract(const Duration(minutes: 45)),
+    ),
+    ActivityModel(
+      id: 'a2',
+      userId: 'admin1',
+      userName: 'System Admin',
+      userRole: 'Admin',
+      action: 'Updated Permissions',
+      description: 'Granted upload rights to Assistant Manager',
+      timestamp: DateTime.now().subtract(const Duration(hours: 2)),
+    ),
+    ActivityModel(
+      id: 'a3',
+      userId: 'm2',
+      userName: 'Pep Guardiola',
+      userRole: 'Manager',
+      action: 'Downloaded Report',
+      description: 'Downloaded weekly fitness report',
+      timestamp: DateTime.now().subtract(const Duration(hours: 5)),
+    ),
+  ];
+}

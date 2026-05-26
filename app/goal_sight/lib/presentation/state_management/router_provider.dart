@@ -12,7 +12,9 @@ import '../../features/supabase_test/test_supabase_page.dart';
 import '../screens/admin/admin_panel_screen.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/register_screen.dart';
-import '../screens/dashboard/admin_dashboard_screen.dart';
+import '../screens/admin/admin_navigation_screen.dart';
+import '../screens/admin/manager_details_page.dart';
+import '../screens/admin/player_intelligence_page.dart';
 import '../screens/fan/club_details_screen.dart';
 import '../screens/fan/fan_navigation_screen.dart';
 import '../screens/manager/manager_panel_screen.dart';
@@ -103,7 +105,39 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/admin',
-        builder: (context, state) => const AdminDashboardScreen(),
+        builder: (context, state) => const AdminNavigationScreen(initialIndex: 0),
+      ),
+      GoRoute(
+        path: '/admin/home',
+        builder: (context, state) => const AdminNavigationScreen(initialIndex: 0),
+      ),
+      GoRoute(
+        path: '/admin/managers',
+        builder: (context, state) => const AdminNavigationScreen(initialIndex: 1),
+      ),
+      GoRoute(
+        path: '/admin/squad',
+        builder: (context, state) => const AdminNavigationScreen(initialIndex: 2),
+      ),
+      GoRoute(
+        path: '/admin/club-analytics',
+        builder: (context, state) => const AdminNavigationScreen(initialIndex: 3),
+      ),
+      GoRoute(
+        path: '/admin/profile',
+        builder: (context, state) => const AdminNavigationScreen(initialIndex: 4),
+      ),
+      GoRoute(
+        path: '/admin/managers/:id',
+        builder: (context, state) {
+          return ManagerDetailsPage(managerId: state.pathParameters['id']!);
+        },
+      ),
+      GoRoute(
+        path: '/admin/player/:id',
+        builder: (context, state) {
+          return PlayerIntelligencePage(playerId: state.pathParameters['id']!);
+        },
       ),
       GoRoute(
         path: '/fan-match-analysis',
