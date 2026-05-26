@@ -9,6 +9,30 @@ The roadmap follows the correct order:
 3. Integrate AI Models
 4. Final Production Polish
 
+---
+
+## 📊 PROGRESS TRACKING
+
+**Click any checkbox below to mark tasks complete. Progress updates automatically.**
+
+### Phase 1 — Flutter Frontend
+- [ ] ✅ 0% Complete
+- Tasks: Authentication, UI System, Fan Role, Manager Role, Admin Role, Mock Data, UX Polish
+
+### Phase 2 — Backend + Supabase
+- [ ] ✅ 0% Complete
+- Tasks: Supabase Setup, Database Design, Auth Integration, Data Integration, Storage, Realtime
+
+### Phase 3 — AI Integration
+- [ ] ✅ 0% Complete
+- Tasks: AI API, Analysis, Visualizations, Player Intelligence
+
+### Phase 4 — Production Polish
+- [ ] ✅ 0% Complete
+- Tasks: Performance, Security, Testing, Deployment
+
+---
+
 ## PHASE 1 — COMPLETE FLUTTER FRONTEND
 
 ### GOAL
