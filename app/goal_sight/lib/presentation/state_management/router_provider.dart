@@ -25,6 +25,7 @@ import '../screens/match/match_details_screen.dart';
 import '../screens/player/player_profile_screen.dart' as fan_player_profile;
 import '../screens/splash_screen.dart';
 import '../screens/fan/match_analysis_screen.dart';
+import '../../shared/transitions/transitions.dart';
 import 'app_providers.dart';
 
 // Temporary: set to false when you finish Supabase testing.
@@ -95,118 +96,203 @@ final routerProvider = Provider<GoRouter>((ref) {
     routes: [
       GoRoute(
         path: '/splash',
-        builder: (context, state) => const SplashScreen(),
+        pageBuilder: (context, state) => goalSightTransitionPage(
+          state: state,
+          child: const SplashScreen(),
+          transition: GoalSightPageTransition.fade,
+        ),
       ),
       GoRoute(
         path: '/login',
-        builder: (context, state) => const LoginScreen(),
+        pageBuilder: (context, state) => goalSightTransitionPage(
+          state: state,
+          child: const LoginScreen(),
+          transition: GoalSightPageTransition.fade,
+        ),
       ),
       GoRoute(
         path: '/register',
-        builder: (context, state) => const RegisterScreen(),
+        pageBuilder: (context, state) => goalSightTransitionPage(
+          state: state,
+          child: const RegisterScreen(),
+          transition: GoalSightPageTransition.slideLeft,
+        ),
       ),
       GoRoute(
         path: '/forgot-password',
-        builder: (context, state) => const ForgotPasswordScreen(),
+        pageBuilder: (context, state) => goalSightTransitionPage(
+          state: state,
+          child: const ForgotPasswordScreen(),
+          transition: GoalSightPageTransition.modal,
+        ),
       ),
       GoRoute(
         path: '/email-verification',
-        builder: (context, state) => const EmailVerificationScreen(),
+        pageBuilder: (context, state) => goalSightTransitionPage(
+          state: state,
+          child: const EmailVerificationScreen(),
+          transition: GoalSightPageTransition.slideUp,
+        ),
       ),
       GoRoute(
         path: '/supabase-test',
-        builder: (context, state) => const TestSupabasePage(),
+        pageBuilder: (context, state) => goalSightTransitionPage(
+          state: state,
+          child: const TestSupabasePage(),
+        ),
       ),
       GoRoute(
         path: '/manager',
-        builder: (context, state) => const ManagerNavigationScreen(),
+        pageBuilder: (context, state) => goalSightTransitionPage(
+          state: state,
+          child: const ManagerNavigationScreen(),
+        ),
       ),
       GoRoute(
         path: '/fan',
-        builder: (context, state) => const FanNavigationScreen(),
+        pageBuilder: (context, state) => goalSightTransitionPage(
+          state: state,
+          child: const FanNavigationScreen(),
+        ),
       ),
       GoRoute(
         path: '/admin',
-        builder: (context, state) => const AdminNavigationScreen(initialIndex: 0),
+        pageBuilder: (context, state) => goalSightTransitionPage(
+          state: state,
+          child: const AdminNavigationScreen(initialIndex: 0),
+        ),
       ),
       GoRoute(
         path: '/admin/home',
-        builder: (context, state) => const AdminNavigationScreen(initialIndex: 0),
+        pageBuilder: (context, state) => goalSightTransitionPage(
+          state: state,
+          child: const AdminNavigationScreen(initialIndex: 0),
+        ),
       ),
       GoRoute(
         path: '/admin/managers',
-        builder: (context, state) => const AdminNavigationScreen(initialIndex: 1),
+        pageBuilder: (context, state) => goalSightTransitionPage(
+          state: state,
+          child: const AdminNavigationScreen(initialIndex: 1),
+        ),
       ),
       GoRoute(
         path: '/admin/squad',
-        builder: (context, state) => const AdminNavigationScreen(initialIndex: 2),
+        pageBuilder: (context, state) => goalSightTransitionPage(
+          state: state,
+          child: const AdminNavigationScreen(initialIndex: 2),
+        ),
       ),
       GoRoute(
         path: '/admin/club-analytics',
-        builder: (context, state) => const AdminNavigationScreen(initialIndex: 3),
+        pageBuilder: (context, state) => goalSightTransitionPage(
+          state: state,
+          child: const AdminNavigationScreen(initialIndex: 3),
+        ),
       ),
       GoRoute(
         path: '/admin/profile',
-        builder: (context, state) => const AdminNavigationScreen(initialIndex: 4),
+        pageBuilder: (context, state) => goalSightTransitionPage(
+          state: state,
+          child: const AdminNavigationScreen(initialIndex: 4),
+        ),
       ),
       GoRoute(
         path: '/admin/managers/:id',
-        builder: (context, state) {
-          return ManagerDetailsPage(managerId: state.pathParameters['id']!);
+        pageBuilder: (context, state) {
+          return goalSightTransitionPage(
+            state: state,
+            child: ManagerDetailsPage(managerId: state.pathParameters['id']!),
+            transition: GoalSightPageTransition.slideLeft,
+          );
         },
       ),
       GoRoute(
         path: '/admin/player/:id',
-        builder: (context, state) {
-          return PlayerIntelligencePage(playerId: state.pathParameters['id']!);
+        pageBuilder: (context, state) {
+          return goalSightTransitionPage(
+            state: state,
+            child: PlayerIntelligencePage(playerId: state.pathParameters['id']!),
+            transition: GoalSightPageTransition.slideLeft,
+          );
         },
       ),
       GoRoute(
         path: '/fan-match-analysis',
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final match = state.extra as MatchAnalysisModel;
-          return MatchAnalysisScreen(match: match);
+          return goalSightTransitionPage(
+            state: state,
+            child: MatchAnalysisScreen(match: match),
+            transition: GoalSightPageTransition.slideLeft,
+          );
         },
       ),
       GoRoute(
         path: '/fan-club-details',
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final club = state.extra as ClubModel;
-          return ClubDetailsScreen(club: club);
+          return goalSightTransitionPage(
+            state: state,
+            child: ClubDetailsScreen(club: club),
+            transition: GoalSightPageTransition.slideLeft,
+          );
         },
       ),
       GoRoute(
         path: '/manager-panel',
-        builder: (context, state) => const ManagerPanelScreen(),
+        pageBuilder: (context, state) => goalSightTransitionPage(
+          state: state,
+          child: const ManagerPanelScreen(),
+        ),
       ),
       GoRoute(
         path: '/manager-player-profile',
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final player = state.extra as PlayerProfileModel;
-          return PlayerProfileScreen(player: player);
+          return goalSightTransitionPage(
+            state: state,
+            child: PlayerProfileScreen(player: player),
+            transition: GoalSightPageTransition.slideLeft,
+          );
         },
       ),
       GoRoute(
         path: '/admin-panel',
-        builder: (context, state) => const AdminPanelScreen(),
+        pageBuilder: (context, state) => goalSightTransitionPage(
+          state: state,
+          child: const AdminPanelScreen(),
+        ),
       ),
       GoRoute(
         path: '/match/:matchId',
-        builder: (context, state) {
-          return MatchDetailsScreen(matchId: state.pathParameters['matchId']!);
+        pageBuilder: (context, state) {
+          return goalSightTransitionPage(
+            state: state,
+            child: MatchDetailsScreen(matchId: state.pathParameters['matchId']!),
+            transition: GoalSightPageTransition.slideLeft,
+          );
         },
       ),
       GoRoute(
         path: '/live-match/:matchId',
-        builder: (context, state) {
-          return LiveMatchScreen(matchId: state.pathParameters['matchId']!);
+        pageBuilder: (context, state) {
+          return goalSightTransitionPage(
+            state: state,
+            child: LiveMatchScreen(matchId: state.pathParameters['matchId']!),
+            transition: GoalSightPageTransition.slideLeft,
+          );
         },
       ),
       GoRoute(
         path: '/player/:playerId',
-        builder: (context, state) {
-          return fan_player_profile.PlayerProfileScreen(
-              playerId: state.pathParameters['playerId']!);
+        pageBuilder: (context, state) {
+          return goalSightTransitionPage(
+            state: state,
+            child: fan_player_profile.PlayerProfileScreen(
+                playerId: state.pathParameters['playerId']!),
+            transition: GoalSightPageTransition.slideLeft,
+          );
         },
       ),
     ],

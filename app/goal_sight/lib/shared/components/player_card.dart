@@ -250,7 +250,7 @@ class _AnimatedMetric extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final clamped = value.clamp(0, 100);
+    final clamped = value.clamp(0, 100).toDouble();
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0, end: clamped / 100),
       duration: const Duration(milliseconds: 700),

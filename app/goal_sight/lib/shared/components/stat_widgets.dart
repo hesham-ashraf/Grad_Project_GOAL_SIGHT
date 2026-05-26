@@ -221,7 +221,7 @@ class GoalSightComparisonStat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final total = (leftValue + rightValue).clamp(1, 1000);
+    final total = (leftValue + rightValue).clamp(1, 1000).toDouble();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,

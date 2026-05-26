@@ -1,3 +1,4 @@
+export 'animated_tactical_widgets.dart';
 export 'ai_recommendation_card.dart';
 export 'analytics_card.dart';
 export 'glass_container.dart';

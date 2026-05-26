@@ -1,4 +1,6 @@
+export 'animations/animations.dart';
 export 'charts/chart_wrapper.dart';
+export 'components/animated_tactical_widgets.dart';
 export 'components/ai_recommendation_card.dart';
 export 'components/analytics_card.dart';
 export 'components/glass_container.dart';
@@ -8,6 +10,8 @@ export 'components/risk_badge.dart';
 export 'components/section_header.dart';
 export 'components/stat_widgets.dart';
 export 'components/tactical_insight_card.dart';
+export 'responsive/responsive.dart';
 export 'states/app_state_widgets.dart';
 export 'states/global_app_state.dart';
+export 'transitions/transitions.dart';
 export 'widgets/animated_reveal.dart';

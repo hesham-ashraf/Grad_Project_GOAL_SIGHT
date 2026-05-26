@@ -87,7 +87,7 @@ class _GoalSightAiRecommendationCardState
                 SizedBox(width: context.rs(12, min: 10, max: 14)),
                 Expanded(
                   child: Text(
-                    title,
+                    widget.title,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: AppTextStyles.title(color: AppColors.textPrimary).copyWith(

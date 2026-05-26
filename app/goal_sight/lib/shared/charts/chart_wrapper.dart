@@ -4,6 +4,7 @@ import '../../core/theme/app_theme.dart';
 import '../../core/utils/responsive.dart';
 import '../components/glass_container.dart';
 import '../components/section_header.dart';
+import '../responsive/responsive.dart';
 import '../states/app_state_widgets.dart';
 
 class GoalSightChartLegendItem {
@@ -61,8 +62,11 @@ class GoalSightChartWrapper extends StatelessWidget {
             trailing: legend.isEmpty ? null : _Legend(items: legend),
           ),
           SizedBox(height: context.rs(16, min: 12, max: 20)),
-          ConstrainedBox(
-            constraints: BoxConstraints(minHeight: context.rs(minHeight, min: 160, max: 340)),
+          GoalSightResponsiveChartBox(
+            phoneHeight: minHeight,
+            tabletHeight: minHeight + 48,
+            landscapeHeight: minHeight + 12,
+            desktopHeight: minHeight + 80,
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 220),
               child: isLoading

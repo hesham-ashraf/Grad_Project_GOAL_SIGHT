@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../animations/reveal_animations.dart';
+
 class GoalSightAnimatedReveal extends StatelessWidget {
   const GoalSightAnimatedReveal({
     super.key,
@@ -16,31 +18,25 @@ class GoalSightAnimatedReveal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0, end: 1),
-      duration: duration + delay,
-      curve: Curves.easeOutCubic,
-      builder: (context, value, child) {
-        final delayedValue = delay == Duration.zero
-            ? value
-            : ((value * (duration + delay).inMilliseconds - delay.inMilliseconds) /
-                    duration.inMilliseconds)
-                .clamp(0.0, 1.0)
-                .toDouble();
-
-        return Opacity(
-          opacity: delayedValue,
-          child: Transform.translate(
-            offset: Offset(
-              offset.dx * (1 - delayedValue),
-              offset.dy * (1 - delayedValue),
-            ),
-            child: child,
-          ),
-        );
-      },
+    return GoalSightReveal(
+      delay: delay,
+      duration: duration,
+      direction: _direction,
+      distance: offset.distance,
       child: child,
     );
+  }
+
+  GoalSightRevealDirection get _direction {
+    if (offset.dx.abs() > offset.dy.abs()) {
+      return offset.dx >= 0
+          ? GoalSightRevealDirection.left
+          : GoalSightRevealDirection.right;
+    }
+    if (offset.dy == 0) return GoalSightRevealDirection.none;
+    return offset.dy >= 0
+        ? GoalSightRevealDirection.up
+        : GoalSightRevealDirection.down;
   }
 }
 
@@ -58,16 +54,10 @@ class GoalSightStaggeredList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        for (var i = 0; i < children.length; i++) ...[
-          GoalSightAnimatedReveal(
-            delay: Duration(milliseconds: delayStep.inMilliseconds * i),
-            child: children[i],
-          ),
-          if (i != children.length - 1) SizedBox(height: gap),
-        ],
-      ],
+    return GoalSightStaggeredReveal(
+      spacing: gap,
+      delayStep: delayStep,
+      children: children,
     );
   }
 }

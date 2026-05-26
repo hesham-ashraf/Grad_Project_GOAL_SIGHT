@@ -320,7 +320,7 @@ class _IntensityBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final clamped = value.clamp(0, 100);
+    final clamped = value.clamp(0, 100).toInt();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
