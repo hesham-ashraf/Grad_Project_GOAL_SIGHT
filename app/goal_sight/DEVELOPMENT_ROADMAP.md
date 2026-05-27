@@ -1,490 +1,505 @@
-# GOALSIGHT MOBILE APP — COMPLETE DEVELOPMENT TODO ROADMAP
+# GOALSIGHT MOBILE APP - DEVELOPMENT ROADMAP
 
-This roadmap is now organized into CLEAR PHASES with ONLY the remaining work needed to fully complete the app and all its functionality.
+This roadmap tracks the remaining work to fully complete the GoalSight app.
 
-The roadmap follows the correct order:
+Status rules:
+- `[x]` = implemented in the codebase
+- `[ ]` = still pending
+- `Sign-off` = fill your initials or name when you complete or verify the task
 
-1. Complete Flutter Frontend
-2. Build Backend + Supabase
-3. Integrate AI Models
-4. Final Production Polish
+Recommended sign-off format:
+- `Sign-off: AH | Date: 2026-05-27`
 
----
-
-## 📊 PROGRESS TRACKING
-
-**Click any checkbox below to mark tasks complete. Progress updates automatically.**
-
-### Phase 1 — Flutter Frontend
-- [ ] ✅ 0% Complete
-- Tasks: Authentication, UI System, Fan Role, Manager Role, Admin Role, Mock Data, UX Polish
-
-### Phase 2 — Backend + Supabase
-- [ ] ✅ 0% Complete
-- Tasks: Supabase Setup, Database Design, Auth Integration, Data Integration, Storage, Realtime
-
-### Phase 3 — AI Integration
-- [ ] ✅ 0% Complete
-- Tasks: AI API, Analysis, Visualizations, Player Intelligence
-
-### Phase 4 — Production Polish
-- [ ] ✅ 0% Complete
-- Tasks: Performance, Security, Testing, Deployment
+Last reviewed against the codebase: `2026-05-27`
 
 ---
 
-## PHASE 1 — COMPLETE FLUTTER FRONTEND
+## Phase Overview
 
-### GOAL
+### Phase 1 - Flutter Frontend
+- Focus: authentication, UI system, fan role, manager role, admin role, mock data, UX polish
 
-Finish the ENTIRE Flutter application visually and functionally using realistic mock data only.
+### Phase 2 - Backend + Supabase
+- Focus: Supabase setup, database design, auth integration, data integration, storage, realtime
 
-- NO backend.
-- NO Supabase integration.
-- NO AI integration yet.
+### Phase 3 - AI Integration
+- Focus: AI API, analysis, visualizations, player intelligence
 
-### 1. AUTHENTICATION FLOW
+### Phase 4 - Production Polish
+- Focus: performance, security, testing, deployment
 
-#### Remaining Tasks
-- [ 1] Build Forget Password flow
-- [ 1] Build Email Verification flow
-- [ 1] Add Splash Screen
-- [ 1] Add Session Loading Screen
-- [ 1] Add Logout Flow
-- [ 1] Add Better Error States
-- [ 1] Add Better Loading States
-- [ 1] Add Route Protection UX
-- [ ] Add Onboarding Flow (optional)
+---
 
-### 2. GLOBAL UI/DESIGN SYSTEM
+## PHASE 1 - COMPLETE FLUTTER FRONTEND
+
+### Goal
+
+Finish the full Flutter application visually and functionally with realistic mock data before completing backend and AI integration.
+
+### 1. Authentication Flow
+
+- [x] Build Forgot Password flow | Sign-off: ______ | Date: ______
+- [x] Build Email Verification flow | Sign-off: ______ | Date: ______
+- [x] Add Splash Screen | Sign-off: ______ | Date: ______
+- [x] Add Session Loading Screen | Sign-off: ______ | Date: ______
+- [x] Add Logout Flow | Sign-off: ______ | Date: ______
+- [ ] Add Better Error States | Sign-off: ______ | Date: ______
+- [ ] Add Better Loading States | Sign-off: ______ | Date: ______
+- [x] Add Route Protection UX | Sign-off: ______ | Date: ______
+- [ ] Add Onboarding Flow (optional) | Sign-off: ______ | Date: ______
+
+### 2. Global UI / Design System
 
 #### Shared Components
-- [1 ] Create reusable analytics cards
-- [1 ] Create reusable tactical insight cards
-- [1 ] Create reusable AI recommendation cards
-- [1 ] Create reusable match cards
-- [1 ] Create reusable player cards
-- [ 1] Create reusable risk badges
-- [ 1] Create reusable stat widgets
-- [ 1] Create reusable chart wrappers
-- [ 1] Create reusable section headers
-- [ 1] Create reusable glassmorphism containers
+
+- [x] Create reusable analytics cards | Sign-off: ______ | Date: ______
+- [x] Create reusable tactical insight cards | Sign-off: ______ | Date: ______
+- [x] Create reusable AI recommendation cards | Sign-off: ______ | Date: ______
+- [x] Create reusable match cards | Sign-off: ______ | Date: ______
+- [x] Create reusable player cards | Sign-off: ______ | Date: ______
+- [x] Create reusable risk badges | Sign-off: ______ | Date: ______
+- [x] Create reusable stat widgets | Sign-off: ______ | Date: ______
+- [x] Create reusable chart wrappers | Sign-off: ______ | Date: ______
+- [x] Create reusable section headers | Sign-off: ______ | Date: ______
+- [x] Create reusable glassmorphism containers | Sign-off: ______ | Date: ______
 
 #### App States
-- [ 1] Create loading skeletons
-- [ 1] Create empty states
-- [ 1] Create error states
-- [ 1] Create retry states
-- [ 1] Create offline states
+
+- [x] Create loading skeletons | Sign-off: ______ | Date: ______
+- [x] Create empty states | Sign-off: ______ | Date: ______
+- [x] Create error states | Sign-off: ______ | Date: ______
+- [x] Create retry states | Sign-off: ______ | Date: ______
+- [x] Create offline states | Sign-off: ______ | Date: ______
 
 #### Animations
-- [ 1] Add staggered reveal animations
-- [ 1] Add smooth page transitions
-- [ 1] Add animated cards
-- [ 1] Add shimmer loading animations
-- [ 1] Add animated tactical widgets
-- [ 1] Add animated AI sections
+
+- [x] Add staggered reveal animations | Sign-off: ______ | Date: ______
+- [x] Add smooth page transitions | Sign-off: ______ | Date: ______
+- [x] Add animated cards | Sign-off: ______ | Date: ______
+- [ ] Add shimmer loading animations | Sign-off: ______ | Date: ______
+- [x] Add animated tactical widgets | Sign-off: ______ | Date: ______
+- [x] Add animated AI sections | Sign-off: ______ | Date: ______
 
 #### Responsiveness
-- [ 1] Optimize tablet layouts
-- [ 1] Optimize landscape layouts
-- [ 1] Fix all overflow issues
-- [ 1] Improve responsive charts
-- [ 1] Improve adaptive grids
 
-### 3. FAN ROLE
+- [ ] Optimize tablet layouts | Sign-off: ______ | Date: ______
+- [ ] Optimize landscape layouts | Sign-off: ______ | Date: ______
+- [ ] Fix all overflow issues | Sign-off: ______ | Date: ______
+- [ ] Improve responsive charts | Sign-off: ______ | Date: ______
+- [x] Improve adaptive grids | Sign-off: ______ | Date: ______
+
+### 3. Fan Role
 
 #### Fan Home
-##### Remaining
-- [ ] Add live animated indicators
-- [ ] Add trending matches section
-- [ ] Add tactical insight section
-- [ ] Add AI recommendations section
-- [ ] Add animated stats cards
-- [ ] Improve featured match experience
+
+- [ ] Add live animated indicators | Sign-off: ______ | Date: ______
+- [ ] Add trending matches section | Sign-off: ______ | Date: ______
+- [ ] Add tactical insight section | Sign-off: ______ | Date: ______
+- [ ] Add AI recommendations section | Sign-off: ______ | Date: ______
+- [ ] Add animated stats cards | Sign-off: ______ | Date: ______
+- [x] Improve featured match experience | Sign-off: ______ | Date: ______
 
 #### Matches Screen
-##### Remaining
-- [ ] Add search functionality
-- [ ] Add league filtering
-- [ ] Add date filtering
-- [ ] Add match intensity indicators
-- [ ] Improve match cards UI
-- [ ] Add match status badges
 
-#### Match Analysis Screen (VERY IMPORTANT)
-##### Remaining
-- [ ] Add tactical summary section
-- [ ] Add team comparison analytics
-- [ ] Add possession charts
-- [ ] Add momentum graphs
-- [ ] Add tactical strengths section
-- [ ] Add tactical weaknesses section
-- [ ] Add attack zones visualization
-- [ ] Add coach recommendations
-- [ ] Add player impact analysis
-- [ ] Add fatigue analysis
-- [ ] Add risk analysis
-- [ ] Add heatmaps
-- [ ] Add formation visualizations
-- [ ] Add bird-eye tactical section
-- [ ] Add AI insights cards
+- [ ] Add search functionality | Sign-off: ______ | Date: ______
+- [ ] Add league filtering | Sign-off: ______ | Date: ______
+- [ ] Add date filtering | Sign-off: ______ | Date: ______
+- [x] Add match intensity indicators | Sign-off: ______ | Date: ______
+- [x] Improve match cards UI | Sign-off: ______ | Date: ______
+- [ ] Add match status badges | Sign-off: ______ | Date: ______
+
+#### Match Analysis Screen
+
+- [ ] Add tactical summary section | Sign-off: ______ | Date: ______
+- [ ] Add team comparison analytics | Sign-off: ______ | Date: ______
+- [ ] Add possession charts | Sign-off: ______ | Date: ______
+- [ ] Add momentum graphs | Sign-off: ______ | Date: ______
+- [ ] Add tactical strengths section | Sign-off: ______ | Date: ______
+- [ ] Add tactical weaknesses section | Sign-off: ______ | Date: ______
+- [ ] Add attack zones visualization | Sign-off: ______ | Date: ______
+- [ ] Add coach recommendations | Sign-off: ______ | Date: ______
+- [ ] Add player impact analysis | Sign-off: ______ | Date: ______
+- [ ] Add fatigue analysis | Sign-off: ______ | Date: ______
+- [ ] Add risk analysis | Sign-off: ______ | Date: ______
+- [ ] Add heatmaps | Sign-off: ______ | Date: ______
+- [ ] Add formation visualizations | Sign-off: ______ | Date: ______
+- [ ] Add bird-eye tactical section | Sign-off: ______ | Date: ______
+- [ ] Add AI insights cards | Sign-off: ______ | Date: ______
 
 #### Clubs Experience
-##### Remaining
-- [ ] Add club tactical identity section
-- [ ] Add club analytics dashboard
-- [ ] Add performance trend charts
-- [ ] Add recent analyses section
-- [ ] Add top players section
-- [ ] Add tactical summaries
+
+- [ ] Add club tactical identity section | Sign-off: ______ | Date: ______
+- [ ] Add club analytics dashboard | Sign-off: ______ | Date: ______
+- [ ] Add performance trend charts | Sign-off: ______ | Date: ______
+- [ ] Add recent analyses section | Sign-off: ______ | Date: ______
+- [ ] Add top players section | Sign-off: ______ | Date: ______
+- [ ] Add tactical summaries | Sign-off: ______ | Date: ______
 
 #### Player Profile Screen
-##### Remaining
-- [ ] Add rating progression charts
-- [ ] Add speed analytics
-- [ ] Add distance analytics
-- [ ] Add fatigue indicators
-- [ ] Add workload analysis
-- [ ] Add consistency analysis
-- [ ] Add tactical contribution section
-- [ ] Add strengths & weaknesses
-- [ ] Add AI insights section
-- [ ] Add match-by-match history
-- [ ] Add risk analysis dashboard
-- [ ] Add season intelligence summary
+
+- [ ] Add rating progression charts | Sign-off: ______ | Date: ______
+- [ ] Add speed analytics | Sign-off: ______ | Date: ______
+- [ ] Add distance analytics | Sign-off: ______ | Date: ______
+- [ ] Add fatigue indicators | Sign-off: ______ | Date: ______
+- [ ] Add workload analysis | Sign-off: ______ | Date: ______
+- [ ] Add consistency analysis | Sign-off: ______ | Date: ______
+- [ ] Add tactical contribution section | Sign-off: ______ | Date: ______
+- [ ] Add strengths and weaknesses | Sign-off: ______ | Date: ______
+- [ ] Add AI insights section | Sign-off: ______ | Date: ______
+- [ ] Add match-by-match history | Sign-off: ______ | Date: ______
+- [ ] Add risk analysis dashboard | Sign-off: ______ | Date: ______
+- [ ] Add season intelligence summary | Sign-off: ______ | Date: ______
 
 #### Fan Profile
-##### Remaining
-- [ ] Add notifications settings
-- [ ] Add favorites system
-- [ ] Add saved matches
-- [ ] Add preferences/settings
-- [ ] Add account management
 
-### 4. MANAGER ROLE (MOST IMPORTANT PHASE)
+- [ ] Add notifications settings | Sign-off: ______ | Date: ______
+- [ ] Add favorites system | Sign-off: ______ | Date: ______
+- [ ] Add saved matches | Sign-off: ______ | Date: ______
+- [ ] Add preferences/settings | Sign-off: ______ | Date: ______
+- [ ] Add account management | Sign-off: ______ | Date: ______
+
+### 4. Manager Role
 
 #### Manager Dashboard
-##### Remaining
-- [ ] Add tactical recommendations
-- [ ] Add fatigue alerts
-- [ ] Add underperforming players section
-- [ ] Add AI insight feed
-- [ ] Add tactical identity overview
-- [ ] Add club analytics widgets
-- [ ] Add performance trend charts
 
-#### Upload Workflow (CRITICAL)
+- [ ] Add tactical recommendations | Sign-off: ______ | Date: ______
+- [x] Add fatigue alerts | Sign-off: ______ | Date: ______
+- [ ] Add underperforming players section | Sign-off: ______ | Date: ______
+- [x] Add AI insight feed | Sign-off: ______ | Date: ______
+- [ ] Add tactical identity overview | Sign-off: ______ | Date: ______
+- [ ] Add club analytics widgets | Sign-off: ______ | Date: ______
+- [ ] Add performance trend charts | Sign-off: ______ | Date: ______
+
+#### Upload Workflow
 
 ##### Upload Screen
-- [ ] Build dedicated upload page
-- [ ] Add video picker
-- [ ] Add drag & drop UI
-- [ ] Add team selection form
-- [ ] Add match metadata form
-- [ ] Add upload confirmation flow
+
+- [x] Build dedicated upload page | Sign-off: ______ | Date: ______
+- [x] Add video picker | Sign-off: ______ | Date: ______
+- [ ] Add drag and drop UI | Sign-off: ______ | Date: ______
+- [ ] Add team selection form | Sign-off: ______ | Date: ______
+- [ ] Add match metadata form | Sign-off: ______ | Date: ______
+- [ ] Add upload confirmation flow | Sign-off: ______ | Date: ______
 
 ##### AI Processing Experience
-- [ ] Create upload progress screen
-- [ ] Create AI processing animations
-- [ ] Create staged progress system
+
+- [x] Create upload progress screen | Sign-off: ______ | Date: ______
+- [ ] Create AI processing animations | Sign-off: ______ | Date: ______
+- [ ] Create staged progress system | Sign-off: ______ | Date: ______
 
 ##### Processing Stages
-- [ ] Detecting players...
-- [ ] Tracking ball...
-- [ ] Estimating possession...
-- [ ] Calculating speed...
-- [ ] Generating tactical insights...
-- [ ] Finalizing report...
+
+- [ ] Detecting players... | Sign-off: ______ | Date: ______
+- [ ] Tracking ball... | Sign-off: ______ | Date: ______
+- [ ] Estimating possession... | Sign-off: ______ | Date: ______
+- [ ] Calculating speed... | Sign-off: ______ | Date: ______
+- [ ] Generating tactical insights... | Sign-off: ______ | Date: ______
+- [ ] Finalizing report... | Sign-off: ______ | Date: ______
 
 ##### Upload Results
-- [ ] Create analysis completed screen
-- [ ] Create upload failed screen
-- [ ] Create retry upload flow
-- [ ] Create upload success animations
+
+- [x] Create analysis completed screen | Sign-off: ______ | Date: ______
+- [ ] Create upload failed screen | Sign-off: ______ | Date: ______
+- [ ] Create retry upload flow | Sign-off: ______ | Date: ______
+- [ ] Create upload success animations | Sign-off: ______ | Date: ______
 
 #### Upload History
-##### Remaining
-- [ ] Build upload history page
-- [ ] Add processing status badges
-- [ ] Add completed analyses list
-- [ ] Add failed uploads list
-- [ ] Add upload filtering/search
 
-#### Match Analysis Dashboard (CORE FEATURE)
-##### Remaining
-- [ ] Add tactical identity section
-- [ ] Add possession analytics
-- [ ] Add team comparison charts
-- [ ] Add tactical strengths
-- [ ] Add tactical weaknesses
-- [ ] Add attack zones visualization
-- [ ] Add risk analysis dashboard
-- [ ] Add fatigue analytics
-- [ ] Add player impact analysis
-- [ ] Add coach recommendations
-- [ ] Add AI-generated insights
-- [ ] Add momentum charts
-- [ ] Add heatmaps
-- [ ] Add formation maps
-- [ ] Add bird-eye tactical views
-- [ ] Add pressure maps
-- [ ] Add passing networks
+- [ ] Build upload history page | Sign-off: ______ | Date: ______
+- [ ] Add processing status badges | Sign-off: ______ | Date: ______
+- [ ] Add completed analyses list | Sign-off: ______ | Date: ______
+- [ ] Add failed uploads list | Sign-off: ______ | Date: ______
+- [ ] Add upload filtering/search | Sign-off: ______ | Date: ______
+
+#### Match Analysis Dashboard
+
+- [ ] Add tactical identity section | Sign-off: ______ | Date: ______
+- [ ] Add possession analytics | Sign-off: ______ | Date: ______
+- [ ] Add team comparison charts | Sign-off: ______ | Date: ______
+- [ ] Add tactical strengths | Sign-off: ______ | Date: ______
+- [ ] Add tactical weaknesses | Sign-off: ______ | Date: ______
+- [ ] Add attack zones visualization | Sign-off: ______ | Date: ______
+- [ ] Add risk analysis dashboard | Sign-off: ______ | Date: ______
+- [ ] Add fatigue analytics | Sign-off: ______ | Date: ______
+- [ ] Add player impact analysis | Sign-off: ______ | Date: ______
+- [ ] Add coach recommendations | Sign-off: ______ | Date: ______
+- [ ] Add AI-generated insights | Sign-off: ______ | Date: ______
+- [ ] Add momentum charts | Sign-off: ______ | Date: ______
+- [ ] Add heatmaps | Sign-off: ______ | Date: ______
+- [ ] Add formation maps | Sign-off: ______ | Date: ______
+- [ ] Add bird-eye tactical views | Sign-off: ______ | Date: ______
+- [ ] Add pressure maps | Sign-off: ______ | Date: ______
+- [ ] Add passing networks | Sign-off: ______ | Date: ______
 
 #### Players Intelligence System
 
 ##### Players Overview
-- [ ] Add search system
-- [ ] Add filters
-- [ ] Add sorting system
-- [ ] Add risk indicators
-- [ ] Add fatigue ranking
-- [ ] Add performance ranking
+
+- [ ] Add search system | Sign-off: ______ | Date: ______
+- [x] Add filters | Sign-off: ______ | Date: ______
+- [x] Add sorting system | Sign-off: ______ | Date: ______
+- [ ] Add risk indicators | Sign-off: ______ | Date: ______
+- [ ] Add fatigue ranking | Sign-off: ______ | Date: ______
+- [x] Add performance ranking | Sign-off: ______ | Date: ______
 
 ##### Player Intelligence Page
-- [ ] Add performance charts
-- [ ] Add workload analysis
-- [ ] Add fatigue analysis
-- [ ] Add consistency analysis
-- [ ] Add tactical contribution
-- [ ] Add AI insights
-- [ ] Add match history
-- [ ] Add strengths & weaknesses
-- [ ] Add risk analysis
-- [ ] Add performance progression
 
-### 5. ADMIN ROLE
+- [ ] Add performance charts | Sign-off: ______ | Date: ______
+- [ ] Add workload analysis | Sign-off: ______ | Date: ______
+- [x] Add fatigue analysis | Sign-off: ______ | Date: ______
+- [ ] Add consistency analysis | Sign-off: ______ | Date: ______
+- [ ] Add tactical contribution | Sign-off: ______ | Date: ______
+- [x] Add AI insights | Sign-off: ______ | Date: ______
+- [x] Add match history | Sign-off: ______ | Date: ______
+- [ ] Add strengths and weaknesses | Sign-off: ______ | Date: ______
+- [ ] Add risk analysis | Sign-off: ______ | Date: ______
+- [x] Add performance progression | Sign-off: ______ | Date: ______
+
+### 5. Admin Role
 
 #### Admin Dashboard
-##### Remaining
-- [ ] Improve tactical analytics
-- [ ] Improve AI insights feed
-- [ ] Add better activity feed
-- [ ] Add squad condition analytics
-- [ ] Add advanced quick actions
-- [ ] Add alerts system
+
+- [ ] Improve tactical analytics | Sign-off: ______ | Date: ______
+- [x] Improve AI insights feed | Sign-off: ______ | Date: ______
+- [ ] Add better activity feed | Sign-off: ______ | Date: ______
+- [ ] Add squad condition analytics | Sign-off: ______ | Date: ______
+- [ ] Add advanced quick actions | Sign-off: ______ | Date: ______
+- [ ] Add alerts system | Sign-off: ______ | Date: ______
 
 #### Managers Management
-##### Remaining
-- [ ] Add Add Manager flow
-- [ ] Add Remove Manager flow
-- [ ] Add permissions management UI
-- [ ] Add enable/disable access
-- [ ] Add manager activity analytics
-- [ ] Add manager search/filter
+
+- [ ] Add Add Manager flow | Sign-off: ______ | Date: ______
+- [ ] Add Remove Manager flow | Sign-off: ______ | Date: ______
+- [ ] Add permissions management UI | Sign-off: ______ | Date: ______
+- [ ] Add enable/disable access | Sign-off: ______ | Date: ______
+- [ ] Add manager activity analytics | Sign-off: ______ | Date: ______
+- [x] Add manager search/filter | Sign-off: ______ | Date: ______
 
 #### Manager Details
-##### Remaining
-- [ ] Add upload analytics
-- [ ] Add activity history
-- [ ] Add performance charts
-- [ ] Add permissions controls
-- [ ] Add manager statistics
+
+- [x] Add upload analytics | Sign-off: ______ | Date: ______
+- [ ] Add activity history | Sign-off: ______ | Date: ______
+- [ ] Add performance charts | Sign-off: ______ | Date: ______
+- [x] Add permissions controls | Sign-off: ______ | Date: ______
+- [x] Add manager statistics | Sign-off: ______ | Date: ______
 
 #### Squad Intelligence
-##### Remaining
-- [ ] Add player intelligence overview
-- [ ] Add risk rankings
-- [ ] Add fatigue rankings
-- [ ] Add tactical contribution analytics
-- [ ] Add player performance overview
+
+- [x] Add player intelligence overview | Sign-off: ______ | Date: ______
+- [ ] Add risk rankings | Sign-off: ______ | Date: ______
+- [x] Add fatigue rankings | Sign-off: ______ | Date: ______
+- [ ] Add tactical contribution analytics | Sign-off: ______ | Date: ______
+- [x] Add player performance overview | Sign-off: ______ | Date: ______
 
 #### Club Analytics
-##### Remaining
-- [ ] Add tactical evolution charts
-- [ ] Add performance trends
-- [ ] Add season analytics
-- [ ] Add tactical identity section
-- [ ] Add fatigue overview
-- [ ] Add match intensity analytics
+
+- [ ] Add tactical evolution charts | Sign-off: ______ | Date: ______
+- [ ] Add performance trends | Sign-off: ______ | Date: ______
+- [ ] Add season analytics | Sign-off: ______ | Date: ______
+- [ ] Add tactical identity section | Sign-off: ______ | Date: ______
+- [ ] Add fatigue overview | Sign-off: ______ | Date: ______
+- [ ] Add match intensity analytics | Sign-off: ______ | Date: ______
 
 #### Admin Profile
-##### Remaining
-- [ ] Add club settings
-- [ ] Add security settings
-- [ ] Add notification settings
-- [ ] Add admin preferences
 
-### 6. MOCK DATA ARCHITECTURE
+- [ ] Add club settings | Sign-off: ______ | Date: ______
+- [ ] Add security settings | Sign-off: ______ | Date: ______
+- [ ] Add notification settings | Sign-off: ______ | Date: ______
+- [ ] Add admin preferences | Sign-off: ______ | Date: ______
+
+### 6. Mock Data Architecture
 
 #### Models
-- [ ] Create ClubModel
-- [ ] Create PlayerModel
-- [ ] Create MatchModel
-- [ ] Create MatchAnalysisModel
-- [ ] Create UploadJobModel
-- [ ] Create TacticalInsightModel
-- [ ] Create RiskAnalysisModel
-- [ ] Create ManagerModel
-- [ ] Create ActivityModel
+
+- [x] Create ClubModel | Sign-off: ______ | Date: ______
+- [x] Create PlayerModel | Sign-off: ______ | Date: ______
+- [x] Create MatchModel | Sign-off: ______ | Date: ______
+- [x] Create MatchAnalysisModel | Sign-off: ______ | Date: ______
+- [ ] Create UploadJobModel | Sign-off: ______ | Date: ______
+- [x] Create TacticalInsightModel | Sign-off: ______ | Date: ______
+- [ ] Create RiskAnalysisModel | Sign-off: ______ | Date: ______
+- [x] Create ManagerModel | Sign-off: ______ | Date: ______
+- [x] Create ActivityModel | Sign-off: ______ | Date: ______
 
 #### Mock Repositories
-- [ ] Create clubs repository
-- [ ] Create players repository
-- [ ] Create matches repository
-- [ ] Create analysis repository
-- [ ] Create uploads repository
-- [ ] Create managers repository
+
+- [ ] Create clubs repository | Sign-off: ______ | Date: ______
+- [ ] Create players repository | Sign-off: ______ | Date: ______
+- [x] Create matches repository | Sign-off: ______ | Date: ______
+- [ ] Create analysis repository | Sign-off: ______ | Date: ______
+- [ ] Create uploads repository | Sign-off: ______ | Date: ______
+- [ ] Create managers repository | Sign-off: ______ | Date: ______
 
 #### Realistic Mock Data
-- [ ] Create realistic clubs
-- [ ] Create realistic players
-- [ ] Create realistic matches
-- [ ] Create realistic AI reports
-- [ ] Create realistic tactical reports
-- [ ] Create realistic recommendations
 
-### 7. APP UX POLISH
+- [ ] Create realistic clubs | Sign-off: ______ | Date: ______
+- [x] Create realistic players | Sign-off: ______ | Date: ______
+- [x] Create realistic matches | Sign-off: ______ | Date: ______
+- [x] Create realistic AI reports | Sign-off: ______ | Date: ______
+- [x] Create realistic tactical reports | Sign-off: ______ | Date: ______
+- [x] Create realistic recommendations | Sign-off: ______ | Date: ______
+
+### 7. App UX Polish
 
 #### UX Improvements
-- [ ] Add pull-to-refresh
-- [ ] Add success animations
-- [ ] Add empty states
-- [ ] Add retry actions
-- [ ] Add haptic feedback
-- [ ] Add micro-interactions
-- [ ] Improve scrolling experience
+
+- [ ] Add pull-to-refresh | Sign-off: ______ | Date: ______
+- [ ] Add success animations | Sign-off: ______ | Date: ______
+- [x] Add empty states | Sign-off: ______ | Date: ______
+- [x] Add retry actions | Sign-off: ______ | Date: ______
+- [ ] Add haptic feedback | Sign-off: ______ | Date: ______
+- [ ] Add micro-interactions | Sign-off: ______ | Date: ______
+- [ ] Improve scrolling experience | Sign-off: ______ | Date: ______
 
 #### AI UX
-- [ ] Add futuristic loading screens
-- [ ] Add AI processing visuals
-- [ ] Add insight reveal animations
-- [ ] Add animated tactical diagrams
+
+- [ ] Add futuristic loading screens | Sign-off: ______ | Date: ______
+- [ ] Add AI processing visuals | Sign-off: ______ | Date: ______
+- [ ] Add insight reveal animations | Sign-off: ______ | Date: ______
+- [ ] Add animated tactical diagrams | Sign-off: ______ | Date: ______
 
 ---
 
-## PHASE 2 — BACKEND + SUPABASE
+## PHASE 2 - BACKEND + SUPABASE
 
-### GOAL
+### Goal
 
 Connect the app to real backend infrastructure after frontend completion.
 
-### 8. SUPABASE SETUP
-- [ ] Create Supabase project
-- [ ] Configure authentication
-- [ ] Configure storage buckets
-- [ ] Configure row-level security
-- [ ] Configure environment variables
+### 8. Supabase Setup
 
-### 9. DATABASE DESIGN
+- [ ] Create Supabase project | Sign-off: ______ | Date: ______
+- [ ] Configure authentication | Sign-off: ______ | Date: ______
+- [ ] Configure storage buckets | Sign-off: ______ | Date: ______
+- [ ] Configure row-level security | Sign-off: ______ | Date: ______
+- [ ] Configure environment variables | Sign-off: ______ | Date: ______
 
-#### Tables
-- [ ] users
-- [ ] clubs
-- [ ] players
-- [ ] managers
-- [ ] matches
-- [ ] analyses
-- [ ] upload_jobs
-- [ ] tactical_reports
-- [ ] player_performance
-- [ ] activities
-- [ ] notifications
+### 9. Database Design
 
-### 10. AUTHENTICATION INTEGRATION
-- [ ] Connect login
-- [ ] Connect signup
-- [ ] Connect forgot password
-- [ ] Connect email verification
-- [ ] Connect role management
-- [ ] Connect session persistence
+- [ ] Create `users` table | Sign-off: ______ | Date: ______
+- [ ] Create `clubs` table | Sign-off: ______ | Date: ______
+- [ ] Create `players` table | Sign-off: ______ | Date: ______
+- [ ] Create `managers` table | Sign-off: ______ | Date: ______
+- [ ] Create `matches` table | Sign-off: ______ | Date: ______
+- [ ] Create `analyses` table | Sign-off: ______ | Date: ______
+- [ ] Create `upload_jobs` table | Sign-off: ______ | Date: ______
+- [ ] Create `tactical_reports` table | Sign-off: ______ | Date: ______
+- [ ] Create `player_performance` table | Sign-off: ______ | Date: ______
+- [ ] Create `activities` table | Sign-off: ______ | Date: ______
+- [ ] Create `notifications` table | Sign-off: ______ | Date: ______
 
-### 11. DATA INTEGRATION
-- [ ] Replace mock repositories
-- [ ] Create Supabase services
-- [ ] Create async state management
-- [ ] Add pagination
-- [ ] Add caching
-- [ ] Add proper error handling
+### 10. Authentication Integration
 
-### 12. STORAGE SYSTEM
-- [ ] Match video uploads
-- [ ] Player images
-- [ ] Club logos
-- [ ] Analysis exports
-- [ ] Report storage
+- [ ] Connect login | Sign-off: ______ | Date: ______
+- [ ] Connect signup | Sign-off: ______ | Date: ______
+- [ ] Connect forgot password | Sign-off: ______ | Date: ______
+- [ ] Connect email verification | Sign-off: ______ | Date: ______
+- [ ] Connect role management | Sign-off: ______ | Date: ______
+- [ ] Connect session persistence | Sign-off: ______ | Date: ______
 
-### 13. REALTIME FEATURES
-- [ ] Live upload progress
-- [ ] Live notifications
-- [ ] Live activity feeds
-- [ ] Real-time analysis updates
+### 11. Data Integration
+
+- [ ] Replace mock repositories | Sign-off: ______ | Date: ______
+- [ ] Create Supabase services | Sign-off: ______ | Date: ______
+- [ ] Create async state management | Sign-off: ______ | Date: ______
+- [ ] Add pagination | Sign-off: ______ | Date: ______
+- [ ] Add caching | Sign-off: ______ | Date: ______
+- [ ] Add proper error handling | Sign-off: ______ | Date: ______
+
+### 12. Storage System
+
+- [ ] Match video uploads | Sign-off: ______ | Date: ______
+- [ ] Player images | Sign-off: ______ | Date: ______
+- [ ] Club logos | Sign-off: ______ | Date: ______
+- [ ] Analysis exports | Sign-off: ______ | Date: ______
+- [ ] Report storage | Sign-off: ______ | Date: ______
+
+### 13. Realtime Features
+
+- [ ] Live upload progress | Sign-off: ______ | Date: ______
+- [ ] Live notifications | Sign-off: ______ | Date: ______
+- [ ] Live activity feeds | Sign-off: ______ | Date: ______
+- [ ] Real-time analysis updates | Sign-off: ______ | Date: ______
 
 ---
 
-## PHASE 3 — AI MODEL INTEGRATION
+## PHASE 3 - AI MODEL INTEGRATION
 
-### GOAL
+### Goal
 
 Connect the AI pipeline to the mobile app.
 
-### 14. AI API CONNECTION
-- [ ] Create upload endpoint
-- [ ] Create processing status endpoint
-- [ ] Create analysis results endpoint
-- [ ] Create tracking JSON endpoint
+### 14. AI API Connection
 
-### 15. ANALYSIS INTEGRATION
-- [ ] Connect tactical reports
-- [ ] Connect AI recommendations
-- [ ] Connect player analytics
-- [ ] Connect fatigue analysis
-- [ ] Connect risk analysis
+- [ ] Create upload endpoint | Sign-off: ______ | Date: ______
+- [ ] Create processing status endpoint | Sign-off: ______ | Date: ______
+- [ ] Create analysis results endpoint | Sign-off: ______ | Date: ______
+- [ ] Create tracking JSON endpoint | Sign-off: ______ | Date: ______
 
-### 16. TACTICAL VISUALIZATION INTEGRATION
-- [ ] Connect heatmaps
-- [ ] Connect bird-eye tactical views
-- [ ] Connect movement tracking
-- [ ] Connect formation maps
-- [ ] Connect pressure maps
+### 15. Analysis Integration
 
-### 17. PLAYER INTELLIGENCE INTEGRATION
-- [ ] Connect real performance history
-- [ ] Connect workload tracking
-- [ ] Connect fatigue metrics
-- [ ] Connect tactical contribution data
+- [ ] Connect tactical reports | Sign-off: ______ | Date: ______
+- [ ] Connect AI recommendations | Sign-off: ______ | Date: ______
+- [ ] Connect player analytics | Sign-off: ______ | Date: ______
+- [ ] Connect fatigue analysis | Sign-off: ______ | Date: ______
+- [ ] Connect risk analysis | Sign-off: ______ | Date: ______
 
----
+### 16. Tactical Visualization Integration
 
-## PHASE 4 — FINAL PRODUCTION POLISH
+- [ ] Connect heatmaps | Sign-off: ______ | Date: ______
+- [ ] Connect bird-eye tactical views | Sign-off: ______ | Date: ______
+- [ ] Connect movement tracking | Sign-off: ______ | Date: ______
+- [ ] Connect formation maps | Sign-off: ______ | Date: ______
+- [ ] Connect pressure maps | Sign-off: ______ | Date: ______
 
-### 18. PERFORMANCE OPTIMIZATION
-- [ ] Optimize rendering
-- [ ] Optimize charts
-- [ ] Optimize animations
-- [ ] Optimize image loading
-- [ ] Optimize memory usage
+### 17. Player Intelligence Integration
 
-### 19. SECURITY
-- [ ] Add role validation
-- [ ] Secure uploads
-- [ ] Secure storage access
-- [ ] Validate permissions
-
-### 20. TESTING
-- [ ] UI testing
-- [ ] Responsive testing
-- [ ] Navigation testing
-- [ ] Upload workflow testing
-- [ ] State management testing
-
-### 21. DEPLOYMENT
-- [ ] App icons
-- [ ] Splash screen
-- [ ] Store screenshots
-- [ ] Android production build
-- [ ] iOS production build
-- [ ] Store deployment assets
+- [ ] Connect real performance history | Sign-off: ______ | Date: ______
+- [ ] Connect workload tracking | Sign-off: ______ | Date: ______
+- [ ] Connect fatigue metrics | Sign-off: ______ | Date: ______
+- [ ] Connect tactical contribution data | Sign-off: ______ | Date: ______
 
 ---
 
-## FINAL GOAL
+## PHASE 4 - FINAL PRODUCTION POLISH
 
-The final GOALSIGHT app should feel like:
+### 18. Performance Optimization
 
-**AI Football Intelligence Operating System**
+- [ ] Optimize rendering | Sign-off: ______ | Date: ______
+- [ ] Optimize charts | Sign-off: ______ | Date: ______
+- [ ] Optimize animations | Sign-off: ______ | Date: ______
+- [ ] Optimize image loading | Sign-off: ______ | Date: ______
+- [ ] Optimize memory usage | Sign-off: ______ | Date: ______
 
-with:
+### 19. Security
+
+- [ ] Add role validation | Sign-off: ______ | Date: ______
+- [ ] Secure uploads | Sign-off: ______ | Date: ______
+- [ ] Secure storage access | Sign-off: ______ | Date: ______
+- [ ] Validate permissions | Sign-off: ______ | Date: ______
+
+### 20. Testing
+
+- [ ] UI testing | Sign-off: ______ | Date: ______
+- [ ] Responsive testing | Sign-off: ______ | Date: ______
+- [ ] Navigation testing | Sign-off: ______ | Date: ______
+- [ ] Upload workflow testing | Sign-off: ______ | Date: ______
+- [ ] State management testing | Sign-off: ______ | Date: ______
+
+### 21. Deployment
+
+- [ ] App icons | Sign-off: ______ | Date: ______
+- [ ] Splash screen | Sign-off: ______ | Date: ______
+- [ ] Store screenshots | Sign-off: ______ | Date: ______
+- [ ] Android production build | Sign-off: ______ | Date: ______
+- [ ] iOS production build | Sign-off: ______ | Date: ______
+- [ ] Store deployment assets | Sign-off: ______ | Date: ______
+
+---
+
+## Final Goal
+
+The final GoalSight app should feel like an AI football intelligence operating system with:
 
 - premium Flutter UI
 - tactical intelligence
