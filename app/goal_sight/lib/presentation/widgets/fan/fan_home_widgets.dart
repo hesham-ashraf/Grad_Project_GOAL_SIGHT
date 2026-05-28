@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
@@ -416,104 +418,257 @@ class PlayerCard extends StatelessWidget {
   }
 }
 
-class StatCard extends StatelessWidget {
+/// Animated version of [StatCard] with a numeric counter and a progress ring.
+class StatCard extends StatefulWidget {
   const StatCard({super.key, required this.stat});
 
   final QuickStatData stat;
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surfaceElevated.withValues(alpha: 0.92),
-        borderRadius: AppRadius.cardLarge,
-        border: Border.all(color: stat.tintColor.withValues(alpha: 0.18)),
-        boxShadow: [
-          BoxShadow(
-            color: stat.tintColor.withValues(alpha: 0.08),
-            blurRadius: 22,
-            offset: const Offset(0, 10),
-          ),
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.16),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
+  State<StatCard> createState() => _StatCardState();
+}
+
+class _StatCardState extends State<StatCard> with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _progressAnim;
+  late final Animation<double> _glowAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1400),
+    )..forward();
+
+    _progressAnim = CurvedAnimation(
+      parent: _controller,
+      curve: const Interval(0.0, 0.85, curve: Curves.easeOutCubic),
+    );
+
+    _glowAnim = Tween<double>(begin: 0.5, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.5, 1.0, curve: Curves.easeOutCubic),
       ),
-      child: Padding(
-        padding: EdgeInsets.all(context.rs(14, min: 12, max: 16)),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  /// Extracts a numeric fraction from the stat value string (0–1) for the ring.
+  double _parseFraction() {
+    final raw = widget.stat.value.replaceAll('%', '').trim();
+    final parsed = double.tryParse(raw);
+    if (parsed == null) return 0.75;
+    if (widget.stat.value.contains('%')) return (parsed / 100).clamp(0.0, 1.0);
+    // For ratings out of 10 or intensity out of 100
+    if (parsed <= 10) return (parsed / 10).clamp(0.0, 1.0);
+    return (parsed / 100).clamp(0.0, 1.0);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final frac = _parseFraction();
+    final color = widget.stat.tintColor;
+
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, _) {
+        return Container(
+          decoration: BoxDecoration(
+            color: AppColors.surfaceElevated.withValues(alpha: 0.92),
+            borderRadius: AppRadius.cardLarge,
+            border: Border.all(
+              color: color.withValues(alpha: 0.18 + _glowAnim.value * 0.08),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: color.withValues(alpha: 0.06 + _glowAnim.value * 0.06),
+                blurRadius: 22 + _glowAnim.value * 8,
+                offset: const Offset(0, 10),
+              ),
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.16),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: EdgeInsets.all(context.rs(14, min: 12, max: 16)),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: context.rs(40, min: 36, max: 44),
-                  height: context.rs(40, min: 36, max: 44),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        stat.tintColor.withValues(alpha: 0.28),
-                        stat.tintColor.withValues(alpha: 0.12),
-                      ],
+                Row(
+                  children: [
+                    // Icon with animated progress ring
+                    SizedBox(
+                      width: context.rs(48, min: 42, max: 54),
+                      height: context.rs(48, min: 42, max: 54),
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          CustomPaint(
+                            size: Size(
+                              context.rs(48, min: 42, max: 54),
+                              context.rs(48, min: 42, max: 54),
+                            ),
+                            painter: _ProgressRingPainter(
+                              progress: _progressAnim.value * frac,
+                              color: color,
+                              trackColor: color.withValues(alpha: 0.12),
+                              strokeWidth: 2.5,
+                            ),
+                          ),
+                          Container(
+                            width: context.rs(36, min: 32, max: 40),
+                            height: context.rs(36, min: 32, max: 40),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  color.withValues(alpha: 0.28),
+                                  color.withValues(alpha: 0.10),
+                                ],
+                              ),
+                            ),
+                            child: Icon(
+                              widget.stat.icon,
+                              color: Colors.white,
+                              size: context.rs(16, min: 14, max: 18),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    border: Border.all(
-                      color: stat.tintColor.withValues(alpha: 0.3),
+                    const Spacer(),
+                    // Animated glow dot
+                    Container(
+                      width: context.rs(8, min: 6, max: 8),
+                      height: context.rs(8, min: 6, max: 8),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: color.withValues(alpha: _glowAnim.value),
+                        boxShadow: [
+                          BoxShadow(
+                            color: color
+                                .withValues(alpha: _glowAnim.value * 0.6),
+                            blurRadius: 8,
+                            spreadRadius: 1,
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  child: Icon(
-                    stat.icon,
-                    color: Colors.white,
-                    size: context.rs(18, min: 16, max: 20),
+                  ],
+                ),
+                SizedBox(height: context.rs(12, min: 10, max: 14)),
+                Text(
+                  widget.stat.value,
+                  style: AppTextStyles.headline(
+                    color: AppColors.textPrimary,
+                  ).copyWith(
+                    fontSize: context.rs(26, min: 22, max: 32),
+                    height: 0.95,
                   ),
                 ),
-                const Spacer(),
-                Container(
-                  width: context.rs(8, min: 6, max: 8),
-                  height: context.rs(8, min: 6, max: 8),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: stat.tintColor,
+                SizedBox(height: context.rs(6, min: 4, max: 8)),
+                Text(
+                  widget.stat.label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTextStyles.title(
+                    color: AppColors.textPrimary,
+                  ).copyWith(
+                    fontSize: context.rs(14, min: 13, max: 16),
+                  ),
+                ),
+                SizedBox(height: context.rs(4, min: 2, max: 6)),
+                // Animated progress bar
+                ClipRRect(
+                  borderRadius: AppRadius.chip,
+                  child: LinearProgressIndicator(
+                    value: _progressAnim.value * frac,
+                    minHeight: 3,
+                    backgroundColor: AppColors.outlineSubtle,
+                    valueColor: AlwaysStoppedAnimation<Color>(color),
+                  ),
+                ),
+                SizedBox(height: context.rs(6, min: 4, max: 8)),
+                Text(
+                  widget.stat.subtitle,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTextStyles.caption(
+                    color: AppColors.textMuted,
+                  ).copyWith(
+                    fontSize: context.rs(10, min: 9, max: 11),
+                    height: 1.35,
                   ),
                 ),
               ],
             ),
-            SizedBox(height: context.rs(14, min: 10, max: 14)),
-            Text(
-              stat.value,
-              style: AppTextStyles.headline(color: AppColors.textPrimary).copyWith(
-                fontSize: context.rs(26, min: 22, max: 32),
-                height: 0.95,
-              ),
-            ),
-            SizedBox(height: context.rs(6, min: 4, max: 8)),
-            Text(
-              stat.label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: AppTextStyles.title(color: AppColors.textPrimary).copyWith(
-                fontSize: context.rs(14, min: 13, max: 16),
-              ),
-            ),
-            SizedBox(height: context.rs(4, min: 2, max: 6)),
-            Text(
-              stat.subtitle,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: AppTextStyles.caption(color: AppColors.textMuted).copyWith(
-                fontSize: context.rs(10, min: 9, max: 11),
-                height: 1.35,
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
+}
+
+/// Paints a circular progress arc.
+class _ProgressRingPainter extends CustomPainter {
+  _ProgressRingPainter({
+    required this.progress,
+    required this.color,
+    required this.trackColor,
+    required this.strokeWidth,
+  });
+
+  final double progress;
+  final Color color;
+  final Color trackColor;
+  final double strokeWidth;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = (size.width / 2) - strokeWidth / 2;
+    const startAngle = -math.pi / 2;
+
+    final trackPaint = Paint()
+      ..color = trackColor
+      ..strokeWidth = strokeWidth
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+
+    canvas.drawCircle(center, radius, trackPaint);
+
+    if (progress > 0) {
+      final arcPaint = Paint()
+        ..color = color
+        ..strokeWidth = strokeWidth
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round;
+
+      canvas.drawArc(
+        Rect.fromCircle(center: center, radius: radius),
+        startAngle,
+        2 * math.pi * progress,
+        false,
+        arcPaint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(_ProgressRingPainter old) =>
+      old.progress != progress || old.color != color;
 }
 
 class _MatchBadge extends StatelessWidget {

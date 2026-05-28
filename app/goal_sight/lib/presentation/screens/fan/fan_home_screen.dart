@@ -4,7 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
 import '../../state_management/app_providers.dart';
+import '../../widgets/fan/ai_recommendations_section.dart';
 import '../../widgets/fan/fan_home_widgets.dart';
+import '../../widgets/fan/live_indicators.dart';
+import '../../widgets/fan/tactical_insights_section.dart';
+import '../../widgets/fan/trending_matches_section.dart';
 
 class FanHomeScreen extends ConsumerStatefulWidget {
   const FanHomeScreen({super.key});
@@ -15,6 +19,7 @@ class FanHomeScreen extends ConsumerStatefulWidget {
 
 class _FanHomeScreenState extends ConsumerState<FanHomeScreen>
     with SingleTickerProviderStateMixin {
+  // ── Static data ─────────────────────────────────────────────────────────────
   static const FeaturedMatchData _featuredMatch = FeaturedMatchData(
     homeTeam: 'GoalSight FC',
     awayTeam: 'Falcons United',
@@ -75,59 +80,65 @@ class _FanHomeScreenState extends ConsumerState<FanHomeScreen>
     ),
   ];
 
+  // ── Animation controller ─────────────────────────────────────────────────────
   late final AnimationController _controller;
+
+  // Section animations (each is a fade + matching slide)
   late final Animation<double> _headerFade;
   late final Animation<Offset> _headerSlide;
+  late final Animation<double> _liveFade;
+  late final Animation<Offset> _liveSlide;
   late final Animation<double> _featuredFade;
   late final Animation<Offset> _featuredSlide;
+  late final Animation<double> _trendingFade;
+  late final Animation<Offset> _trendingSlide;
   late final Animation<double> _playersFade;
   late final Animation<Offset> _playersSlide;
   late final Animation<double> _statsFade;
   late final Animation<Offset> _statsSlide;
+  late final Animation<double> _insightsFade;
+  late final Animation<Offset> _insightsSlide;
+  late final Animation<double> _recsFade;
+  late final Animation<Offset> _recsSlide;
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1100),
+      duration: const Duration(milliseconds: 1600),
     )..forward();
 
-    _headerFade = CurvedAnimation(
-      parent: _controller,
-      curve: const Interval(0.0, 0.24, curve: Curves.easeOutCubic),
-    );
-    _headerSlide = Tween<Offset>(
-      begin: const Offset(0, -0.04),
-      end: Offset.zero,
-    ).animate(_headerFade);
+    _headerFade = _interval(0.00, 0.22);
+    _headerSlide = _slideOf(_headerFade);
+    _liveFade = _interval(0.08, 0.30);
+    _liveSlide = _slideOf(_liveFade);
+    _featuredFade = _interval(0.16, 0.42);
+    _featuredSlide = _slideOf(_featuredFade);
+    _trendingFade = _interval(0.28, 0.52);
+    _trendingSlide = _slideOf(_trendingFade);
+    _playersFade = _interval(0.38, 0.62);
+    _playersSlide = _slideOf(_playersFade);
+    _statsFade = _interval(0.50, 0.74);
+    _statsSlide = _slideOf(_statsFade);
+    _insightsFade = _interval(0.60, 0.84);
+    _insightsSlide = _slideOf(_insightsFade);
+    _recsFade = _interval(0.72, 1.00);
+    _recsSlide = _slideOf(_recsFade);
+  }
 
-    _featuredFade = CurvedAnimation(
+  Animation<double> _interval(double begin, double end) {
+    return CurvedAnimation(
       parent: _controller,
-      curve: const Interval(0.10, 0.45, curve: Curves.easeOutCubic),
+      curve: Interval(begin, end, curve: Curves.easeOutCubic),
     );
-    _featuredSlide = Tween<Offset>(
-      begin: const Offset(0, 0.05),
-      end: Offset.zero,
-    ).animate(_featuredFade);
+  }
 
-    _playersFade = CurvedAnimation(
-      parent: _controller,
-      curve: const Interval(0.28, 0.68, curve: Curves.easeOutCubic),
-    );
-    _playersSlide = Tween<Offset>(
-      begin: const Offset(0, 0.05),
+  Animation<Offset> _slideOf(Animation<double> fade) {
+    return Tween<Offset>(
+      begin: const Offset(0, 0.04),
       end: Offset.zero,
-    ).animate(_playersFade);
-
-    _statsFade = CurvedAnimation(
-      parent: _controller,
-      curve: const Interval(0.46, 0.92, curve: Curves.easeOutCubic),
-    );
-    _statsSlide = Tween<Offset>(
-      begin: const Offset(0, 0.05),
-      end: Offset.zero,
-    ).animate(_statsFade);
+    ).animate(fade);
   }
 
   @override
@@ -139,8 +150,12 @@ class _FanHomeScreenState extends ConsumerState<FanHomeScreen>
   @override
   Widget build(BuildContext context) {
     final userName =
-        ref.watch(authControllerProvider.select((state) => state.user?.name)) ??
-            'Fan';
+        ref.watch(authControllerProvider.select((s) => s.user?.name)) ?? 'Fan';
+
+    final isTablet = context.isTablet || context.isDesktop;
+    final hPad = context.rs(18, min: 14, max: isTablet ? 32 : 24);
+    final vPad = context.rs(16, min: 12, max: 20);
+    final gap = context.rs(18, min: 14, max: 22);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -166,37 +181,74 @@ class _FanHomeScreenState extends ConsumerState<FanHomeScreen>
                 ),
                 child: ResponsiveCentered(
                   maxWidth: 1180,
-                  padding: EdgeInsets.fromLTRB(
-                    context.rs(18, min: 14, max: 24),
-                    context.rs(16, min: 12, max: 20),
-                    context.rs(18, min: 14, max: 24),
-                    context.rs(28, min: 22, max: 36),
-                  ),
+                  padding: EdgeInsets.fromLTRB(hPad, vPad, hPad, 36),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      _SectionReveal(
+                      // 1. Header
+                      _Reveal(
                         opacity: _headerFade,
                         position: _headerSlide,
                         child: _HomeHeader(userName: userName),
                       ),
-                      SizedBox(height: context.rs(16, min: 12, max: 20)),
-                      _SectionReveal(
+                      SizedBox(height: gap),
+
+                      // 2. Live Match Banner
+                      _Reveal(
+                        opacity: _liveFade,
+                        position: _liveSlide,
+                        child: LiveMatchBanner(
+                          liveMatchCount: 1,
+                          matchDescription: 'Storm United vs Delta FC — Champions League',
+                        ),
+                      ),
+                      SizedBox(height: gap),
+
+                      // 3. Featured Match Card
+                      _Reveal(
                         opacity: _featuredFade,
                         position: _featuredSlide,
                         child: const FeaturedMatchCard(match: _featuredMatch),
                       ),
-                      SizedBox(height: context.rs(18, min: 14, max: 22)),
-                      _SectionReveal(
+                      SizedBox(height: gap),
+
+                      // 4. Trending Matches — horizontal scroll
+                      _Reveal(
+                        opacity: _trendingFade,
+                        position: _trendingSlide,
+                        child: const TrendingMatchesSection(),
+                      ),
+                      SizedBox(height: gap),
+
+                      // 5. Top 3 Players
+                      _Reveal(
                         opacity: _playersFade,
                         position: _playersSlide,
-                        child: const _PlayersSection(players: _topPlayers),
+                        child: _PlayersSection(players: _topPlayers),
                       ),
-                      SizedBox(height: context.rs(18, min: 14, max: 22)),
-                      _SectionReveal(
+                      SizedBox(height: gap),
+
+                      // 6. Animated Quick Stats
+                      _Reveal(
                         opacity: _statsFade,
                         position: _statsSlide,
-                        child: const _QuickStatsSection(stats: _quickStats),
+                        child: _QuickStatsSection(stats: _quickStats),
+                      ),
+                      SizedBox(height: gap),
+
+                      // 7. Tactical Insights
+                      _Reveal(
+                        opacity: _insightsFade,
+                        position: _insightsSlide,
+                        child: const TacticalInsightsSection(),
+                      ),
+                      SizedBox(height: gap),
+
+                      // 8. AI Recommendations
+                      _Reveal(
+                        opacity: _recsFade,
+                        position: _recsSlide,
+                        child: const AIRecommendationsSection(),
                       ),
                     ],
                   ),
@@ -209,6 +261,8 @@ class _FanHomeScreenState extends ConsumerState<FanHomeScreen>
     );
   }
 }
+
+// ─── Home Header ─────────────────────────────────────────────────────────────
 
 class _HomeHeader extends StatelessWidget {
   const _HomeHeader({required this.userName});
@@ -231,23 +285,29 @@ class _HomeHeader extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: context.rs(12, min: 10, max: 14),
-                    vertical: context.rs(7, min: 6, max: 8),
-                  ),
-                  decoration: const BoxDecoration(
-                    gradient: AppGradients.brand,
-                    borderRadius: AppRadius.chip,
-                  ),
-                  child: Text(
-                    'FAN HOME',
-                    style: AppTextStyles.caption(color: Colors.white).copyWith(
-                      fontSize: context.rs(10, min: 9, max: 11),
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 1.0,
+                Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: context.rs(12, min: 10, max: 14),
+                        vertical: context.rs(7, min: 6, max: 8),
+                      ),
+                      decoration: const BoxDecoration(
+                        gradient: AppGradients.brand,
+                        borderRadius: AppRadius.chip,
+                      ),
+                      child: Text(
+                        'FAN HOME',
+                        style: AppTextStyles.caption(color: Colors.white).copyWith(
+                          fontSize: context.rs(10, min: 9, max: 11),
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 1.0,
+                        ),
+                      ),
                     ),
-                  ),
+                    SizedBox(width: context.rs(10, min: 8, max: 12)),
+                    const LiveAnalysisIndicator(),
+                  ],
                 ),
                 SizedBox(height: context.rs(12, min: 8, max: 14)),
                 Text(
@@ -298,6 +358,8 @@ class _HomeHeader extends StatelessWidget {
   }
 }
 
+// ─── Players Section ─────────────────────────────────────────────────────────
+
 class _PlayersSection extends StatelessWidget {
   const _PlayersSection({required this.players});
 
@@ -322,24 +384,15 @@ class _PlayersSection extends StatelessWidget {
               return Row(
                 children: [
                   Expanded(
-                    child: PlayerCard(
-                      player: players[0],
-                      onTap: () {},
-                    ),
+                    child: PlayerCard(player: players[0], onTap: () {}),
                   ),
                   SizedBox(width: context.rs(12, min: 10, max: 14)),
                   Expanded(
-                    child: PlayerCard(
-                      player: players[1],
-                      onTap: () {},
-                    ),
+                    child: PlayerCard(player: players[1], onTap: () {}),
                   ),
                   SizedBox(width: context.rs(12, min: 10, max: 14)),
                   Expanded(
-                    child: PlayerCard(
-                      player: players[2],
-                      onTap: () {},
-                    ),
+                    child: PlayerCard(player: players[2], onTap: () {}),
                   ),
                 ],
               );
@@ -383,6 +436,8 @@ class _PlayersSection extends StatelessWidget {
   }
 }
 
+// ─── Quick Stats Section ─────────────────────────────────────────────────────
+
 class _QuickStatsSection extends StatelessWidget {
   const _QuickStatsSection({required this.stats});
 
@@ -394,8 +449,8 @@ class _QuickStatsSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const _SectionHeader(
-          title: 'Quick Stats',
-          subtitle: 'Compact match metrics in a clean grid.',
+          title: 'Live Stats',
+          subtitle: 'Animated match metrics with real-time progress.',
           icon: Icons.insights_rounded,
         ),
         SizedBox(height: context.rs(12, min: 10, max: 14)),
@@ -428,6 +483,8 @@ class _QuickStatsSection extends StatelessWidget {
     );
   }
 }
+
+// ─── Section Header ───────────────────────────────────────────────────────────
 
 class _SectionHeader extends StatelessWidget {
   const _SectionHeader({
@@ -485,8 +542,10 @@ class _SectionHeader extends StatelessWidget {
   }
 }
 
-class _SectionReveal extends StatelessWidget {
-  const _SectionReveal({
+// ─── Reveal Wrapper ───────────────────────────────────────────────────────────
+
+class _Reveal extends StatelessWidget {
+  const _Reveal({
     required this.opacity,
     required this.position,
     required this.child,
@@ -500,13 +559,12 @@ class _SectionReveal extends StatelessWidget {
   Widget build(BuildContext context) {
     return FadeTransition(
       opacity: opacity,
-      child: SlideTransition(
-        position: position,
-        child: child,
-      ),
+      child: SlideTransition(position: position, child: child),
     );
   }
 }
+
+// ─── Fan Backdrop ─────────────────────────────────────────────────────────────
 
 class _FanBackdrop extends StatelessWidget {
   const _FanBackdrop();
@@ -566,15 +624,14 @@ class _GlowOrb extends StatelessWidget {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         gradient: RadialGradient(
-          colors: [
-            color,
-            Colors.transparent,
-          ],
+          colors: [color, Colors.transparent],
         ),
       ),
     );
   }
 }
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 String _initials(String value) {
   final parts = value
@@ -583,13 +640,13 @@ String _initials(String value) {
       .where((part) => part.isNotEmpty)
       .toList(growable: false);
 
-  if (parts.isEmpty) {
-    return 'F';
-  }
+  if (parts.isEmpty) return 'F';
 
   if (parts.length == 1) {
     final word = parts.first;
-    return word.length >= 2 ? word.substring(0, 2).toUpperCase() : word.toUpperCase();
+    return word.length >= 2
+        ? word.substring(0, 2).toUpperCase()
+        : word.toUpperCase();
   }
 
   final first = parts.first.characters.first;
