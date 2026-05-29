@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/services/haptic_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
 import '../../../data/models/club_model.dart';
@@ -48,6 +49,15 @@ class _ClubsScreenState extends ConsumerState<ClubsScreen>
         _searchQuery = _searchController.text.toLowerCase();
       });
     });
+  }
+
+  bool _refreshing = false;
+  Future<void> _handleRefresh() async {
+    if (_refreshing) return;
+    setState(() => _refreshing = true);
+    await HapticService.refresh();
+    await Future.delayed(const Duration(milliseconds: 800));
+    if (mounted) setState(() => _refreshing = false);
   }
 
   @override
@@ -138,18 +148,25 @@ class _ClubsScreenState extends ConsumerState<ClubsScreen>
                         style: AppTextStyles.body(color: AppColors.textMuted),
                       ),
                     )
-                  : FadeTransition(
-                      opacity: _fadeAnimation,
-                      child: SlideTransition(
-                        position: _slideAnimation,
-                        child: GridView.builder(
-                          padding: EdgeInsets.fromLTRB(
-                            context.rs(20, min: 16, max: 24),
-                            context.rs(8, min: 4, max: 12),
-                            context.rs(20, min: 16, max: 24),
-                            context.rs(100, min: 80, max: 120),
-                          ),
-                          physics: const BouncingScrollPhysics(),
+                  : RefreshIndicator(
+                      onRefresh: _handleRefresh,
+                      color: AppColors.accentCyan,
+                      backgroundColor: AppColors.surface,
+                      strokeWidth: 2.5,
+                      child: FadeTransition(
+                        opacity: _fadeAnimation,
+                        child: SlideTransition(
+                          position: _slideAnimation,
+                          child: GridView.builder(
+                            padding: EdgeInsets.fromLTRB(
+                              context.rs(20, min: 16, max: 24),
+                              context.rs(8, min: 4, max: 12),
+                              context.rs(20, min: 16, max: 24),
+                              context.rs(100, min: 80, max: 120),
+                            ),
+                            physics: const BouncingScrollPhysics(
+                              parent: AlwaysScrollableScrollPhysics(),
+                            ),
                           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount:
                                 MediaQuery.of(context).size.width > 600 ? 3 : 2,
@@ -167,6 +184,7 @@ class _ClubsScreenState extends ConsumerState<ClubsScreen>
                               },
                             );
                           },
+                          ),
                         ),
                       ),
                     ),

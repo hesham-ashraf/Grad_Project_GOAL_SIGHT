@@ -129,10 +129,37 @@ All animate on first render via internal `AnimationController` + `Future.delayed
 | Manager dashboard | `lib/features/manager/manager_dashboard_mock_data.dart` |
 | Manager matches | `lib/features/manager/manager_matches_mock_data.dart` |
 | Upload / analysis generation | `lib/features/manager/manager_upload_mock_data.dart` |
-| Players | `lib/features/manager/players_mock_data.dart` |
+| Players (manager view) | `lib/features/manager/players_mock_data.dart` |
 | Match analyses (3 matches) | `lib/presentation/state_management/match_analysis_providers.dart` |
 | Fan clubs | `lib/presentation/state_management/clubs_provider.dart` |
 | Team members | `lib/presentation/state_management/app_providers.dart` (`teamMembersProvider`) |
+
+### Repository pattern (Mock Data Architecture)
+
+Interfaces live in `lib/data/repositories/interfaces/`, mock implementations in `lib/data/repositories/mock/`. Riverpod providers in `lib/presentation/state_management/repository_providers.dart`.
+
+| Interface | Mock | Swap to |
+|---|---|---|
+| `IClubRepository` | `MockClubRepository` | `SupabaseClubRepository` |
+| `IPlayerRepository` | `MockPlayerRepository` | `SupabasePlayerRepository` |
+| `IAnalysisRepository` | `MockAnalysisRepository` | `SupabaseAnalysisRepository` |
+| `IUploadRepository` | `MockUploadRepository` | `SupabaseUploadRepository` |
+| `IManagerRepository` | `MockManagerRepository` | `SupabaseManagerRepository` |
+
+Key providers: `clubListProvider`, `squadProvider`, `playerRiskProvider`, `squadRiskProvider`, `matchAnalysisListProvider`, `uploadHistoryProvider`, `managerListProvider`.
+
+`RiskAnalysisModel` in `lib/data/models/risk_analysis_model.dart` — composite fatigue/injury/consistency/tactical risk per player. `RiskLevel` enum (low/medium/high/critical) with severity scores (0.15/0.45/0.72/0.95).
+
+### UX Polish components
+
+Located in `lib/shared/animations/`:
+
+- `GsPullRefresh` — `RefreshIndicator` wrapper with haptic feedback; applied to Fan Home, Matches, Clubs, Standings, Manager Dashboard, Upload History, Admin Dashboard
+- `GsSuccessOverlay` — full-screen animated success overlay; call `GsSuccessOverlay.show(context, type: GsSuccessType.uploadComplete)`; `GsSuccessSnackBar.show()` for lightweight variant
+- `GsAiLoader` — futuristic AI processing overlay with rotating rings, scan lines, stage timeline; use `GsAiStageCard` for compact inline version
+- `GsInsightReveal` — staggered AI insight list reveal with fade+slide per item
+
+`HapticService` in `lib/core/services/haptic_service.dart` — centralised haptic patterns: `selection()`, `light()`, `medium()`, `success()`, `error()`, `refresh()`, `aiReveal()`, `longPress()`.
 
 ### Supabase / backend
 

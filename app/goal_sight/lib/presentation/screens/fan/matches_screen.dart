@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/services/haptic_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
 import '../../state_management/match_analysis_providers.dart';
@@ -147,6 +148,15 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen>
   void _selectStatus(String f) => setState(() => _statusFilter = f);
   void _selectLeague(String l) => setState(() => _leagueFilter = l);
 
+  bool _refreshing = false;
+  Future<void> _handleRefresh() async {
+    if (_refreshing) return;
+    setState(() => _refreshing = true);
+    await HapticService.refresh();
+    await Future.delayed(const Duration(milliseconds: 800));
+    if (mounted) setState(() => _refreshing = false);
+  }
+
   Future<void> _pickDate() async {
     final now = DateTime.now();
     final picked = await showDatePicker(
@@ -264,14 +274,21 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen>
             Expanded(
               child: filtered.isEmpty
                   ? _EmptyState(query: _searchQuery)
-                  : ListView.separated(
-                      padding: EdgeInsets.fromLTRB(
-                        context.rs(20, min: 16, max: 24),
-                        context.rs(4, min: 2, max: 8),
-                        context.rs(20, min: 16, max: 24),
-                        context.rs(40, min: 20, max: 60),
-                      ),
-                      physics: const BouncingScrollPhysics(),
+                  : RefreshIndicator(
+                      onRefresh: _handleRefresh,
+                      color: AppColors.accentCyan,
+                      backgroundColor: AppColors.surface,
+                      strokeWidth: 2.5,
+                      child: ListView.separated(
+                        padding: EdgeInsets.fromLTRB(
+                          context.rs(20, min: 16, max: 24),
+                          context.rs(4, min: 2, max: 8),
+                          context.rs(20, min: 16, max: 24),
+                          context.rs(40, min: 20, max: 60),
+                        ),
+                        physics: const BouncingScrollPhysics(
+                          parent: AlwaysScrollableScrollPhysics(),
+                        ),
                       itemCount: filtered.length,
                       separatorBuilder: (_, __) =>
                           SizedBox(height: context.rs(16, min: 12, max: 20)),
@@ -288,6 +305,7 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen>
                           ),
                         );
                       },
+                    ),
                     ),
             ),
           ],

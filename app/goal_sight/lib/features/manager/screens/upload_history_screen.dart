@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/services/haptic_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
 import '../upload_history_mock_data.dart';
@@ -28,6 +29,15 @@ class _UploadHistoryScreenState extends State<UploadHistoryScreen>
       vsync: this,
       duration: const Duration(milliseconds: 1100),
     )..forward();
+  }
+
+  bool _refreshing = false;
+  Future<void> _handleRefresh() async {
+    if (_refreshing) return;
+    setState(() => _refreshing = true);
+    await HapticService.refresh();
+    await Future.delayed(const Duration(milliseconds: 800));
+    if (mounted) setState(() => _refreshing = false);
   }
 
   @override
@@ -118,10 +128,15 @@ class _UploadHistoryScreenState extends State<UploadHistoryScreen>
 
             // ── Scrollable content ──
             Expanded(
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(
-                  parent: AlwaysScrollableScrollPhysics(),
-                ),
+              child: RefreshIndicator(
+                onRefresh: _handleRefresh,
+                color: AppColors.accentCyan,
+                backgroundColor: AppColors.surface,
+                strokeWidth: 2.5,
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(
+                    parent: AlwaysScrollableScrollPhysics(),
+                  ),
                 child: Center(
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 720),
@@ -227,6 +242,7 @@ class _UploadHistoryScreenState extends State<UploadHistoryScreen>
                       ),
                     ),
                   ),
+                ),
                 ),
               ),
             ),

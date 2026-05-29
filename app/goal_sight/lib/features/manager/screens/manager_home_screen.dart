@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/services/haptic_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
 import '../manager_dashboard_mock_data.dart';
@@ -31,6 +32,15 @@ class _ManagerHomeScreenState extends State<ManagerHomeScreen>
     )..forward();
   }
 
+  bool _refreshing = false;
+  Future<void> _handleRefresh() async {
+    if (_refreshing) return;
+    setState(() => _refreshing = true);
+    await HapticService.refresh();
+    await Future.delayed(const Duration(milliseconds: 900));
+    if (mounted) setState(() => _refreshing = false);
+  }
+
   @override
   void dispose() {
     _controller.dispose();
@@ -51,11 +61,16 @@ class _ManagerHomeScreenState extends State<ManagerHomeScreen>
 
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(
-          parent: AlwaysScrollableScrollPhysics(),
-        ),
-        child: Center(
+      body: RefreshIndicator(
+        onRefresh: _handleRefresh,
+        color: AppColors.accentCyan,
+        backgroundColor: AppColors.surface,
+        strokeWidth: 2.5,
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(
+            parent: AlwaysScrollableScrollPhysics(),
+          ),
+          child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 980),
             child: Padding(
@@ -179,6 +194,7 @@ class _ManagerHomeScreenState extends State<ManagerHomeScreen>
             ),
           ),
         ),
+      ),
       ),
     );
   }

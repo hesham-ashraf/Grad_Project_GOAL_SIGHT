@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/services/haptic_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
 import '../../state_management/app_providers.dart';
@@ -141,6 +142,16 @@ class _FanHomeScreenState extends ConsumerState<FanHomeScreen>
     ).animate(fade);
   }
 
+  bool _refreshing = false;
+
+  Future<void> _handleRefresh() async {
+    if (_refreshing) return;
+    setState(() => _refreshing = true);
+    await HapticService.refresh();
+    await Future.delayed(const Duration(milliseconds: 900));
+    if (mounted) setState(() => _refreshing = false);
+  }
+
   @override
   void dispose() {
     _controller.dispose();
@@ -175,10 +186,15 @@ class _FanHomeScreenState extends ConsumerState<FanHomeScreen>
           children: [
             const Positioned.fill(child: _FanBackdrop()),
             SafeArea(
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(
-                  parent: AlwaysScrollableScrollPhysics(),
-                ),
+              child: RefreshIndicator(
+                onRefresh: _handleRefresh,
+                color: AppColors.accentCyan,
+                backgroundColor: AppColors.surface,
+                strokeWidth: 2.5,
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(
+                    parent: AlwaysScrollableScrollPhysics(),
+                  ),
                 child: ResponsiveCentered(
                   maxWidth: 1180,
                   padding: EdgeInsets.fromLTRB(hPad, vPad, hPad, 36),
@@ -255,6 +271,7 @@ class _FanHomeScreenState extends ConsumerState<FanHomeScreen>
                 ),
               ),
             ),
+          ),
           ],
         ),
       ),

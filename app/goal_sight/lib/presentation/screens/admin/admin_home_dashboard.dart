@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/services/haptic_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../widgets/admin/admin_dashboard_widgets.dart';
 import '../../widgets/admin/tactical_insight_widget.dart';
@@ -40,6 +41,15 @@ class _AdminHomeDashboardState extends State<AdminHomeDashboard>
       return Tween<Offset>(begin: const Offset(0, 0.06), end: Offset.zero)
           .animate(f);
     }).toList();
+  }
+
+  bool _refreshing = false;
+  Future<void> _handleRefresh() async {
+    if (_refreshing) return;
+    setState(() => _refreshing = true);
+    await HapticService.refresh();
+    await Future.delayed(const Duration(milliseconds: 900));
+    if (mounted) setState(() => _refreshing = false);
   }
 
   @override
@@ -98,9 +108,16 @@ class _AdminHomeDashboardState extends State<AdminHomeDashboard>
           ),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 4, 20, 120),
-        physics: const BouncingScrollPhysics(),
+      body: RefreshIndicator(
+        onRefresh: _handleRefresh,
+        color: AppColors.accentCyan,
+        backgroundColor: AppColors.surface,
+        strokeWidth: 2.5,
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(20, 4, 20, 120),
+          physics: const BouncingScrollPhysics(
+            parent: AlwaysScrollableScrollPhysics(),
+          ),
         children: [
           // 0 — Hero Header
           _reveal(0, const AdminDashboardHero()),
@@ -153,6 +170,7 @@ class _AdminHomeDashboardState extends State<AdminHomeDashboard>
           // 6 — Alerts
           _reveal(6, const AdminAlertsSection()),
         ],
+        ),
       ),
     );
   }
