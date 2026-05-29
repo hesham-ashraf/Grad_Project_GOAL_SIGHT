@@ -1,9 +1,9 @@
-/// ---------------------------------------------------------------------------
-/// GoalSight — Player Profile Model
-///
-/// Extended player data aggregated from multiple match analyses.
-/// Includes historical ratings, trends, fatigue tracking, and AI insights.
-/// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// GoalSight — Player Profile Model
+//
+// Extended player data aggregated from multiple match analyses.
+// Includes historical ratings, trends, fatigue tracking, and AI insights.
+// ---------------------------------------------------------------------------
 
 enum PerformanceTrend { improving, declining, stable }
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/utils/responsive.dart';
-import '../../../features/manager/standing_entry_model.dart';
+import '../../../data/models/standing_entry_model.dart';
 
 class StandingsTableCard extends StatelessWidget {
   const StandingsTableCard({

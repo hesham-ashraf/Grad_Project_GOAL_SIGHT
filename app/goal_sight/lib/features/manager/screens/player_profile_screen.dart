@@ -1,17 +1,18 @@
-/// ---------------------------------------------------------------------------
-/// GoalSight — Player Profile Screen
-///
-/// Detailed performance analysis view for a single player.
-/// Features:
-/// - Header with player info and status
-/// - Performance metrics (rating, fatigue, activity)
-/// - Contribution breakdown
-/// - Match history with statistics
-/// - Performance trend visualization
-/// - AI-generated insights
-/// ---------------------------------------------------------------------------
+﻿// ---------------------------------------------------------------------------
+// GoalSight — Player Profile Screen
+//
+// Detailed performance analysis view for a single player.
+// Features:
+// - Header with player info and status
+// - Performance metrics (rating, fatigue, activity)
+// - Contribution breakdown
+// - Match history with statistics
+// - Performance trend visualization
+// - AI-generated insights
+// ---------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:goal_sight/core/theme/app_theme.dart';
 import 'package:goal_sight/core/utils/responsive.dart';
 import 'package:goal_sight/data/models/player_profile_model.dart';
@@ -20,9 +21,9 @@ import 'package:goal_sight/features/manager/widgets/player_match_history_item.da
 
 class PlayerProfileScreen extends StatefulWidget {
   const PlayerProfileScreen({
+    super.key,
     required this.player,
-    Key? key,
-  }) : super(key: key);
+  });
 
   final PlayerProfileModel player;
 
@@ -93,21 +94,56 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.backgroundAlt,
+        backgroundColor: Colors.transparent,
         elevation: 0,
+        scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios_rounded,
-            color: AppColors.textPrimary,
-            size: context.rs(20, min: 18, max: 24),
+          icon: Container(
+            padding: EdgeInsets.all(context.rs(8, min: 6, max: 10)),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceElevated.withValues(alpha: 0.8),
+              borderRadius: AppRadius.button,
+              border: Border.all(color: AppColors.outlineSubtle),
+            ),
+            child: Icon(
+              Icons.arrow_back_ios_rounded,
+              color: AppColors.textPrimary,
+              size: context.rs(16, min: 14, max: 18),
+            ),
           ),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => context.pop(),
         ),
-        title: Text(
-          widget.player.name,
-          style: AppTextStyles.title(
-            color: AppColors.textPrimary,
-          ),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Flexible(
+              child: Text(
+                widget.player.name,
+                overflow: TextOverflow.ellipsis,
+                style: AppTextStyles.title(color: AppColors.textPrimary).copyWith(
+                  fontSize: context.sp(17, min: 15, max: 19),
+                ),
+              ),
+            ),
+            SizedBox(width: context.rs(8, min: 6, max: 10)),
+            Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: context.rs(8, min: 6, max: 10),
+                vertical: context.rs(3, min: 2, max: 4),
+              ),
+              decoration: const BoxDecoration(
+                gradient: AppGradients.brand,
+                borderRadius: AppRadius.chip,
+              ),
+              child: Text(
+                widget.player.position,
+                style: AppTextStyles.caption(color: Colors.white).copyWith(
+                  fontSize: context.rs(10, min: 9, max: 11),
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ],
         ),
         centerTitle: false,
       ),
@@ -181,7 +217,7 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
   Widget _buildHeaderCard(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        gradient: LinearGradient(
+        gradient: const LinearGradient(
           colors: [
             AppColors.surfaceElevated,
             AppColors.surfaceRaised,
@@ -190,7 +226,7 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
           end: Alignment.bottomRight,
         ),
         border: Border.all(
-          color: AppColors.outline.withOpacity(0.3),
+          color: AppColors.outline.withValues(alpha: 0.3),
           width: 1,
         ),
         borderRadius: BorderRadius.circular(AppRadius.xxl),
@@ -224,7 +260,7 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
                             vertical: context.rs(AppSpacing.xs),
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.primaryPurple.withOpacity(0.2),
+                            color: AppColors.primaryPurple.withValues(alpha: 0.2),
                             border: Border.all(
                               color: AppColors.primaryPurple,
                               width: 0.5,
@@ -247,9 +283,9 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
               Container(
                 padding: EdgeInsets.all(context.rs(AppSpacing.lg)),
                 decoration: BoxDecoration(
-                  color: _getRatingColor().withOpacity(0.15),
+                  color: _getRatingColor().withValues(alpha: 0.15),
                   border: Border.all(
-                    color: _getRatingColor().withOpacity(0.5),
+                    color: _getRatingColor().withValues(alpha: 0.5),
                     width: 1.5,
                   ),
                   borderRadius: BorderRadius.circular(AppRadius.lg),
@@ -257,7 +293,7 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
                 child: Column(
                   children: [
                     Text(
-                      '${widget.player.currentRating.toStringAsFixed(1)}',
+                      widget.player.currentRating.toStringAsFixed(1),
                       style: AppTextStyles.headline(
                         color: _getRatingColor(),
                       ),
@@ -288,12 +324,12 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
                 ),
                 decoration: BoxDecoration(
                   color: widget.player.status == 'Explosive Form'
-                      ? AppColors.accentGreen.withOpacity(0.15)
+                      ? AppColors.accentGreen.withValues(alpha: 0.15)
                       : widget.player.status == 'Elite Form'
-                          ? AppColors.accentCyan.withOpacity(0.15)
+                          ? AppColors.accentCyan.withValues(alpha: 0.15)
                           : widget.player.status.contains('Improvement')
-                              ? AppColors.danger.withOpacity(0.15)
-                              : AppColors.warning.withOpacity(0.15),
+                              ? AppColors.danger.withValues(alpha: 0.15)
+                              : AppColors.warning.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(AppRadius.md),
                 ),
                 child: Text(
@@ -317,7 +353,7 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
                   vertical: context.rs(AppSpacing.sm),
                 ),
                 decoration: BoxDecoration(
-                  color: _getTrendColor().withOpacity(0.15),
+                  color: _getTrendColor().withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(AppRadius.md),
                 ),
                 child: Row(
@@ -398,7 +434,7 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
             decoration: BoxDecoration(
               color: AppColors.surfaceElevated,
               border: Border.all(
-                color: AppColors.outline.withOpacity(0.3),
+                color: AppColors.outline.withValues(alpha: 0.3),
                 width: 1,
               ),
               borderRadius: BorderRadius.circular(AppRadius.lg),
@@ -440,7 +476,7 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
             decoration: BoxDecoration(
               color: AppColors.surfaceElevated,
               border: Border.all(
-                color: AppColors.outline.withOpacity(0.3),
+                color: AppColors.outline.withValues(alpha: 0.3),
                 width: 1,
               ),
               borderRadius: BorderRadius.circular(AppRadius.lg),
@@ -489,7 +525,7 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
       decoration: BoxDecoration(
         color: AppColors.surfaceElevated,
         border: Border.all(
-          color: AppColors.outline.withOpacity(0.3),
+          color: AppColors.outline.withValues(alpha: 0.3),
           width: 1,
         ),
         borderRadius: BorderRadius.circular(AppRadius.lg),
@@ -539,7 +575,7 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
               Column(
                 children: [
                   Text(
-                    '${minRating.toStringAsFixed(1)}',
+                    minRating.toStringAsFixed(1),
                     style: AppTextStyles.caption(
                       color: AppColors.danger,
                     ),
@@ -555,7 +591,7 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
               Column(
                 children: [
                   Text(
-                    '${widget.player.averageRating.toStringAsFixed(1)}',
+                    widget.player.averageRating.toStringAsFixed(1),
                     style: AppTextStyles.caption(
                       color: AppColors.accentCyan,
                     ),
@@ -571,7 +607,7 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
               Column(
                 children: [
                   Text(
-                    '${maxRating.toStringAsFixed(1)}',
+                    maxRating.toStringAsFixed(1),
                     style: AppTextStyles.caption(
                       color: AppColors.accentGreen,
                     ),
@@ -599,7 +635,7 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
           decoration: BoxDecoration(
             color: AppColors.surfaceElevated,
             border: Border.all(
-              color: AppColors.primaryBlue.withOpacity(0.3),
+              color: AppColors.primaryBlue.withValues(alpha: 0.3),
               width: 1,
             ),
             borderRadius: BorderRadius.circular(AppRadius.lg),
@@ -684,7 +720,7 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
       decoration: BoxDecoration(
         color: AppColors.surfaceElevated,
         border: Border.all(
-          color: AppColors.outline.withOpacity(0.3),
+          color: AppColors.outline.withValues(alpha: 0.3),
           width: 1,
         ),
         borderRadius: BorderRadius.circular(AppRadius.lg),
@@ -767,7 +803,7 @@ class _TrendChartPainter extends CustomPainter {
       ..strokeCap = StrokeCap.round;
 
     final fillPaint = Paint()
-      ..color = color.withOpacity(0.1)
+      ..color = color.withValues(alpha: 0.1)
       ..style = PaintingStyle.fill;
 
     final range = maxRating - minRating;

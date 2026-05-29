@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/responsive.dart';
 import '../../../features/admin/data/admin_mock_data.dart';
 import '../../widgets/admin/tactical_insight_widget.dart';
 import '../../widgets/admin/admin_analytics_widgets.dart';
@@ -51,7 +52,7 @@ class _ClubAnalyticsPageState extends State<ClubAnalyticsPage>
           children: [
             const Icon(Icons.bar_chart, color: AppColors.accentGreen, size: 20),
             const SizedBox(width: 8),
-            Text('Club Intelligence', style: AppTextStyles.title(color: Colors.white).copyWith(fontSize: 18)),
+            Text('Club Intelligence', style: AppTextStyles.title(color: AppColors.textPrimary).copyWith(fontSize: context.sp(17, min: 15, max: 20))),
           ],
         ),
         backgroundColor: Colors.transparent,
@@ -59,7 +60,12 @@ class _ClubAnalyticsPageState extends State<ClubAnalyticsPage>
         elevation: 0,
       ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 4, 20, 100),
+        padding: EdgeInsets.fromLTRB(
+          context.rs(20, min: 16, max: 28),
+          context.rs(4, min: 2, max: 8),
+          context.rs(20, min: 16, max: 28),
+          context.rs(100, min: 80, max: 120),
+        ),
         physics: const BouncingScrollPhysics(),
         children: [
           // 0 — Tactical Identity
@@ -154,7 +160,7 @@ class _TacticalIdentityCard extends StatelessWidget {
             style: AppTextStyles.body(color: AppColors.textSecondary),
           ),
           const SizedBox(height: 16),
-          Wrap(
+          const Wrap(
             spacing: 8,
             runSpacing: 8,
             children: [
@@ -166,7 +172,7 @@ class _TacticalIdentityCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          Row(
+          const Row(
             children: [
               Expanded(child: _IdentityStat(label: 'Avg Possession', value: '62%', color: AppColors.accentCyan)),
               Expanded(child: _IdentityStat(label: 'Press Success', value: '84%', color: AppColors.primaryPurple)),

@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/constants/app_roles.dart';
+import '../../../core/services/haptic_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
 import '../../../core/utils/validators.dart';
 import '../../../features/auth/auth_state.dart';
-import '../../state_management/app_providers.dart';
+import '../../../providers/app_providers.dart';
 import '../../widgets/app_text_field.dart';
+import '../../widgets/auth_card_widgets.dart';
 import '../../widgets/goalsight_logo.dart';
 import '../../widgets/primary_button.dart';
 
@@ -19,41 +20,75 @@ class LoginScreen extends ConsumerStatefulWidget {
   ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends ConsumerState<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen>
+    with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+
   bool _rememberMe = true;
+  bool _obscurePassword = true;
+
+  late AnimationController _ctrl;
+  late List<Animation<double>> _fades;
+  late List<Animation<Offset>> _slides;
+  static const int _n = 4;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    )..forward();
+
+    _fades = List.generate(_n, (i) {
+      final start = (i * 0.14).clamp(0.0, 0.80);
+      final end = (start + 0.30).clamp(0.0, 1.0);
+      return CurvedAnimation(
+        parent: _ctrl,
+        curve: Interval(start, end, curve: Curves.easeOutCubic),
+      );
+    });
+    _slides = _fades
+        .map(
+          (f) => Tween<Offset>(
+            begin: const Offset(0, 0.05),
+            end: Offset.zero,
+          ).animate(f),
+        )
+        .toList();
+  }
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _ctrl.dispose();
     super.dispose();
   }
 
+  Widget _reveal(int i, Widget child) => FadeTransition(
+        opacity: _fades[i],
+        child: SlideTransition(position: _slides[i], child: child),
+      );
+
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
-
+    await HapticService.medium();
     await ref.read(authControllerProvider.notifier).login(
           email: _emailController.text.trim(),
           password: _passwordController.text,
         );
   }
 
-  Future<void> _loginAs(UserRole role) async {
-    final email = role == UserRole.admin
-        ? 'admin@goalsight.ai'
-        : role == UserRole.manager
-            ? 'manager@goalsight.ai'
-            : 'fan@goalsight.ai';
-
+  Future<void> _demoLogin(String email, String password) async {
+    await HapticService.selection();
     _emailController.text = email;
-    _passwordController.text = '123456';
-
+    _passwordController.text = password;
     await ref.read(authControllerProvider.notifier).login(
           email: email,
-          password: '123456',
+          password: password,
         );
   }
 
@@ -61,229 +96,177 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget build(BuildContext context) {
     final authState = ref.watch(authControllerProvider);
     final loading = authState.status == AuthStatus.loading;
+    final hasError =
+        authState.status == AuthStatus.error &&
+        authState.errorMessage != null;
 
-    return Theme(
-      data: AppTheme.lightTheme(),
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          surfaceTintColor: Colors.transparent,
-          foregroundColor: const Color(0xFF23304C),
-        ),
-        body: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [Color(0xFFF3F5F9), Color(0xFFEDEFF5)],
-            ),
-          ),
-          child: Center(
-            child: SingleChildScrollView(
-              padding: context.padAll(18),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 420),
-                child: Column(
-                  children: [
-                    GoalSightLogo(iconSize: context.rs(64, min: 54, max: 80)),
-                    SizedBox(height: context.rs(22, min: 16, max: 28)),
-                    Container(
-                      padding: context.padSym(h: 24, v: 24),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(context.rs(20, min: 14, max: 26)),
-                        border: Border.all(color: const Color(0xFFDCE3F1)),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Color(0x26000000),
-                            blurRadius: 24,
-                            offset: Offset(0, 8),
-                          ),
-                        ],
-                      ),
+    return AuthBackground(
+      child: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: context.padAll(20),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 440),
+              child: Column(
+                children: [
+                  SizedBox(height: context.rs(8, min: 4, max: 16)),
+
+                  // ── Logo & tagline ─────────────────────────────────────
+                  _reveal(
+                    0,
+                    GoalSightLogo(
+                      iconSize: context.rs(62, min: 52, max: 78),
+                      showSubtitle: false,
+                    ),
+                  ),
+
+                  SizedBox(height: context.rs(28, min: 20, max: 38)),
+
+                  // ── Auth card ──────────────────────────────────────────
+                  _reveal(
+                    1,
+                    AuthCard(
                       child: Form(
                         key: _formKey,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            // Title
+                            const AuthGradientTitle(text: 'Welcome Back'),
+                            SizedBox(height: context.rs(5, min: 3, max: 8)),
                             Text(
-                              'Welcome to GOALSIGHT',
-                              style: AppTheme.authTitleStyle(context),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
+                              'Sign in to access your analytics dashboard',
+                              style: AppTextStyles.body(
+                                color: AppColors.textMuted,
+                              ).copyWith(fontSize: 13),
                             ),
-                            SizedBox(height: context.rs(8, min: 5, max: 12)),
-                            Text(
-                              'Enter your email address and password to use the application.',
-                              style: AppTheme.authSubtitleStyle(context),
-                            ),
-                            SizedBox(height: context.rs(20, min: 12, max: 28)),
+
+                            SizedBox(height: context.rs(24, min: 18, max: 32)),
+
+                            // Email
                             AppTextField(
-                              label: 'Email / Username',
-                              hintText: 'Enter your email or username',
+                              label: 'Email Address',
+                              hintText: 'you@club.com',
                               controller: _emailController,
                               keyboardType: TextInputType.emailAddress,
                               validator: Validators.email,
                             ),
-                            SizedBox(height: context.rs(12, min: 8, max: 16)),
+
+                            SizedBox(height: context.rs(14, min: 10, max: 18)),
+
+                            // Password
                             AppTextField(
                               label: 'Password',
                               hintText: 'Enter your password',
                               controller: _passwordController,
-                              obscureText: true,
+                              obscureText: _obscurePassword,
                               validator: Validators.password,
-                              suffixIcon: const Icon(
-                                Icons.remove_red_eye_outlined,
-                                color: Color(0xFF8A97B6),
+                              suffixIcon: PasswordToggleIcon(
+                                obscure: _obscurePassword,
+                                onTap: () => setState(
+                                  () => _obscurePassword = !_obscurePassword,
+                                ),
                               ),
                             ),
+
                             SizedBox(height: context.rs(12, min: 8, max: 16)),
+
+                            // Remember me + forgot password
                             Row(
                               children: [
                                 SizedBox(
-                                  width: 22,
+                                  width: 20,
+                                  height: 20,
                                   child: Checkbox(
                                     value: _rememberMe,
-                                    onChanged: (value) => setState(
-                                        () => _rememberMe = value ?? false),
-                                  ),
-                                ),
-                                SizedBox(width: context.rs(8, min: 6, max: 10)),
-                                Expanded(
-                                  child: Text(
-                                    'Remember Me',
-                                    style: TextStyle(
-                                      fontSize: context.sp(13, min: 12, max: 16),
+                                    onChanged: (v) => setState(
+                                      () => _rememberMe = v ?? false,
+                                    ),
+                                    activeColor: AppColors.primaryPurple,
+                                    side: const BorderSide(
+                                      color: AppColors.outline,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(5),
                                     ),
                                   ),
                                 ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Remember me',
+                                  style: AppTextStyles.caption(
+                                    color: AppColors.textSecondary,
+                                  ),
+                                ),
+                                const Spacer(),
                                 TextButton(
                                   onPressed: loading
                                       ? null
                                       : () => context.push('/forgot-password'),
-                                  child: const Text('Forget Password?'),
+                                  style: TextButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 6,
+                                      vertical: 2,
+                                    ),
+                                    minimumSize: Size.zero,
+                                    tapTargetSize:
+                                        MaterialTapTargetSize.shrinkWrap,
+                                  ),
+                                  child: Text(
+                                    'Forgot Password?',
+                                    style: AppTextStyles.caption(
+                                      color: AppColors.primaryPurple,
+                                    ).copyWith(fontWeight: FontWeight.w600),
+                                  ),
                                 ),
                               ],
                             ),
-                            if (authState.status == AuthStatus.error &&
-                                authState.errorMessage != null) ...[
-                              SizedBox(height: context.rs(8, min: 5, max: 12)),
-                              Text(
-                                authState.errorMessage!,
-                                style: const TextStyle(color: Colors.redAccent),
-                              ),
+
+                            // Error state
+                            if (hasError) ...[
+                              SizedBox(height: context.rs(14, min: 10, max: 18)),
+                              AuthErrorBox(message: authState.errorMessage!),
                             ],
-                            SizedBox(height: context.rs(10, min: 7, max: 14)),
+
+                            SizedBox(height: context.rs(22, min: 16, max: 28)),
+
+                            // Sign In button
                             PrimaryButton(
                               label: 'SIGN IN',
                               loading: loading,
                               icon: Icons.login_rounded,
                               onPressed: _submit,
                             ),
+
+                            SizedBox(height: context.rs(20, min: 14, max: 26)),
+
+                            // Demo login
+                            const AuthDividerLabel(label: 'Quick Demo'),
                             SizedBox(height: context.rs(14, min: 10, max: 18)),
-                            Row(
-                              children: const [
-                                Expanded(
-                                    child: Divider(color: Color(0xFFD8DFED))),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 12),
-                                  child: Text(
-                                    'Or login with',
-                                    style: TextStyle(color: Color(0xFF68789B)),
-                                  ),
-                                ),
-                                Expanded(
-                                    child: Divider(color: Color(0xFFD8DFED))),
-                              ],
+                            DemoLoginSection(
+                              loading: loading,
+                              onLogin: _demoLogin,
                             ),
-                            SizedBox(height: context.rs(14, min: 10, max: 18)),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: OutlinedButton.icon(
-                                    onPressed: () {},
-                                    icon: const Icon(Icons.facebook,
-                                        color: Color(0xFF1877F2)),
-                                    label: const Text('Facebook'),
-                                  ),
-                                ),
-                                SizedBox(width: context.rs(10, min: 6, max: 14)),
-                                Expanded(
-                                  child: OutlinedButton.icon(
-                                    onPressed: () {},
-                                    icon: const Text(
-                                      'G',
-                                      style: TextStyle(
-                                        color: Color(0xFFDB4437),
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                    label: const Text('Google'),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: context.rs(14, min: 10, max: 18)),
-                            Container(
-                              padding: context.padAll(10),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFF4F6FB),
-                                borderRadius: BorderRadius.circular(context.rs(12, min: 10, max: 16)),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  const Text(
-                                    'Quick Demo Login',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      color: Color(0xFF5F6D8D),
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  SizedBox(height: context.rs(8, min: 5, max: 12)),
-                                  Wrap(
-                                    spacing: 8,
-                                    runSpacing: 8,
-                                    children: [
-                                      OutlinedButton(
-                                        onPressed: loading
-                                            ? null
-                                            : () => _loginAs(UserRole.fan),
-                                        child: const Text('Enter as Fan'),
-                                      ),
-                                      OutlinedButton(
-                                        onPressed: loading
-                                            ? null
-                                            : () => _loginAs(UserRole.manager),
-                                        child: const Text('Enter as Manager'),
-                                      ),
-                                      OutlinedButton(
-                                        onPressed: loading
-                                            ? null
-                                            : () => _loginAs(UserRole.admin),
-                                        child: const Text('Enter as Admin'),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(height: context.rs(10, min: 7, max: 14)),
+
+                            SizedBox(height: context.rs(20, min: 14, max: 26)),
+
+                            // Register link
                             Center(
-                              child: TextButton(
-                                onPressed: () => context.push('/register'),
+                              child: GestureDetector(
+                                onTap: () => context.push('/register'),
                                 child: RichText(
-                                  text: const TextSpan(
-                                    style: TextStyle(color: Color(0xFF23304C)),
-                                    children: [
-                                      TextSpan(text: "Don't have an account? "),
+                                  text: TextSpan(
+                                    style: AppTextStyles.body(
+                                      color: AppColors.textSecondary,
+                                    ).copyWith(fontSize: 13),
+                                    children: const [
+                                      TextSpan(
+                                        text: "Don't have an account? ",
+                                      ),
                                       TextSpan(
                                         text: 'Register Now',
                                         style: TextStyle(
-                                          color: AppTheme.brandPurple,
+                                          color: AppColors.primaryPurple,
                                           fontWeight: FontWeight.w700,
                                         ),
                                       ),
@@ -296,13 +279,24 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                       ),
                     ),
-                    SizedBox(height: context.rs(14, min: 10, max: 18)),
-                    const Text(
-                      '(c) 2026 GOALSIGHT. Premium Football Analytics Platform.',
-                      style: TextStyle(color: Color(0xFF8A95B2), fontSize: 12),
+                  ),
+
+                  SizedBox(height: context.rs(24, min: 16, max: 32)),
+
+                  // Footer
+                  _reveal(
+                    3,
+                    Text(
+                      '© 2026 GOALSIGHT. Premium Football Analytics Platform.',
+                      style: AppTextStyles.caption(
+                        color: AppColors.textMuted.withValues(alpha: 0.55),
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                  ],
-                ),
+                  ),
+
+                  SizedBox(height: context.rs(12, min: 8, max: 20)),
+                ],
               ),
             ),
           ),

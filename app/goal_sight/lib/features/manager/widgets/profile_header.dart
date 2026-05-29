@@ -10,13 +10,13 @@ class ProfileHeader extends StatelessWidget {
   final String? subtitle;
 
   const ProfileHeader({
-    Key? key,
+    super.key,
     required this.avatarInitials,
     required this.name,
     required this.role,
     required this.club,
     this.subtitle,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

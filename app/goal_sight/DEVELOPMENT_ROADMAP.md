@@ -10,7 +10,7 @@ Status rules:
 Recommended sign-off format:
 - `Sign-off: AH | Date: 2026-05-27`
 
-Last reviewed against the codebase: `2026-05-27`
+Last reviewed against the codebase: `2026-05-29`
 
 ---
 
@@ -43,8 +43,8 @@ Finish the full Flutter application visually and functionally with realistic moc
 - [x] Add Splash Screen | Sign-off: ______ | Date: ______
 - [x] Add Session Loading Screen | Sign-off: ______ | Date: ______
 - [x] Add Logout Flow | Sign-off: ______ | Date: ______
-- [ ] Add Better Error States | Sign-off: ______ | Date: ______
-- [ ] Add Better Loading States | Sign-off: ______ | Date: ______
+- [x] Add Better Error States | Sign-off: AH | Date: 2026-05-29
+- [x] Add Better Loading States | Sign-off: AH | Date: 2026-05-29
 - [x] Add Route Protection UX | Sign-off: ______ | Date: ______
 - [ ] Add Onboarding Flow (optional) | Sign-off: ______ | Date: ______
 
@@ -76,7 +76,7 @@ Finish the full Flutter application visually and functionally with realistic moc
 - [x] Add staggered reveal animations | Sign-off: ______ | Date: ______
 - [x] Add smooth page transitions | Sign-off: ______ | Date: ______
 - [x] Add animated cards | Sign-off: ______ | Date: ______
-- [ ] Add shimmer loading animations | Sign-off: ______ | Date: ______
+- [x] Add shimmer loading animations | Sign-off: AH | Date: 2026-05-29
 - [x] Add animated tactical widgets | Sign-off: ______ | Date: ______
 - [x] Add animated AI sections | Sign-off: ______ | Date: ______
 

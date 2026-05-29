@@ -152,7 +152,7 @@ class GoalSightPressureIndicator extends StatelessWidget {
               children: [
                 Container(
                   height: context.rs(12, min: 9, max: 14),
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: AppColors.outlineSubtle,
                     borderRadius: AppRadius.chip,
                   ),

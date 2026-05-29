@@ -1,4 +1,4 @@
-import 'dart:ui';
+﻿import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
@@ -31,7 +31,7 @@ class DashboardCard extends StatelessWidget {
           duration: const Duration(milliseconds: 220),
           padding: padding,
           decoration: BoxDecoration(
-            color: const Color(0xFF15182B).withOpacity(0.94),
+            color: const Color(0xFF15182B).withValues(alpha: 0.94),
             borderRadius: BorderRadius.circular(radius),
             border: Border.all(color: const Color(0xFF2A3156)),
             boxShadow: [

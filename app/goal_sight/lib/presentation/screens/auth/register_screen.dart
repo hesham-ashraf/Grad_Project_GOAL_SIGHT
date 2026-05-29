@@ -3,12 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/constants/app_roles.dart';
+import '../../../core/services/haptic_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
 import '../../../core/utils/validators.dart';
 import '../../../features/auth/auth_state.dart';
-import '../../state_management/app_providers.dart';
+import '../../../providers/app_providers.dart';
 import '../../widgets/app_text_field.dart';
+import '../../widgets/auth_card_widgets.dart';
 import '../../widgets/goalsight_logo.dart';
 import '../../widgets/primary_button.dart';
 
@@ -19,7 +21,8 @@ class RegisterScreen extends ConsumerStatefulWidget {
   ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _RegisterScreenState extends ConsumerState<RegisterScreen> {
+class _RegisterScreenState extends ConsumerState<RegisterScreen>
+    with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
@@ -27,7 +30,40 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _confirmPasswordController = TextEditingController();
 
   bool _acceptTerms = true;
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
   UserRole _selectedRole = UserRole.manager;
+
+  late AnimationController _ctrl;
+  late List<Animation<double>> _fades;
+  late List<Animation<Offset>> _slides;
+  static const int _n = 4;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    )..forward();
+
+    _fades = List.generate(_n, (i) {
+      final start = (i * 0.14).clamp(0.0, 0.80);
+      final end = (start + 0.30).clamp(0.0, 1.0);
+      return CurvedAnimation(
+        parent: _ctrl,
+        curve: Interval(start, end, curve: Curves.easeOutCubic),
+      );
+    });
+    _slides = _fades
+        .map(
+          (f) => Tween<Offset>(
+            begin: const Offset(0, 0.05),
+            end: Offset.zero,
+          ).animate(f),
+        )
+        .toList();
+  }
 
   @override
   void dispose() {
@@ -35,13 +71,19 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    _ctrl.dispose();
     super.dispose();
   }
+
+  Widget _reveal(int i, Widget child) => FadeTransition(
+        opacity: _fades[i],
+        child: SlideTransition(position: _slides[i], child: child),
+      );
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     if (!_acceptTerms) return;
-
+    await HapticService.medium();
     await ref.read(authControllerProvider.notifier).register(
           name: _nameController.text.trim(),
           email: _emailController.text.trim(),
@@ -54,295 +96,368 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   Widget build(BuildContext context) {
     final authState = ref.watch(authControllerProvider);
     final loading = authState.status == AuthStatus.loading;
+    final hasError =
+        authState.status == AuthStatus.error &&
+        authState.errorMessage != null;
 
-    return Theme(
-      data: AppTheme.lightTheme(),
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          surfaceTintColor: Colors.transparent,
-          foregroundColor: const Color(0xFF23304C),
-        ),
-        body: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [Color(0xFFF3F5F9), Color(0xFFEDEFF5)],
+    return AuthBackground(
+      child: SafeArea(
+        child: Column(
+          children: [
+            // Back button
+            Align(
+              alignment: Alignment.topLeft,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 4,
+                ),
+                child: IconButton(
+                  icon: const Icon(Icons.arrow_back_ios_new_rounded),
+                  color: AppColors.textSecondary,
+                  onPressed: () {
+                    if (context.canPop()) {
+                      context.pop();
+                    } else {
+                      context.go('/login');
+                    }
+                  },
+                ),
+              ),
             ),
-          ),
-          child: Center(
-            child: SingleChildScrollView(
-              padding: context.padAll(18),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 420),
-                child: Column(
-                  children: [
-                    GoalSightLogo(iconSize: context.rs(64, min: 54, max: 80)),
-                    SizedBox(height: context.rs(22, min: 16, max: 28)),
-                    Container(
-                      padding: context.padSym(h: 24, v: 24),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(context.rs(20, min: 14, max: 26)),
-                        border: Border.all(color: const Color(0xFFDCE3F1)),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Color(0x26000000),
-                            blurRadius: 24,
-                            offset: Offset(0, 8),
+            Expanded(
+              child: Center(
+                child: SingleChildScrollView(
+                  padding: context.padAll(20),
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 440),
+                    child: Column(
+                      children: [
+                        // ── Logo ────────────────────────────────────────
+                        _reveal(
+                          0,
+                          GoalSightLogo(
+                            iconSize: context.rs(56, min: 46, max: 70),
+                            showSubtitle: false,
                           ),
-                        ],
-                      ),
-                      child: Form(
-                        key: _formKey,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Create Your Account',
-                              style: AppTheme.authTitleStyle(context).copyWith(
-                                fontSize: context.sp(32, min: 24, max: 40),
-                              ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            SizedBox(height: context.rs(8, min: 5, max: 12)),
-                            Text(
-                              'Join GOALSIGHT and start analyzing football matches like a pro.',
-                              style: AppTheme.authSubtitleStyle(context),
-                            ),
-                            SizedBox(height: context.rs(16, min: 10, max: 22)),
-                            AppTextField(
-                              label: 'Full Name',
-                              hintText: 'Enter your full name',
-                              controller: _nameController,
-                              validator: (value) =>
-                                  Validators.requiredField(value, 'Name'),
-                            ),
-                            SizedBox(height: context.rs(12, min: 8, max: 16)),
-                            AppTextField(
-                              label: 'Email Address',
-                              hintText: 'Enter your email',
-                              controller: _emailController,
-                              keyboardType: TextInputType.emailAddress,
-                              validator: Validators.email,
-                            ),
-                            SizedBox(height: context.rs(12, min: 8, max: 16)),
-                            AppTextField(
-                              label: 'Password',
-                              hintText: 'Create a strong password',
-                              controller: _passwordController,
-                              obscureText: true,
-                              validator: Validators.password,
-                              suffixIcon: const Icon(
-                                Icons.remove_red_eye_outlined,
-                                color: Color(0xFF8A97B6),
-                              ),
-                            ),
-                            SizedBox(height: context.rs(12, min: 8, max: 16)),
-                            AppTextField(
-                              label: 'Confirm Password',
-                              hintText: 'Re-enter your password',
-                              controller: _confirmPasswordController,
-                              obscureText: true,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Confirm password is required';
-                                }
-                                if (value != _passwordController.text) {
-                                  return 'Passwords do not match';
-                                }
-                                return null;
-                              },
-                              suffixIcon: const Icon(
-                                Icons.remove_red_eye_outlined,
-                                color: Color(0xFF8A97B6),
-                              ),
-                            ),
-                            SizedBox(height: context.rs(12, min: 8, max: 16)),
-                            const Text(
-                              'Account Type',
-                              style: TextStyle(
-                                color: Color(0xFF4B587A),
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            SizedBox(height: context.rs(8, min: 5, max: 12)),
-                            Wrap(
-                              spacing: 10,
-                              runSpacing: 10,
-                              children: [
-                                ChoiceChip(
-                                  label: const Text('Fan'),
-                                  selected: _selectedRole == UserRole.fan,
-                                  onSelected: (_) => setState(
-                                    () => _selectedRole = UserRole.fan,
+                        ),
+
+                        SizedBox(height: context.rs(22, min: 16, max: 30)),
+
+                        // ── Card ─────────────────────────────────────────
+                        _reveal(
+                          1,
+                          AuthCard(
+                            child: Form(
+                              key: _formKey,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Title
+                                  const AuthGradientTitle(
+                                    text: 'Create Account',
+                                    fontSize: 26,
                                   ),
-                                ),
-                                ChoiceChip(
-                                  label: const Text('Manager'),
-                                  selected: _selectedRole == UserRole.manager,
-                                  onSelected: (_) => setState(
-                                    () => _selectedRole = UserRole.manager,
+                                  SizedBox(height: context.rs(5, min: 3, max: 8)),
+                                  Text(
+                                    'Join GOALSIGHT and analyze football like a pro.',
+                                    style: AppTextStyles.body(
+                                      color: AppColors.textMuted,
+                                    ).copyWith(fontSize: 13),
                                   ),
-                                ),
-                                ChoiceChip(
-                                  label: const Text('Admin'),
-                                  selected: _selectedRole == UserRole.admin,
-                                  onSelected: (_) => setState(
-                                    () => _selectedRole = UserRole.admin,
+
+                                  SizedBox(height: context.rs(22, min: 16, max: 28)),
+
+                                  // Full name
+                                  AppTextField(
+                                    label: 'Full Name',
+                                    hintText: 'Enter your full name',
+                                    controller: _nameController,
+                                    validator: (v) =>
+                                        Validators.requiredField(v, 'Name'),
                                   ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: context.rs(10, min: 7, max: 14)),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                SizedBox(
-                                  width: 22,
-                                  child: Checkbox(
-                                    value: _acceptTerms,
-                                    onChanged: (value) => setState(
-                                      () => _acceptTerms = value ?? false,
+
+                                  SizedBox(height: context.rs(12, min: 8, max: 16)),
+
+                                  // Email
+                                  AppTextField(
+                                    label: 'Email Address',
+                                    hintText: 'you@club.com',
+                                    controller: _emailController,
+                                    keyboardType: TextInputType.emailAddress,
+                                    validator: Validators.email,
+                                  ),
+
+                                  SizedBox(height: context.rs(12, min: 8, max: 16)),
+
+                                  // Password
+                                  AppTextField(
+                                    label: 'Password',
+                                    hintText: 'Create a strong password',
+                                    controller: _passwordController,
+                                    obscureText: _obscurePassword,
+                                    validator: Validators.password,
+                                    suffixIcon: PasswordToggleIcon(
+                                      obscure: _obscurePassword,
+                                      onTap: () => setState(
+                                        () =>
+                                            _obscurePassword = !_obscurePassword,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                SizedBox(width: context.rs(8, min: 6, max: 10)),
-                                const Expanded(
-                                  child: Text.rich(
-                                    TextSpan(
-                                      text: 'I agree to the ',
-                                      style:
-                                          TextStyle(color: Color(0xFF68789B)),
-                                      children: [
-                                        TextSpan(
-                                          text: 'Terms & Conditions',
-                                          style: TextStyle(
-                                            color: AppTheme.brandPurple,
-                                            fontWeight: FontWeight.w700,
+
+                                  SizedBox(height: context.rs(12, min: 8, max: 16)),
+
+                                  // Confirm password
+                                  AppTextField(
+                                    label: 'Confirm Password',
+                                    hintText: 'Re-enter your password',
+                                    controller: _confirmPasswordController,
+                                    obscureText: _obscureConfirmPassword,
+                                    suffixIcon: PasswordToggleIcon(
+                                      obscure: _obscureConfirmPassword,
+                                      onTap: () => setState(
+                                        () => _obscureConfirmPassword =
+                                            !_obscureConfirmPassword,
+                                      ),
+                                    ),
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Confirm password is required';
+                                      }
+                                      if (value != _passwordController.text) {
+                                        return 'Passwords do not match';
+                                      }
+                                      return null;
+                                    },
+                                  ),
+
+                                  SizedBox(height: context.rs(18, min: 12, max: 22)),
+
+                                  // Account type
+                                  Text(
+                                    'Account Type',
+                                    style: AppTextStyles.body(
+                                      color: AppColors.textSecondary,
+                                    ).copyWith(fontWeight: FontWeight.w700, fontSize: 13),
+                                  ),
+                                  SizedBox(height: context.rs(10, min: 6, max: 14)),
+                                  Wrap(
+                                    spacing: 8,
+                                    runSpacing: 8,
+                                    children: UserRole.values.map((role) {
+                                      final selected = _selectedRole == role;
+                                      final label = role == UserRole.fan
+                                          ? 'Fan'
+                                          : role == UserRole.manager
+                                              ? 'Manager'
+                                              : 'Admin';
+                                      final icon = role == UserRole.fan
+                                          ? Icons.sports_soccer_rounded
+                                          : role == UserRole.manager
+                                              ? Icons.analytics_outlined
+                                              : Icons.shield_outlined;
+                                      final color = role == UserRole.fan
+                                          ? AppColors.accentCyan
+                                          : role == UserRole.manager
+                                              ? AppColors.primaryPurple
+                                              : AppColors.accentGreen;
+
+                                      return GestureDetector(
+                                        onTap: () => setState(
+                                          () => _selectedRole = role,
+                                        ),
+                                        child: AnimatedContainer(
+                                          duration: const Duration(
+                                            milliseconds: 200,
+                                          ),
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 14,
+                                            vertical: 10,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: selected
+                                                ? color.withValues(alpha: 0.14)
+                                                : AppColors.surface,
+                                            borderRadius: BorderRadius.circular(
+                                              AppRadius.pill,
+                                            ),
+                                            border: Border.all(
+                                              color: selected
+                                                  ? color.withValues(alpha: 0.5)
+                                                  : AppColors.outline,
+                                              width: selected ? 1.5 : 1.0,
+                                            ),
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(
+                                                icon,
+                                                color: selected
+                                                    ? color
+                                                    : AppColors.textMuted,
+                                                size: 15,
+                                              ),
+                                              const SizedBox(width: 6),
+                                              Text(
+                                                label,
+                                                style: AppTextStyles.caption(
+                                                  color: selected
+                                                      ? color
+                                                      : AppColors.textMuted,
+                                                ).copyWith(
+                                                  fontWeight: selected
+                                                      ? FontWeight.w700
+                                                      : FontWeight.w500,
+                                                  fontSize: 13,
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
-                                        TextSpan(text: ' and '),
-                                        TextSpan(
-                                          text: 'Privacy Policy',
-                                          style: TextStyle(
-                                            color: AppTheme.brandPurple,
-                                            fontWeight: FontWeight.w700,
+                                      );
+                                    }).toList(),
+                                  ),
+
+                                  SizedBox(height: context.rs(16, min: 10, max: 20)),
+
+                                  // Terms
+                                  GestureDetector(
+                                    onTap: () => setState(
+                                      () => _acceptTerms = !_acceptTerms,
+                                    ),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: Checkbox(
+                                            value: _acceptTerms,
+                                            onChanged: (v) => setState(
+                                              () => _acceptTerms = v ?? false,
+                                            ),
+                                            activeColor: AppColors.primaryPurple,
+                                            side: const BorderSide(
+                                              color: AppColors.outline,
+                                            ),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(5),
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 10),
+                                        Expanded(
+                                          child: RichText(
+                                            text: TextSpan(
+                                              style: AppTextStyles.caption(
+                                                color: AppColors.textSecondary,
+                                              ),
+                                              children: const [
+                                                TextSpan(
+                                                  text: 'I agree to the ',
+                                                ),
+                                                TextSpan(
+                                                  text: 'Terms & Conditions',
+                                                  style: TextStyle(
+                                                    color: AppColors.primaryPurple,
+                                                    fontWeight: FontWeight.w700,
+                                                  ),
+                                                ),
+                                                TextSpan(text: ' and '),
+                                                TextSpan(
+                                                  text: 'Privacy Policy',
+                                                  style: TextStyle(
+                                                    color: AppColors.primaryPurple,
+                                                    fontWeight: FontWeight.w700,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ],
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                            if (!_acceptTerms)
-                              Padding(
-                                padding: EdgeInsets.only(top: context.rs(4, min: 2, max: 8)),
-                                child: Text(
-                                  'You need to accept terms to continue',
-                                  style: TextStyle(color: Colors.redAccent),
-                                ),
-                              ),
-                            if (authState.status == AuthStatus.error &&
-                                authState.errorMessage != null) ...[
-                              SizedBox(height: context.rs(8, min: 5, max: 12)),
-                              Text(
-                                authState.errorMessage!,
-                                style: const TextStyle(color: Colors.redAccent),
-                              ),
-                            ],
-                            SizedBox(height: context.rs(12, min: 8, max: 16)),
-                            PrimaryButton(
-                              label: 'CREATE ACCOUNT',
-                              loading: loading,
-                              icon: Icons.person_add_alt_1_rounded,
-                              onPressed: _submit,
-                            ),
-                            SizedBox(height: context.rs(14, min: 10, max: 18)),
-                            Row(
-                              children: const [
-                                Expanded(
-                                    child: Divider(color: Color(0xFFD8DFED))),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 12),
-                                  child: Text(
-                                    'Or register with',
-                                    style: TextStyle(color: Color(0xFF68789B)),
-                                  ),
-                                ),
-                                Expanded(
-                                    child: Divider(color: Color(0xFFD8DFED))),
-                              ],
-                            ),
-                            SizedBox(height: context.rs(14, min: 10, max: 18)),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: OutlinedButton.icon(
-                                    onPressed: () {},
-                                    icon: const Icon(Icons.facebook,
-                                        color: Color(0xFF1877F2)),
-                                    label: const Text('Facebook'),
-                                  ),
-                                ),
-                                SizedBox(width: context.rs(10, min: 6, max: 14)),
-                                Expanded(
-                                  child: OutlinedButton.icon(
-                                    onPressed: () {},
-                                    icon: const Text(
-                                      'G',
-                                      style: TextStyle(
-                                        color: Color(0xFFDB4437),
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w700,
+
+                                  if (!_acceptTerms) ...[
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      'You must accept the terms to continue',
+                                      style: AppTextStyles.caption(
+                                        color: AppColors.danger,
                                       ),
                                     ),
-                                    label: const Text('Google'),
+                                  ],
+
+                                  // Error state
+                                  if (hasError) ...[
+                                    SizedBox(height: context.rs(14, min: 10, max: 18)),
+                                    AuthErrorBox(
+                                      message: authState.errorMessage!,
+                                    ),
+                                  ],
+
+                                  SizedBox(height: context.rs(22, min: 16, max: 28)),
+
+                                  // Create account button
+                                  PrimaryButton(
+                                    label: 'CREATE ACCOUNT',
+                                    loading: loading,
+                                    icon: Icons.person_add_alt_1_rounded,
+                                    onPressed: _submit,
                                   ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: context.rs(8, min: 5, max: 12)),
-                            Center(
-                              child: TextButton(
-                                onPressed: () {
-                                  if (context.canPop()) {
-                                    context.pop();
-                                  } else {
-                                    context.push('/login');
-                                  }
-                                },
-                                child: RichText(
-                                  text: const TextSpan(
-                                    style: TextStyle(color: Color(0xFF23304C)),
-                                    children: [
-                                      TextSpan(
-                                          text: 'Already have an account? '),
-                                      TextSpan(
-                                        text: 'Sign In',
-                                        style: TextStyle(
-                                          color: AppTheme.brandPurple,
-                                          fontWeight: FontWeight.w700,
+
+                                  SizedBox(height: context.rs(18, min: 12, max: 24)),
+
+                                  // Sign in link
+                                  Center(
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        if (context.canPop()) {
+                                          context.pop();
+                                        } else {
+                                          context.go('/login');
+                                        }
+                                      },
+                                      child: RichText(
+                                        text: TextSpan(
+                                          style: AppTextStyles.body(
+                                            color: AppColors.textSecondary,
+                                          ).copyWith(fontSize: 13),
+                                          children: const [
+                                            TextSpan(
+                                              text: 'Already have an account? ',
+                                            ),
+                                            TextSpan(
+                                              text: 'Sign In',
+                                              style: TextStyle(
+                                                color: AppColors.primaryPurple,
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
-                                    ],
+                                    ),
                                   ),
-                                ),
+                                ],
                               ),
                             ),
-                          ],
+                          ),
                         ),
-                      ),
+
+                        SizedBox(height: context.rs(20, min: 12, max: 28)),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),
-          ),
+          ],
         ),
       ),
     );

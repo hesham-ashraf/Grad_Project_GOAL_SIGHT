@@ -1,10 +1,10 @@
-/// ---------------------------------------------------------------------------
-/// GoalSight — Players Mock Data
-///
-/// Generates realistic player profile data with historical ratings,
-/// match history, and AI-generated insights.
-/// Simulates data aggregated from multiple match analyses.
-/// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// GoalSight — Players Mock Data
+//
+// Generates realistic player profile data with historical ratings,
+// match history, and AI-generated insights.
+// Simulates data aggregated from multiple match analyses.
+// ---------------------------------------------------------------------------
 
 import 'package:goal_sight/data/models/player_profile_model.dart';
 

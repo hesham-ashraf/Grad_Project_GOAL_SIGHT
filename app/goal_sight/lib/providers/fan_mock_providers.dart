@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/theme/app_theme.dart';
-import '../../data/models/club_model.dart';
-import '../../data/models/match_model.dart';
-import '../widgets/fan/standings_row.dart';
+import '../core/theme/app_theme.dart';
+import '../data/models/club_model.dart';
+import '../data/models/match_model.dart';
+import '../../presentation/widgets/fan/standings_row.dart';
 
 // Matches
 final mockMatchesProvider = Provider<List<MatchModel>>((ref) {

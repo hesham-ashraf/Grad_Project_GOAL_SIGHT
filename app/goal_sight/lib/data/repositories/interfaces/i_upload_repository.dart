@@ -1,4 +1,4 @@
-import '../../../features/manager/upload_job_model.dart';
+import '../../models/upload_job_model.dart';
 
 abstract interface class IUploadRepository {
   Future<List<UploadJobModel>> fetchUploadHistory({String? managerId});

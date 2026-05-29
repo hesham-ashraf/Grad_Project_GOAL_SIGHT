@@ -1,20 +1,22 @@
-/// ---------------------------------------------------------------------------
-/// GoalSight — Players Screen (Intelligence Edition)
-///
-/// Displays squad with risk indicators, fatigue rankings, search, and
-/// advanced filters. Navigates to full intelligence profile.
-/// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// GoalSight — Players Screen (Intelligence Edition)
+//
+// Displays squad with risk indicators, fatigue rankings, search, and
+// advanced filters. Navigates to full intelligence profile.
+// ---------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:goal_sight/core/services/haptic_service.dart';
 import 'package:goal_sight/core/theme/app_theme.dart';
 import 'package:goal_sight/core/utils/responsive.dart';
 import 'package:goal_sight/data/models/player_profile_model.dart';
-import 'package:goal_sight/presentation/state_management/manager_players_provider.dart';
+import 'package:goal_sight/features/manager/widgets/manager_bottom_navigation_bar.dart';
+import 'package:goal_sight/providers/manager_players_provider.dart';
 
 class PlayersScreen extends ConsumerStatefulWidget {
-  const PlayersScreen({Key? key}) : super(key: key);
+  const PlayersScreen({super.key});
 
   @override
   ConsumerState<PlayersScreen> createState() => _PlayersScreenState();
@@ -52,6 +54,7 @@ class _PlayersScreenState extends ConsumerState<PlayersScreen>
   }
 
   void _openPlayerProfile(PlayerProfileModel player) {
+    HapticService.selection();
     context.push('/manager-player-profile', extra: player);
   }
 
@@ -90,101 +93,211 @@ class _PlayersScreenState extends ConsumerState<PlayersScreen>
         : allPlayers.map((p) => p.currentRating).reduce((a, b) => a + b) / allPlayers.length;
     final highFatigueCount = allPlayers.where((p) => p.fatigue > 75).length;
 
+    final hPad = context.rs(20, min: 16, max: 28);
+    final bottomPad = ManagerBottomNavigationBar.totalHeight(context) +
+        context.rs(10, min: 6, max: 14);
+
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.backgroundAlt,
-        elevation: 0,
-        title: Text(
-          'Players',
-          style: AppTextStyles.headline(color: AppColors.textPrimary),
-        ),
-        centerTitle: false,
-        actions: [
-          PopupMenuButton<String>(
-            icon: Container(
-              padding: const EdgeInsets.all(6),
-              margin: const EdgeInsets.only(right: 8),
-              decoration: BoxDecoration(
-                color: AppColors.surfaceElevated,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: AppColors.outline),
-              ),
-              child: const Icon(Icons.sort, color: Colors.white, size: 16),
-            ),
-            color: AppColors.surfaceElevated,
-            onSelected: (v) => setState(() => _sortMode = v),
-            itemBuilder: (_) => ['Rating', 'Fatigue', 'Risk'].map((s) {
-              return PopupMenuItem<String>(
-                value: s,
+      backgroundColor: Colors.transparent,
+      body: SafeArea(
+        bottom: false,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // ── Premium Page Header ───────────────────────────────────────
+            Padding(
+              padding: EdgeInsets.fromLTRB(hPad, context.rs(20, min: 16, max: 28), hPad, 0),
+              child: _reveal(0, Container(
+                padding: EdgeInsets.all(context.rs(16, min: 14, max: 20)),
+                decoration: BoxDecoration(
+                  borderRadius: AppRadius.cardLarge,
+                  color: AppColors.surfaceElevated.withValues(alpha: 0.72),
+                  border: Border.all(color: AppColors.outlineSubtle),
+                ),
                 child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (_sortMode == s)
-                      const Icon(Icons.check, color: AppColors.accentCyan, size: 14)
-                    else
-                      const SizedBox(width: 14),
-                    const SizedBox(width: 8),
-                    Text('Sort by $s', style: AppTextStyles.body(color: Colors.white)),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: context.rs(12, min: 10, max: 14),
+                                  vertical: context.rs(6, min: 5, max: 8),
+                                ),
+                                decoration: const BoxDecoration(
+                                  gradient: AppGradients.brand,
+                                  borderRadius: AppRadius.chip,
+                                ),
+                                child: Text(
+                                  'SQUAD INTEL',
+                                  style: AppTextStyles.caption(color: Colors.white).copyWith(
+                                    fontSize: context.rs(10, min: 9, max: 11),
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 1.0,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: context.rs(10, min: 8, max: 12)),
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: context.rs(10, min: 8, max: 12),
+                                  vertical: context.rs(5, min: 4, max: 7),
+                                ),
+                                decoration: BoxDecoration(
+                                  color: highFatigueCount > 0
+                                      ? AppColors.warning.withValues(alpha: 0.1)
+                                      : AppColors.accentGreen.withValues(alpha: 0.1),
+                                  borderRadius: AppRadius.chip,
+                                  border: Border.all(
+                                    color: highFatigueCount > 0
+                                        ? AppColors.warning.withValues(alpha: 0.3)
+                                        : AppColors.accentGreen.withValues(alpha: 0.3),
+                                  ),
+                                ),
+                                child: Text(
+                                  highFatigueCount > 0
+                                      ? '$highFatigueCount AT RISK'
+                                      : 'ALL FIT',
+                                  style: AppTextStyles.caption(
+                                    color: highFatigueCount > 0
+                                        ? AppColors.warning
+                                        : AppColors.accentGreen,
+                                  ).copyWith(
+                                    fontSize: context.rs(10, min: 9, max: 11),
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 1.0,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: context.rs(10, min: 8, max: 14)),
+                          Text(
+                            'Squad',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTextStyles.headline(color: AppColors.textPrimary).copyWith(
+                              fontSize: context.rs(30, min: 26, max: 36),
+                              height: 1.05,
+                            ),
+                          ),
+                          SizedBox(height: context.rs(4, min: 3, max: 6)),
+                          Text(
+                            '${allPlayers.length} players · Avg ${avgRating.toStringAsFixed(1)} rating',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTextStyles.body(color: AppColors.textSecondary).copyWith(
+                              fontSize: context.rs(13, min: 12, max: 15),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(width: context.rs(10, min: 8, max: 12)),
+                    // Sort menu + icon
+                    Column(
+                      children: [
+                        Container(
+                          width: context.rs(52, min: 44, max: 58),
+                          height: context.rs(52, min: 44, max: 58),
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: AppGradients.brand,
+                            boxShadow: AppShadows.buttonGlow,
+                          ),
+                          child: PopupMenuButton<String>(
+                            icon: Icon(
+                              Icons.people_rounded,
+                              size: context.rs(24, min: 20, max: 28),
+                              color: Colors.white,
+                            ),
+                            color: AppColors.surfaceElevated,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: AppRadius.card,
+                              side: BorderSide(color: AppColors.outlineSubtle),
+                            ),
+                            onSelected: (v) => setState(() => _sortMode = v),
+                            itemBuilder: (_) => ['Rating', 'Fatigue', 'Risk'].map((s) {
+                              return PopupMenuItem<String>(
+                                value: s,
+                                child: Row(
+                                  children: [
+                                    if (_sortMode == s)
+                                      const Icon(Icons.check_rounded, color: AppColors.accentCyan, size: 14)
+                                    else
+                                      const SizedBox(width: 14),
+                                    const SizedBox(width: 8),
+                                    Text('Sort by $s', style: AppTextStyles.body(color: AppColors.textPrimary)),
+                                  ],
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
-              );
-            }).toList(),
-          ),
-        ],
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
+              )),
+            ),
+
+            SizedBox(height: context.rs(12, min: 10, max: 16)),
+
+            // ── Search & Filters ──────────────────────────────────────────
             Padding(
-              padding: EdgeInsets.all(context.rs(AppSpacing.lg)),
+              padding: EdgeInsets.symmetric(horizontal: hPad),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 0 — Squad summary header
-                  _reveal(0, _SquadSummaryHeader(
-                    totalPlayers: allPlayers.length,
-                    avgRating: avgRating,
-                    highFatigueCount: highFatigueCount,
-                  )),
-                  SizedBox(height: context.rs(AppSpacing.md)),
-
                   // 1 — Search bar
                   _reveal(1, _SearchBar(
                     controller: _searchCtrl,
                     onChanged: (v) => setState(() => _searchQuery = v),
                     onClear: () { _searchCtrl.clear(); setState(() => _searchQuery = ''); },
                   )),
-                  SizedBox(height: context.rs(AppSpacing.md)),
+                  SizedBox(height: context.rs(10, min: 8, max: 12)),
 
                   // Position Filter Chips
                   _reveal(1, _PositionFilterRow(
                     selected: _selectedPosition,
                     onSelect: (pos) => setState(() => _selectedPosition = pos),
                   )),
-                  SizedBox(height: context.rs(AppSpacing.sm)),
+                  SizedBox(height: context.rs(8, min: 6, max: 10)),
 
-                  // Sort mode indicator
+                  // Sort mode + count indicator
                   _reveal(1, Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         '${filteredPlayers.length} player${filteredPlayers.length == 1 ? '' : 's'}',
-                        style: AppTextStyles.caption(color: AppColors.textMuted),
+                        style: AppTextStyles.caption(color: AppColors.textMuted).copyWith(
+                          fontSize: context.sp(12, min: 11, max: 13),
+                        ),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: context.rs(8, min: 6, max: 10),
+                          vertical: context.rs(3, min: 2, max: 4),
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.surfaceElevated,
-                          borderRadius: BorderRadius.circular(AppRadius.pill),
-                          border: Border.all(color: AppColors.outline),
+                          borderRadius: AppRadius.chip,
+                          border: Border.all(color: AppColors.outlineSubtle),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(Icons.sort, color: AppColors.textMuted, size: 12),
+                            Icon(Icons.sort_rounded, color: AppColors.textMuted,
+                                size: context.rs(12, min: 10, max: 14)),
                             const SizedBox(width: 4),
                             Text('by $_sortMode',
-                                style: AppTextStyles.caption(color: AppColors.textSecondary).copyWith(fontSize: 11)),
+                                style: AppTextStyles.caption(color: AppColors.textSecondary).copyWith(
+                                  fontSize: context.sp(11, min: 10, max: 12),
+                                )),
                           ],
                         ),
                       ),
@@ -194,13 +307,17 @@ class _PlayersScreenState extends ConsumerState<PlayersScreen>
               ),
             ),
 
-            // 2 — Player list
+            SizedBox(height: context.rs(8, min: 6, max: 10)),
+
+            // ── Player list ───────────────────────────────────────────────
             Expanded(
               child: _reveal(2, filteredPlayers.isEmpty
                   ? _EmptyState(query: _searchQuery, position: _selectedPosition)
                   : ListView.builder(
-                      padding: EdgeInsets.symmetric(horizontal: context.rs(AppSpacing.lg)),
-                      physics: const BouncingScrollPhysics(),
+                      padding: EdgeInsets.fromLTRB(hPad, 0, hPad, bottomPad),
+                      physics: const BouncingScrollPhysics(
+                        parent: AlwaysScrollableScrollPhysics(),
+                      ),
                       itemCount: filteredPlayers.length,
                       itemBuilder: (context, index) {
                         final player = filteredPlayers[index];
@@ -214,75 +331,6 @@ class _PlayersScreenState extends ConsumerState<PlayersScreen>
           ],
         ),
       ),
-    );
-  }
-}
-
-// ─── Squad Summary Header ─────────────────────────────────────────────────────
-
-class _SquadSummaryHeader extends StatelessWidget {
-  final int totalPlayers;
-  final double avgRating;
-  final int highFatigueCount;
-  const _SquadSummaryHeader({required this.totalPlayers, required this.avgRating, required this.highFatigueCount});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Squad Overview',
-                  style: AppTextStyles.title(color: AppColors.textPrimary)),
-              Text('$totalPlayers players tracked',
-                  style: AppTextStyles.body(color: AppColors.textMuted).copyWith(fontSize: 12)),
-            ],
-          ),
-        ),
-        Row(
-          children: [
-            if (highFatigueCount > 0) ...[
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AppColors.warning.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(AppRadius.pill),
-                  border: Border.all(color: AppColors.warning.withValues(alpha: 0.35)),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.local_fire_department_outlined, color: AppColors.warning, size: 12),
-                    const SizedBox(width: 4),
-                    Text('$highFatigueCount',
-                        style: AppTextStyles.caption(color: AppColors.warning).copyWith(fontWeight: FontWeight.bold)),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 8),
-            ],
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: AppColors.surfaceElevated,
-                border: Border.all(color: AppColors.outline.withValues(alpha: 0.4)),
-                borderRadius: BorderRadius.circular(AppRadius.md),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.star, color: AppColors.warning, size: 13),
-                  const SizedBox(width: 4),
-                  Text('Avg: ${avgRating.toStringAsFixed(2)}',
-                      style: AppTextStyles.caption(color: AppColors.warning)),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ],
     );
   }
 }

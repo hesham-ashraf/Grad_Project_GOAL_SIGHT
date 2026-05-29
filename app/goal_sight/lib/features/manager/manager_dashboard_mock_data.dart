@@ -5,7 +5,7 @@ import 'manager_dashboard_models.dart';
 
 const ManagerDashboardData kManagerDashboardMockData = ManagerDashboardData(
   clubName: 'GoalSight FC',
-  subtitle: 'Team Performance Overview',
+  subtitle: 'Season 2025/26 · AI Intelligence Active',
   keyStats: [
     ManagerKeyStat(
       label: 'Played Matches',

@@ -1,9 +1,9 @@
-/// ---------------------------------------------------------------------------
-/// GoalSight — Player Stat Tile Widget
-///
-/// Displays a single performance stat in the player profile.
-/// Used for: Average Rating, Fatigue Level, Activity Level, etc.
-/// ---------------------------------------------------------------------------
+﻿// ---------------------------------------------------------------------------
+// GoalSight — Player Stat Tile Widget
+//
+// Displays a single performance stat in the player profile.
+// Used for: Average Rating, Fatigue Level, Activity Level, etc.
+// ---------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 import 'package:goal_sight/core/theme/app_theme.dart';
@@ -17,8 +17,8 @@ class PlayerStatTile extends StatelessWidget {
     required this.icon,
     this.color = AppColors.accentCyan,
     this.maxValue = 100,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final String label;
   final double value;
@@ -35,7 +35,7 @@ class PlayerStatTile extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surfaceElevated,
         border: Border.all(
-          color: AppColors.outline.withOpacity(0.3),
+          color: AppColors.outline.withValues(alpha: 0.3),
           width: 1,
         ),
         borderRadius: BorderRadius.circular(AppRadius.lg),
@@ -51,9 +51,9 @@ class PlayerStatTile extends StatelessWidget {
                 width: context.rs(40),
                 height: context.rs(40),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.15),
+                  color: color.withValues(alpha: 0.15),
                   border: Border.all(
-                    color: color.withOpacity(0.3),
+                    color: color.withValues(alpha: 0.3),
                     width: 1,
                   ),
                   borderRadius: BorderRadius.circular(AppRadius.md),
@@ -94,7 +94,7 @@ class PlayerStatTile extends StatelessWidget {
             child: LinearProgressIndicator(
               value: percentage,
               minHeight: context.rs(6),
-              backgroundColor: AppColors.outline.withOpacity(0.2),
+              backgroundColor: AppColors.outline.withValues(alpha: 0.2),
               valueColor: AlwaysStoppedAnimation<Color>(color),
             ),
           ),

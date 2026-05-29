@@ -1,9 +1,9 @@
-/// ---------------------------------------------------------------------------
-/// GoalSight — Player Match History Item Widget
-///
-/// Displays a single match from player's history.
-/// Shows: match name, date, rating, and key statistics.
-/// ---------------------------------------------------------------------------
+﻿// ---------------------------------------------------------------------------
+// GoalSight — Player Match History Item Widget
+//
+// Displays a single match from player's history.
+// Shows: match name, date, rating, and key statistics.
+// ---------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 import 'package:goal_sight/core/theme/app_theme.dart';
@@ -13,8 +13,8 @@ import 'package:goal_sight/data/models/player_profile_model.dart';
 class PlayerMatchHistoryItem extends StatelessWidget {
   const PlayerMatchHistoryItem({
     required this.match,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final PlayerMatchHistory match;
 
@@ -64,7 +64,7 @@ class PlayerMatchHistoryItem extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surfaceElevated,
         border: Border.all(
-          color: AppColors.outline.withOpacity(0.3),
+          color: AppColors.outline.withValues(alpha: 0.3),
           width: 1,
         ),
         borderRadius: BorderRadius.circular(AppRadius.lg),
@@ -109,9 +109,9 @@ class PlayerMatchHistoryItem extends StatelessWidget {
                   vertical: context.rs(AppSpacing.sm),
                 ),
                 decoration: BoxDecoration(
-                  color: _getPerformanceColor().withOpacity(0.15),
+                  color: _getPerformanceColor().withValues(alpha: 0.15),
                   border: Border.all(
-                    color: _getPerformanceColor().withOpacity(0.5),
+                    color: _getPerformanceColor().withValues(alpha: 0.5),
                     width: 1,
                   ),
                   borderRadius: BorderRadius.circular(AppRadius.md),
@@ -119,7 +119,7 @@ class PlayerMatchHistoryItem extends StatelessWidget {
                 child: Column(
                   children: [
                     Text(
-                      '${match.playerRating.toStringAsFixed(1)}',
+                      match.playerRating.toStringAsFixed(1),
                       style: AppTextStyles.title(
                         color: _getPerformanceColor(),
                       ).copyWith(
@@ -142,7 +142,7 @@ class PlayerMatchHistoryItem extends StatelessWidget {
           // Stats Grid
           Container(
             decoration: BoxDecoration(
-              color: AppColors.background.withOpacity(0.5),
+              color: AppColors.background.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(AppRadius.md),
             ),
             padding: EdgeInsets.all(context.rs(AppSpacing.md)),
@@ -192,8 +192,7 @@ class _StatBadge extends StatelessWidget {
     required this.value,
     required this.icon,
     required this.context,
-    Key? key,
-  }) : super(key: key);
+  });
 
   final String label;
   final String value;

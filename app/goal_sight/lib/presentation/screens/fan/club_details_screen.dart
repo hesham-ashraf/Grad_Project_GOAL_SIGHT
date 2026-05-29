@@ -1,6 +1,7 @@
-import 'dart:ui';
+﻿import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
@@ -37,15 +38,15 @@ class _ClubDetailsScreenState extends State<ClubDetailsScreen>
       duration: const Duration(milliseconds: 1400),
     )..forward();
 
-    CurvedAnimation _curve(double start, double end) => CurvedAnimation(
+    CurvedAnimation makeCurve(double start, double end) => CurvedAnimation(
           parent: _ctrl,
           curve: Interval(start, end, curve: Curves.easeOutCubic),
         );
 
-    _headerFade = _curve(0.0, 0.3);
-    _statsFade = _curve(0.15, 0.5);
-    _squadFade = _curve(0.35, 0.7);
-    _analyticsFade = _curve(0.55, 0.9);
+    _headerFade = makeCurve(0.0, 0.3);
+    _statsFade = makeCurve(0.15, 0.5);
+    _squadFade = makeCurve(0.35, 0.7);
+    _analyticsFade = makeCurve(0.55, 0.9);
 
     _headerSlide = Tween<Offset>(begin: const Offset(0, 0.06), end: Offset.zero).animate(_headerFade);
     _statsSlide = Tween<Offset>(begin: const Offset(0, 0.06), end: Offset.zero).animate(_statsFade);
@@ -233,7 +234,7 @@ class _ClubDetailsScreenState extends State<ClubDetailsScreen>
               child: IconButton(
                 icon: const Icon(Icons.arrow_back_ios_new_rounded,
                     color: AppColors.textPrimary, size: 18),
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed: () => context.pop(),
               ),
             ),
           ),
@@ -643,3 +644,4 @@ class _SquadSection extends StatelessWidget {
     );
   }
 }
+

@@ -18,18 +18,18 @@ final class MockClubRepository implements IClubRepository {
   // ── Static dataset ────────────────────────────────────────────────────────
 
   static final List<ClubModel> _clubs = [
-    ClubModel(
+    const ClubModel(
       id: 'club_01',
       name: 'GoalSight FC',
       stadium: 'Analytics Arena',
       league: 'Premier League',
-      primaryColor: const Color(0xFF705AF5),
+      primaryColor: Color(0xFF705AF5),
       coach: 'Jurgen Klopp',
       foundedYear: 1992,
       country: 'England',
       playingStyle: 'High-Press 4-3-3',
       description: 'An elite intelligence-driven club built on data and pressing.',
-      stats: const ClubStats(
+      stats: ClubStats(
         matchesPlayed: 38,
         wins: 24,
         draws: 8,
@@ -46,18 +46,18 @@ final class MockClubRepository implements IClubRepository {
       ),
       players: _goalsightSquad,
     ),
-    ClubModel(
+    const ClubModel(
       id: 'club_02',
       name: 'Falcons United',
       stadium: 'Falcon Park',
       league: 'Premier League',
-      primaryColor: const Color(0xFF2DE2E6),
+      primaryColor: Color(0xFF2DE2E6),
       coach: 'Carlo Ancelotti',
       foundedYear: 1910,
       country: 'England',
       playingStyle: 'Counter-Attack 4-4-2',
       description: 'A resilient defensive unit with lethal counter-attacking pace.',
-      stats: const ClubStats(
+      stats: ClubStats(
         matchesPlayed: 38,
         wins: 18,
         draws: 10,
@@ -74,18 +74,18 @@ final class MockClubRepository implements IClubRepository {
       ),
       players: _falconsSquad,
     ),
-    ClubModel(
+    const ClubModel(
       id: 'club_03',
       name: 'City Panthers',
       stadium: 'Panther Stadium',
       league: 'Premier League',
-      primaryColor: const Color(0xFF70F59A),
+      primaryColor: Color(0xFF70F59A),
       coach: 'Pep Guardiola',
       foundedYear: 1935,
       country: 'England',
       playingStyle: 'Positional Play 4-2-3-1',
       description: 'Dominant possession maestros with surgical attacking transitions.',
-      stats: const ClubStats(
+      stats: ClubStats(
         matchesPlayed: 38,
         wins: 28,
         draws: 6,
@@ -102,18 +102,18 @@ final class MockClubRepository implements IClubRepository {
       ),
       players: _panthersSquad,
     ),
-    ClubModel(
+    const ClubModel(
       id: 'club_04',
       name: 'Red Lions FC',
       stadium: 'Lion Fortress',
       league: 'Championship',
-      primaryColor: const Color(0xFFFF6B8A),
+      primaryColor: Color(0xFFFF6B8A),
       coach: 'Thomas Tuchel',
       foundedYear: 1948,
       country: 'England',
       playingStyle: 'Direct Play 4-4-2',
       description: 'Physical and direct with strong set-piece routines.',
-      stats: const ClubStats(
+      stats: ClubStats(
         matchesPlayed: 46,
         wins: 22,
         draws: 12,
@@ -130,18 +130,18 @@ final class MockClubRepository implements IClubRepository {
       ),
       players: _redLionsSquad,
     ),
-    ClubModel(
+    const ClubModel(
       id: 'club_05',
       name: 'Thunder Athletic',
       stadium: 'Thunder Dome',
       league: 'Championship',
-      primaryColor: const Color(0xFFFFC857),
+      primaryColor: Color(0xFFFFC857),
       coach: 'Xabi Alonso',
       foundedYear: 1963,
       country: 'England',
       playingStyle: 'High Line 3-4-3',
       description: 'Innovative with a young and dynamic squad pushing boundaries.',
-      stats: const ClubStats(
+      stats: ClubStats(
         matchesPlayed: 46,
         wins: 26,
         draws: 10,

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
-import '../upload_job_model.dart';
+import '../../../data/models/upload_job_model.dart';
 
 // ─── AI Processing View ───────────────────────────────────────────────────────
 
@@ -74,7 +74,7 @@ class _AiProcessingViewState extends State<AiProcessingView>
   @override
   Widget build(BuildContext context) {
     final stage = widget.currentStage;
-    final stages = ProcessingStage.values;
+    const stages = ProcessingStage.values;
     final currentIndex =
         stage != null ? stages.indexOf(stage) : -1;
     final percentage = (widget.overallProgress * 100).round();
@@ -116,7 +116,7 @@ class _AiProcessingViewState extends State<AiProcessingView>
           SizedBox(height: context.rs(16, min: 12, max: 20)),
 
           // Info banner
-          _ProcessingInfoBanner(),
+          const _ProcessingInfoBanner(),
         ],
       ),
     );
@@ -385,7 +385,7 @@ class _OverallProgressBar extends StatelessWidget {
                   value: value,
                   minHeight: 10,
                   backgroundColor: AppColors.surfaceRaised,
-                  valueColor: AlwaysStoppedAnimation<Color>(
+                  valueColor: const AlwaysStoppedAnimation<Color>(
                     AppColors.primaryPurple,
                   ),
                 );
@@ -448,7 +448,7 @@ class _StagePipelineList extends StatelessWidget {
                     shape: BoxShape.circle,
                     color: AppColors.primaryPurple.withValues(alpha: 0.15),
                   ),
-                  child: Icon(Icons.account_tree_rounded,
+                  child: const Icon(Icons.account_tree_rounded,
                       size: 14, color: AppColors.primaryPurple),
                 ),
                 const SizedBox(width: 10),
@@ -465,13 +465,13 @@ class _StagePipelineList extends StatelessWidget {
               ],
             ),
           ),
-          Divider(height: 1, color: AppColors.outlineSubtle),
+          const Divider(height: 1, color: AppColors.outlineSubtle),
           ListView.separated(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: stages.length,
             separatorBuilder: (_, __) =>
-                Divider(height: 1, color: AppColors.outlineSubtle),
+                const Divider(height: 1, color: AppColors.outlineSubtle),
             itemBuilder: (context, i) {
               final s = stages[i];
               final isCompleted = i < currentIndex;
@@ -639,7 +639,7 @@ class _ProcessingInfoBanner extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(Icons.info_outline_rounded,
+          const Icon(Icons.info_outline_rounded,
               size: 18, color: AppColors.primaryBlue),
           const SizedBox(width: 10),
           Expanded(
@@ -756,7 +756,7 @@ class _ProcessingSuccessCardState extends State<ProcessingSuccessCard>
             ),
             child: Column(
               children: [
-                _SuccessRing(),
+                const _SuccessRing(),
                 const SizedBox(height: 16),
                 Text(
                   'Analysis Complete!',
@@ -845,18 +845,22 @@ class _ProcessingSuccessCardState extends State<ProcessingSuccessCard>
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    _MetricChip(
-                      icon: Icons.local_fire_department_rounded,
-                      label: 'Intensity',
-                      value: '${widget.intensityScore}',
-                      color: intensityColor,
+                    Flexible(
+                      child: _MetricChip(
+                        icon: Icons.local_fire_department_rounded,
+                        label: 'Intensity',
+                        value: '${widget.intensityScore}',
+                        color: intensityColor,
+                      ),
                     ),
                     const SizedBox(width: 10),
-                    _MetricChip(
-                      icon: Icons.emoji_events_rounded,
-                      label: 'Competition',
-                      value: widget.competition,
-                      color: AppColors.accentCyan,
+                    Flexible(
+                      child: _MetricChip(
+                        icon: Icons.emoji_events_rounded,
+                        label: 'Competition',
+                        value: widget.competition,
+                        color: AppColors.accentCyan,
+                      ),
                     ),
                   ],
                 ),
@@ -881,7 +885,7 @@ class _ProcessingSuccessCardState extends State<ProcessingSuccessCard>
               children: [
                 Row(
                   children: [
-                    Icon(Icons.auto_awesome_rounded,
+                    const Icon(Icons.auto_awesome_rounded,
                         size: 16, color: AppColors.primaryPurple),
                     const SizedBox(width: 8),
                     Text(
@@ -917,7 +921,7 @@ class _ProcessingSuccessCardState extends State<ProcessingSuccessCard>
                 foregroundColor: AppColors.textPrimary,
                 padding: EdgeInsets.symmetric(
                     vertical: context.rs(15, min: 12, max: 18)),
-                shape: RoundedRectangleBorder(
+                shape: const RoundedRectangleBorder(
                     borderRadius: AppRadius.button),
                 elevation: 0,
               ),
@@ -938,9 +942,9 @@ class _ProcessingSuccessCardState extends State<ProcessingSuccessCard>
                   label: const Text('History'),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.textSecondary,
-                    side: BorderSide(color: AppColors.outline, width: 1.5),
+                    side: const BorderSide(color: AppColors.outline, width: 1.5),
                     padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
+                    shape: const RoundedRectangleBorder(
                         borderRadius: AppRadius.button),
                   ),
                 ),
@@ -957,7 +961,7 @@ class _ProcessingSuccessCardState extends State<ProcessingSuccessCard>
                         color: AppColors.accentCyan.withValues(alpha: 0.4),
                         width: 1.5),
                     padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
+                    shape: const RoundedRectangleBorder(
                         borderRadius: AppRadius.button),
                   ),
                 ),
@@ -1019,7 +1023,7 @@ class _SuccessRingState extends State<_SuccessRing>
               width: 2,
             ),
           ),
-          child: Icon(
+          child: const Icon(
             Icons.check_rounded,
             size: 38,
             color: AppColors.accentGreen,
@@ -1149,10 +1153,14 @@ class _MetricChip extends StatelessWidget {
         children: [
           Icon(icon, size: 13, color: color),
           const SizedBox(width: 5),
-          Text(
-            '$label: $value',
-            style: AppTextStyles.caption(color: color)
-                .copyWith(fontWeight: FontWeight.w700),
+          Flexible(
+            child: Text(
+              '$label: $value',
+              style: AppTextStyles.caption(color: color)
+                  .copyWith(fontWeight: FontWeight.w700),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
         ],
       ),

@@ -1,20 +1,20 @@
-/// ---------------------------------------------------------------------------
-/// GoalSight — Manager Players Provider
-///
-/// Converts club roster data to detailed player profiles for manager view.
-/// Loads all players from the manager's assigned club.
-/// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+//GoalSight — Manager Players Provider
+//
+//Converts club roster data to detailed player profiles for manager view.
+//Loads all players from the manager's assigned club.
+// ---------------------------------------------------------------------------
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/models/player_profile_model.dart';
-import '../../data/models/club_model.dart';
+import '../data/models/player_profile_model.dart';
+import '../data/models/club_model.dart';
 import 'clubs_provider.dart';
 
-/// Manager's club ID - currently manages GoalSight FC
+//Manager's club ID - currently manages GoalSight FC
 const String _managerClubId = 'club_001';
 
-/// Fetch the manager's club
+//Fetch the manager's club
 final managerClubProvider = Provider<ClubModel?>((ref) {
   final clubs = ref.watch(mockClubsProvider);
   try {
@@ -24,7 +24,7 @@ final managerClubProvider = Provider<ClubModel?>((ref) {
   }
 });
 
-/// Convert a ClubPlayer to PlayerProfileModel with realistic historical data
+//Convert a ClubPlayer to PlayerProfileModel with realistic historical data
 PlayerProfileModel _clubPlayerToProfileModel(ClubPlayer player) {
   // Generate realistic ratings history based on performance tier
   final List<double> ratingsHistory;
@@ -191,7 +191,7 @@ PlayerProfileModel _clubPlayerToProfileModel(ClubPlayer player) {
   // Generate insights
   final List<String> insights = [];
   if (player.rating >= 8.0) {
-    insights.add('${player.performanceSummary}');
+    insights.add(player.performanceSummary);
   }
   if (player.goals > 0) {
     insights.add('${player.goals} goals this season');
@@ -229,7 +229,7 @@ PlayerProfileModel _clubPlayerToProfileModel(ClubPlayer player) {
   );
 }
 
-/// All players from the manager's club with detailed profiles
+//All players from the manager's club with detailed profiles
 final managerPlayersProvider = Provider<List<PlayerProfileModel>>((ref) {
   final club = ref.watch(managerClubProvider);
   

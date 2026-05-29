@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/utils/responsive.dart';
-import '../../state_management/app_providers.dart';
+import '../../../providers/app_providers.dart';
 
 class LiveMatchScreen extends ConsumerWidget {
   const LiveMatchScreen({super.key, required this.matchId});

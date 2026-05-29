@@ -1,10 +1,10 @@
-/// ---------------------------------------------------------------------------
-/// GoalSight — Club Data Models
-///
-/// These models mirror the exact JSON shape the backend returns.
-/// When Supabase is connected, replace the mock provider with a real
-/// AsyncNotifierProvider calling [ClubModel.fromJson] — zero UI changes needed.
-/// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// GoalSight — Club Data Models
+//
+// These models mirror the exact JSON shape the backend returns.
+// When Supabase is connected, replace the mock provider with a real
+// AsyncNotifierProvider calling [ClubModel.fromJson] — zero UI changes needed.
+// ---------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 

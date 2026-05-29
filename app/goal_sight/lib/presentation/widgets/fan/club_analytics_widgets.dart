@@ -17,7 +17,7 @@ class _GlassCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        gradient: gradient ?? LinearGradient(
+        gradient: gradient ?? const LinearGradient(
           begin: Alignment.topLeft, end: Alignment.bottomRight,
           colors: [AppColors.surfaceElevated, AppColors.surface],
         ),
@@ -94,7 +94,7 @@ class ClubTacticalIdentityCard extends StatelessWidget {
         AppColors.accentGreen,
         club.stats.goalsConceded < 12 ? 0.78 : 0.65,
       ),
-      _TacticIdentity(
+      const _TacticIdentity(
         'Rapid Transitions',
         Icons.speed_rounded,
         'Speed of transition from defense to attack phases',
@@ -223,7 +223,7 @@ class ClubAnalyticsDashboard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SectionHeader(
+          const _SectionHeader(
               title: 'Analytics Dashboard',
               icon: Icons.analytics_rounded,
               color: AppColors.primaryBlue,
@@ -600,7 +600,7 @@ class TopPlayersCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SectionHeader(
+          const _SectionHeader(
               title: 'Top Performers',
               icon: Icons.star_rounded,
               color: AppColors.warning,

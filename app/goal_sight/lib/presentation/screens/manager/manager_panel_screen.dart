@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/utils/responsive.dart';
 import '../../../features/user/team_member_model.dart';
-import '../../state_management/app_providers.dart';
+import '../../../providers/app_providers.dart';
 
 class ManagerPanelScreen extends ConsumerWidget {
   const ManagerPanelScreen({super.key});
@@ -107,7 +107,7 @@ class ManagerPanelScreen extends ConsumerWidget {
                         ],
                       ),
                       SizedBox(height: spacing),
-                      _StandingsPanel(entries: standings),
+                      const _StandingsPanel(entries: standings),
                       SizedBox(height: spacing),
                       Wrap(
                         spacing: spacing,

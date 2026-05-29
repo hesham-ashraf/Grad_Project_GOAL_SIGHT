@@ -277,7 +277,7 @@ class GsSuccessSnackBar {
         duration: duration,
         backgroundColor: AppColors.surface,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: AppRadius.card),
+        shape: const RoundedRectangleBorder(borderRadius: AppRadius.card),
         margin: const EdgeInsets.all(12),
         content: Row(
           children: [

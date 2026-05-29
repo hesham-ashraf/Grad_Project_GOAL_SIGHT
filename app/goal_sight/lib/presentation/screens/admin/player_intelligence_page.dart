@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../features/admin/data/admin_mock_data.dart';
-import '../../widgets/admin/tactical_insight_widget.dart';
 
 class PlayerIntelligencePage extends StatelessWidget {
   const PlayerIntelligencePage({super.key, required this.playerId});

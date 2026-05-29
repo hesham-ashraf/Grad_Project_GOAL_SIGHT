@@ -1,0 +1,268 @@
+Analyzing goal_sight...                                         
+
+   info - Dangling library doc comment. Add a 'library' directive after the library comment - lib\data\models\club_model.dart:1:1 - dangling_library_doc_comments
+   info - Dangling library doc comment. Add a 'library' directive after the library comment - lib\data\models\match_analysis_model.dart:1:1 - dangling_library_doc_comments
+   info - Dangling library doc comment. Add a 'library' directive after the library comment - lib\data\models\player_profile_model.dart:1:1 - dangling_library_doc_comments
+   info - Unnecessary constructor invocation. Try using a collection literal - lib\features\manager\manager_upload_mock_data.dart:113:23 - prefer_collection_literals
+   info - Unnecessary constructor invocation. Try using a collection literal - lib\features\manager\manager_upload_mock_data.dart:127:23 - prefer_collection_literals
+   info - Unnecessary braces in a string interpolation. Try removing the braces - lib\features\manager\manager_upload_mock_data.dart:242:20 - unnecessary_brace_in_string_interps
+   info - Unnecessary braces in a string interpolation. Try removing the braces - lib\features\manager\manager_upload_mock_data.dart:245:20 - unnecessary_brace_in_string_interps
+   info - Dangling library doc comment. Add a 'library' directive after the library comment - lib\features\manager\players_mock_data.dart:1:1 - dangling_library_doc_comments
+   info - Dangling library doc comment. Add a 'library' directive after the library comment - lib\features\manager\screens\player_profile_screen.dart:1:1 - dangling_library_doc_comments
+  error - The constructor being called isn't a const constructor. Try removing 'const' from the constructor invocation - lib\features\manager\screens\player_profile_screen.dart:228:17 - const_with_non_const
+  error - The constructor being called isn't a const constructor. Try removing 'const' from the constructor invocation - lib\features\manager\screens\player_profile_screen.dart:232:23 - const_with_non_const
+   info - Unnecessary use of string interpolation. Try replacing the string literal with the variable name - lib\features\manager\screens\player_profile_screen.dart:296:23 - unnecessary_string_interpolations
+   info - Unnecessary use of string interpolation. Try replacing the string literal with the variable name - lib\features\manager\screens\player_profile_screen.dart:578:21 - unnecessary_string_interpolations
+   info - Unnecessary use of string interpolation. Try replacing the string literal with the variable name - lib\features\manager\screens\player_profile_screen.dart:594:21 - unnecessary_string_interpolations
+   info - Unnecessary use of string interpolation. Try replacing the string literal with the variable name - lib\features\manager\screens\player_profile_screen.dart:610:21 - unnecessary_string_interpolations
+   info - Dangling library doc comment. Add a 'library' directive after the library comment - lib\features\manager\screens\players_screen.dart:1:1 - dangling_library_doc_comments
+   info - Use interpolation to compose strings and values. Try using string interpolation to build the composite string - lib\features\manager\screens\upload_match_screen.dart:421:50 - prefer_interpolation_to_compose_strings
+   info - Parameter 'key' could be a super parameter. Trying converting 'key' to a super parameter - lib\features\manager\widgets\action_tile.dart:11:9 - use_super_parameters
+   info - Parameter 'key' could be a super parameter. Trying converting 'key' to a super parameter - lib\features\manager\widgets\info_tile.dart:10:9 - use_super_parameters
+   info - Dangling library doc comment. Add a 'library' directive after the library comment - lib\features\manager\widgets\player_list_card.dart:1:1 - dangling_library_doc_comments
+   info - Parameter 'key' could be a super parameter. Trying converting 'key' to a super parameter - lib\features\manager\widgets\player_list_card.dart:14:9 - use_super_parameters
+   info - Unnecessary use of string interpolation. Try replacing the string literal with the variable name - lib\features\manager\widgets\player_list_card.dart:144:37 - unnecessary_string_interpolations
+   info - Dangling library doc comment. Add a 'library' directive after the library comment - lib\features\manager\widgets\player_match_history_item.dart:1:1 - dangling_library_doc_comments
+   info - Parameter 'key' could be a super parameter. Trying converting 'key' to a super parameter - lib\features\manager\widgets\player_match_history_item.dart:14:9 - use_super_parameters
+   info - Unnecessary use of string interpolation. Try replacing the string literal with the variable name - lib\features\manager\widgets\player_match_history_item.dart:122:23 - unnecessary_string_interpolations
+   info - Parameter 'key' could be a super parameter. Trying converting 'key' to a super parameter - lib\features\manager\widgets\player_match_history_item.dart:190:9 - use_super_parameters
+   info - Dangling library doc comment. Add a 'library' directive after the library comment - lib\features\manager\widgets\player_stat_tile.dart:1:1 - dangling_library_doc_comments
+   info - Parameter 'key' could be a super parameter. Trying converting 'key' to a super parameter - lib\features\manager\widgets\player_stat_tile.dart:13:9 - use_super_parameters
+   info - Parameter 'key' could be a super parameter. Trying converting 'key' to a super parameter - lib\features\manager\widgets\profile_header.dart:12:9 - use_super_parameters
+   info - Constructors for public widgets should have a named 'key' parameter. Try adding a named parameter to the constructor - lib\pages\about_page.dart:10:7 - use_key_in_widget_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\about_page.dart:17:39 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal - lib\pages\about_page.dart:18:21 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\about_page.dart:20:18 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\about_page.dart:22:20 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\about_page.dart:35:20 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\about_page.dart:42:29 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal - lib\pages\about_page.dart:43:29 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\about_page.dart:50:31 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\about_page.dart:54:24 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\about_page.dart:55:26 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\about_page.dart:57:28 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\about_page.dart:65:15 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\about_page.dart:66:15 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\about_page.dart:68:24 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\about_page.dart:75:15 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\about_page.dart:76:15 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\about_page.dart:78:24 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\about_page.dart:83:15 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\about_page.dart:89:15 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\about_page.dart:95:15 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\about_page.dart:101:15 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\about_page.dart:107:15 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\about_page.dart:109:26 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\about_page.dart:118:24 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal - lib\pages\about_page.dart:119:29 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\about_page.dart:120:21 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\about_page.dart:125:21 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\about_page.dart:126:21 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\about_page.dart:128:30 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\about_page.dart:135:21 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\about_page.dart:136:21 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\about_page.dart:138:30 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\about_page.dart:160:16 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\about_page.dart:173:22 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\about_page.dart:175:25 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal - lib\pages\about_page.dart:176:25 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\about_page.dart:182:11 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\about_page.dart:189:26 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\about_page.dart:195:17 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\about_page.dart:198:26 - prefer_const_constructors
+   info - Invalid use of a private type in a public API. Try making the private type public, or making the API that uses the private type also be private - lib\pages\add_match_page.dart:17:3 - library_private_types_in_public_api
+   info - Don't use 'BuildContext's across async gaps. Try rewriting the code to not use the 'BuildContext', or guard the use with a 'mounted' check - lib\pages\add_match_page.dart:95:28 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps. Try rewriting the code to not use the 'BuildContext', or guard the use with a 'mounted' check - lib\pages\add_match_page.dart:112:20 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps. Try rewriting the code to not use the 'BuildContext', or guard the use with a 'mounted' check - lib\pages\add_match_page.dart:114:28 - use_build_context_synchronously
+   info - Constructors for public widgets should have a named 'key' parameter. Try adding a named parameter to the constructor - lib\pages\match_detail_page.dart:15:3 - use_key_in_widget_constructors
+   info - Constructors in '@immutable' classes should be declared as 'const'. Try adding 'const' to the constructor declaration - lib\pages\match_detail_page.dart:15:3 - prefer_const_constructors_in_immutables
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:30:39 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal - lib\pages\match_detail_page.dart:31:21 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:33:18 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:35:20 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:47:19 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:61:20 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:66:15 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:72:15 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:78:15 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:80:15 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:83:17 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:86:15 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:97:16 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:113:21 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:121:20 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:127:11 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:132:26 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:134:29 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal - lib\pages\match_detail_page.dart:135:29 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:141:26 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:148:15 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:149:26 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:150:24 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:152:26 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:160:26 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:162:29 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal - lib\pages\match_detail_page.dart:163:29 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:169:26 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:178:11 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:181:20 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:198:16 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:210:22 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:212:25 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal - lib\pages\match_detail_page.dart:213:25 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:219:11 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:226:26 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:231:17 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:234:26 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:250:16 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:273:24 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:281:11 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:288:26 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:294:17 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:297:26 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:306:22 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:315:22 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:329:16 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:341:11 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal - lib\pages\match_detail_page.dart:342:23 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:343:15 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:344:15 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:345:15 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:347:24 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:355:11 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:358:20 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:372:19 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal - lib\pages\match_detail_page.dart:373:19 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:382:21 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:399:22 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:400:20 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal - lib\pages\match_detail_page.dart:402:25 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:403:17 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:404:17 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:405:17 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_detail_page.dart:407:26 - prefer_const_constructors
+   info - Constructors for public widgets should have a named 'key' parameter. Try adding a named parameter to the constructor - lib\pages\match_history_page.dart:14:7 - use_key_in_widget_constructors
+   info - Invalid use of a private type in a public API. Try making the private type public, or making the API that uses the private type also be private - lib\pages\match_history_page.dart:16:3 - library_private_types_in_public_api
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_history_page.dart:34:39 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal - lib\pages\match_history_page.dart:35:21 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_history_page.dart:37:18 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_history_page.dart:39:20 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_history_page.dart:54:22 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_history_page.dart:55:24 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_history_page.dart:56:31 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_history_page.dart:62:22 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_history_page.dart:63:24 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal - lib\pages\match_history_page.dart:65:29 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_history_page.dart:66:21 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_history_page.dart:71:21 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_history_page.dart:72:21 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_history_page.dart:74:30 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_history_page.dart:80:21 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_history_page.dart:81:21 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_history_page.dart:83:30 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_history_page.dart:97:26 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_history_page.dart:127:18 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_history_page.dart:139:24 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_history_page.dart:156:40 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_history_page.dart:162:25 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_history_page.dart:169:35 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_history_page.dart:171:38 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal - lib\pages\match_history_page.dart:172:38 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_history_page.dart:178:35 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_history_page.dart:185:24 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_history_page.dart:186:24 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_history_page.dart:189:20 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_history_page.dart:199:39 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_history_page.dart:205:30 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_history_page.dart:206:30 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_history_page.dart:208:39 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_history_page.dart:213:30 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_history_page.dart:216:39 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_history_page.dart:226:35 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_history_page.dart:228:38 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal - lib\pages\match_history_page.dart:229:38 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_history_page.dart:235:35 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_history_page.dart:244:20 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_history_page.dart:246:20 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_history_page.dart:249:24 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_history_page.dart:250:24 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_history_page.dart:253:33 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_history_page.dart:259:26 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_history_page.dart:260:26 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_history_page.dart:261:26 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_history_page.dart:262:26 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\match_history_page.dart:264:35 - prefer_const_constructors
+   info - Constructors for public widgets should have a named 'key' parameter. Try adding a named parameter to the constructor - lib\pages\settings_page.dart:11:7 - use_key_in_widget_constructors
+   info - Invalid use of a private type in a public API. Try making the private type public, or making the API that uses the private type also be private - lib\pages\settings_page.dart:13:3 - library_private_types_in_public_api
+   info - Don't use 'BuildContext's across async gaps. Try rewriting the code to not use the 'BuildContext', or guard the use with a 'mounted' check - lib\pages\settings_page.dart:45:26 - use_build_context_synchronously
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:47:18 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal - lib\pages\settings_page.dart:48:21 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:49:13 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:50:13 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:51:13 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:69:39 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal - lib\pages\settings_page.dart:70:21 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:72:18 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:74:20 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:87:20 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:92:15 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:100:15 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:102:15 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:110:15 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:112:15 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:114:15 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:116:15 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:132:23 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal - lib\pages\settings_page.dart:133:23 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:140:9 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:143:18 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:171:20 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:173:23 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal - lib\pages\settings_page.dart:174:23 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:182:18 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:190:18 - prefer_const_constructors
+   info - 'activeColor' is deprecated and shouldn't be used. Use activeThumbColor instead. This feature was deprecated after v3.31.0-2.0.pre. Try replacing the use of the deprecated member with the replacement - lib\pages\settings_page.dart:198:11 - deprecated_member_use
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:216:20 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:218:23 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal - lib\pages\settings_page.dart:219:23 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:223:18 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:225:16 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:227:18 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:235:18 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:240:19 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:245:20 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:246:29 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:246:56 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:249:24 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:253:19 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:255:28 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:261:19 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:266:32 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:269:29 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:288:16 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:303:15 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:305:24 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:313:24 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:321:11 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:339:19 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal - lib\pages\settings_page.dart:340:19 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:349:21 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:359:22 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:360:20 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes. Try adding 'const' before the literal - lib\pages\settings_page.dart:362:25 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:363:17 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:364:17 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:365:17 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance. Try adding the 'const' keyword to the constructor invocation - lib\pages\settings_page.dart:367:26 - prefer_const_constructors
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check. Guard a 'State.context' use with a 'mounted' check on the State, and other BuildContext use with a 'mounted' check on the BuildContext - lib\presentation\screens\admin\admin_panel_screen.dart:56:44 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check. Guard a 'State.context' use with a 'mounted' check on the State, and other BuildContext use with a 'mounted' check on the BuildContext - lib\presentation\screens\dashboard\admin_dashboard_screen.dart:55:44 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check. Guard a 'State.context' use with a 'mounted' check on the State, and other BuildContext use with a 'mounted' check on the BuildContext - lib\presentation\screens\dashboard\manager_dashboard_screen.dart:66:43 - use_build_context_synchronously
+   info - The local variable '_curve' starts with an underscore. Try renaming the variable to not start with an underscore - lib\presentation\screens\fan\club_details_screen.dart:41:21 - no_leading_underscores_for_local_identifiers
+   info - Dangling library doc comment. Add a 'library' directive after the library comment - lib\presentation\state_management\clubs_provider.dart:1:1 - dangling_library_doc_comments
+   info - Dangling library doc comment. Add a 'library' directive after the library comment - lib\presentation\state_management\manager_players_provider.dart:1:1 - dangling_library_doc_comments
+   info - Unnecessary use of string interpolation. Try replacing the string literal with the variable name - lib\presentation\state_management\manager_players_provider.dart:194:18 - unnecessary_string_interpolations
+   info - Dangling library doc comment. Add a 'library' directive after the library comment - lib\presentation\state_management\match_analysis_providers.dart:1:1 - dangling_library_doc_comments
+  error - Methods can't be invoked in constant expressions - lib\presentation\widgets\admin\admin_analytics_widgets.dart:441:55 - const_eval_method_invocation
+   info - 'activeColor' is deprecated and shouldn't be used. Use activeThumbColor instead. This feature was deprecated after v3.31.0-2.0.pre. Try replacing the use of the deprecated member with the replacement - lib\presentation\widgets\fan\fan_profile_advanced_widgets.dart:333:13 - deprecated_member_use
+   info - 'activeColor' is deprecated and shouldn't be used. Use activeThumbColor instead. This feature was deprecated after v3.31.0-2.0.pre. Try replacing the use of the deprecated member with the replacement - lib\presentation\widgets\fan\fan_profile_advanced_widgets.dart:890:13 - deprecated_member_use
+

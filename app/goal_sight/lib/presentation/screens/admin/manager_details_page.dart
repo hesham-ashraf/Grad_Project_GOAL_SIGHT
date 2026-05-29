@@ -555,7 +555,7 @@ class _PermissionsCard extends StatelessWidget {
                 onChanged: onUploadChanged,
                 color: AppColors.accentCyan,
               ),
-              Divider(height: 1, color: AppColors.outline),
+              const Divider(height: 1, color: AppColors.outline),
               _PermissionRow(
                 icon: Icons.edit_outlined,
                 title: 'Edit Player Data',
@@ -564,7 +564,7 @@ class _PermissionsCard extends StatelessWidget {
                 onChanged: onEditPlayersChanged,
                 color: AppColors.accentGreen,
               ),
-              Divider(height: 1, color: AppColors.outline),
+              const Divider(height: 1, color: AppColors.outline),
               _PermissionRow(
                 icon: Icons.group_outlined,
                 title: 'Manage Sub-Staff',

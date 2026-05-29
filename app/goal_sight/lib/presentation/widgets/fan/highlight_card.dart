@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
-import '../../../features/fan/fan_highlight_model.dart';
+import '../../../data/models/fan_highlight_model.dart';
 import '../../../core/utils/responsive.dart';
 
 class HighlightCard extends StatefulWidget {
@@ -40,7 +40,7 @@ class _HighlightCardState extends State<HighlightCard> {
               boxShadow: [
                 BoxShadow(
                   color: const Color(0xFF4DA1FF)
-                      .withOpacity(_hovered ? 0.28 : 0.15),
+                      .withValues(alpha: _hovered ? 0.28 : 0.15),
                   blurRadius: _hovered ? 24 : 12,
                   offset: const Offset(0, 8),
                 ),
@@ -65,16 +65,16 @@ class _HighlightCardState extends State<HighlightCard> {
                       },
                     ),
                   ),
-                  Positioned.fill(
+                  const Positioned.fill(
                     child: DecoratedBox(
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                           colors: [
-                            const Color(0x99000000),
-                            const Color(0x22000000),
-                            const Color(0xD9000000),
+                            Color(0x99000000),
+                            Color(0x22000000),
+                            Color(0xD9000000),
                           ],
                         ),
                       ),

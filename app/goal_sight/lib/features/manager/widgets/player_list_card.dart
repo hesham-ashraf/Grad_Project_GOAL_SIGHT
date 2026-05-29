@@ -1,9 +1,9 @@
-/// ---------------------------------------------------------------------------
-/// GoalSight — Player List Card Widget
-///
-/// Displays a player summary card for use in players list.
-/// Shows: name, position, current rating, performance indicator, and tap target.
-/// ---------------------------------------------------------------------------
+﻿// ---------------------------------------------------------------------------
+// GoalSight — Player List Card Widget
+//
+// Displays a player summary card for use in players list.
+// Shows: name, position, current rating, performance indicator, and tap target.
+// ---------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
 import 'package:goal_sight/core/theme/app_theme.dart';
@@ -14,8 +14,8 @@ class PlayerListCard extends StatelessWidget {
   const PlayerListCard({
     required this.player,
     required this.onTap,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final PlayerProfileModel player;
   final VoidCallback onTap;
@@ -68,7 +68,7 @@ class PlayerListCard extends StatelessWidget {
             decoration: BoxDecoration(
               color: AppColors.surfaceElevated,
               border: Border.all(
-                color: AppColors.outline.withOpacity(0.3),
+                color: AppColors.outline.withValues(alpha: 0.3),
                 width: 1,
               ),
               borderRadius: BorderRadius.circular(AppRadius.lg),
@@ -106,7 +106,7 @@ class PlayerListCard extends StatelessWidget {
                               vertical: context.rs(AppSpacing.xxs),
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.primaryPurple.withOpacity(0.2),
+                              color: AppColors.primaryPurple.withValues(alpha: 0.2),
                               border: Border.all(
                                 color: AppColors.primaryPurple,
                                 width: 0.5,
@@ -141,7 +141,7 @@ class PlayerListCard extends StatelessWidget {
                               Row(
                                 children: [
                                   Text(
-                                    '${player.currentRating.toStringAsFixed(1)}',
+                                    player.currentRating.toStringAsFixed(1),
                                     style: AppTextStyles.title(
                                       color: _getRatingColor(),
                                     ).copyWith(
@@ -155,7 +155,7 @@ class PlayerListCard extends StatelessWidget {
                                       vertical: context.rs(AppSpacing.xxs),
                                     ),
                                     decoration: BoxDecoration(
-                                      color: _getTrendColor().withOpacity(0.15),
+                                      color: _getTrendColor().withValues(alpha: 0.15),
                                       borderRadius: BorderRadius.circular(AppRadius.sm),
                                     ),
                                     child: Text(
@@ -179,12 +179,12 @@ class PlayerListCard extends StatelessWidget {
                             ),
                             decoration: BoxDecoration(
                               color: player.status == 'Explosive Form'
-                                  ? AppColors.accentGreen.withOpacity(0.15)
+                                  ? AppColors.accentGreen.withValues(alpha: 0.15)
                                   : player.status == 'Elite Form'
-                                      ? AppColors.accentCyan.withOpacity(0.15)
+                                      ? AppColors.accentCyan.withValues(alpha: 0.15)
                                       : player.status.contains('Improvement')
-                                          ? AppColors.danger.withOpacity(0.15)
-                                          : AppColors.warning.withOpacity(0.15),
+                                          ? AppColors.danger.withValues(alpha: 0.15)
+                                          : AppColors.warning.withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(AppRadius.sm),
                             ),
                             child: Text(

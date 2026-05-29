@@ -146,7 +146,7 @@ class GoalSightMatchCard extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  Icon(Icons.auto_awesome_rounded, color: AppColors.accentCyan, size: 16),
+                  const Icon(Icons.auto_awesome_rounded, color: AppColors.accentCyan, size: 16),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(

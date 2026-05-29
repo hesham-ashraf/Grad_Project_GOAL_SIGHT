@@ -1,4 +1,4 @@
-import 'upload_job_model.dart';
+import '../../data/models/upload_job_model.dart';
 
 final List<UploadJobModel> kMockUploadHistory = [
   UploadJobModel(

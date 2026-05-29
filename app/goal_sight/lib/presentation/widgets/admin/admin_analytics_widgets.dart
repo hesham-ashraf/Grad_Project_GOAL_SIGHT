@@ -69,7 +69,7 @@ class ClubTacticalEvolutionSection extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           // Legend
-          Wrap(
+          const Wrap(
             spacing: 16,
             runSpacing: 8,
             children: [
@@ -244,26 +244,26 @@ class ClubSeasonStatsSection extends StatelessWidget {
       children: [
         Text('Season Analytics', style: AppTextStyles.title(color: Colors.white).copyWith(fontSize: 16)),
         const SizedBox(height: 12),
-        Row(
+        const Row(
           children: [
             Expanded(child: _SeasonCard(value: '38', label: 'Matches Played', sublabel: '+6 this month', color: AppColors.accentCyan, icon: Icons.sports_soccer)),
-            const SizedBox(width: 10),
+            SizedBox(width: 10),
             Expanded(child: _SeasonCard(value: '24', label: 'Wins', sublabel: '63% win rate', color: AppColors.accentGreen, icon: Icons.emoji_events_outlined)),
           ],
         ),
         const SizedBox(height: 10),
-        Row(
+        const Row(
           children: [
             Expanded(child: _SeasonCard(value: '72', label: 'Goals Scored', sublabel: '1.9/match avg', color: AppColors.primaryPurple, icon: Icons.flag_outlined)),
-            const SizedBox(width: 10),
+            SizedBox(width: 10),
             Expanded(child: _SeasonCard(value: '31', label: 'Goals Conceded', sublabel: '0.8/match avg', color: AppColors.warning, icon: Icons.shield_outlined)),
           ],
         ),
         const SizedBox(height: 10),
-        Row(
+        const Row(
           children: [
             Expanded(child: _SeasonCard(value: '391', label: 'Total Analyses', sublabel: 'by AI engine', color: AppColors.accentCyan, icon: Icons.analytics_outlined)),
-            const SizedBox(width: 10),
+            SizedBox(width: 10),
             Expanded(child: _SeasonCard(value: '8.9', label: 'Avg Team Rating', sublabel: '+0.4 vs last season', color: AppColors.accentGreen, icon: Icons.star_outline)),
           ],
         ),
@@ -432,11 +432,11 @@ class ClubMatchIntensitySection extends StatelessWidget {
           const SizedBox(height: 12),
           Row(
             children: [
-              _ResultLegend(color: AppColors.accentGreen, label: 'Win'),
+              const _ResultLegend(color: AppColors.accentGreen, label: 'Win'),
               const SizedBox(width: 16),
-              _ResultLegend(color: AppColors.warning, label: 'Draw'),
+              const _ResultLegend(color: AppColors.warning, label: 'Draw'),
               const SizedBox(width: 16),
-              _ResultLegend(color: AppColors.danger, label: 'Loss'),
+              const _ResultLegend(color: AppColors.danger, label: 'Loss'),
               const Spacer(),
               Text('Height = Press Intensity', style: AppTextStyles.caption(color: AppColors.textMuted).copyWith(fontSize: 10)),
             ],
@@ -532,7 +532,7 @@ class ClubFatigueOverviewSection extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          SizedBox(
+          const SizedBox(
             height: 80,
             child: CustomPaint(
               painter: _FatiguePainter(values: _fatigueTrend),

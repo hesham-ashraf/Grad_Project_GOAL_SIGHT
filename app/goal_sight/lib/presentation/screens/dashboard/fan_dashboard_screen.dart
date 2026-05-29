@@ -1,12 +1,12 @@
-import 'dart:async';
+﻿import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/utils/responsive.dart';
 import '../../../data/models/match_model.dart';
-import '../../../features/fan/fan_highlight_model.dart';
-import '../../state_management/app_providers.dart';
+import '../../../data/models/fan_highlight_model.dart';
+import '../../../providers/app_providers.dart';
 import '../../widgets/fan/dashboard_card.dart';
 import '../../widgets/fan/fan_skeletons.dart';
 import '../../widgets/fan/highlight_card.dart';
@@ -184,7 +184,7 @@ class _AmbientGlowState extends State<_AmbientGlow>
                 right: -70,
                 child: _GlowOrb(
                   size: 260,
-                  color: const Color(0xFF7B61FF).withOpacity(0.17 + (t * 0.06)),
+                  color: const Color(0xFF7B61FF).withValues(alpha: 0.17 + (t * 0.06)),
                 ),
               ),
               Positioned(
@@ -192,7 +192,7 @@ class _AmbientGlowState extends State<_AmbientGlow>
                 bottom: -120 + ((1 - t) * 30),
                 child: _GlowOrb(
                   size: 300,
-                  color: const Color(0xFF4DA1FF).withOpacity(0.13 + (t * 0.06)),
+                  color: const Color(0xFF4DA1FF).withValues(alpha: 0.13 + (t * 0.06)),
                 ),
               ),
             ],
@@ -317,12 +317,12 @@ class _Header extends StatelessWidget {
           Container(
             width: context.rs(50, min: 40, max: 62),
             height: context.rs(50, min: 40, max: 62),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               shape: BoxShape.circle,
-              gradient: const LinearGradient(
+              gradient: LinearGradient(
                 colors: [Color(0xFF7B61FF), Color(0xFF4DA1FF)],
               ),
-              boxShadow: const [
+              boxShadow: [
                 BoxShadow(
                   color: Color(0x4D7B61FF),
                   blurRadius: 18,
@@ -634,7 +634,7 @@ class _LivePillState extends State<_LivePill>
             border: Border.all(color: const Color(0x66FFFFFF)),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF9FFFC1).withOpacity(glow),
+                color: const Color(0xFF9FFFC1).withValues(alpha: glow),
                 blurRadius: 12 + (t * 8),
                 spreadRadius: 0.5 + t,
               ),
@@ -835,7 +835,7 @@ class _TodayMatchChip extends StatelessWidget {
             Text(
               match.status.toUpperCase(),
               style: TextStyle(
-                color: Color(0xFF9CA8C8),
+                color: const Color(0xFF9CA8C8),
                 fontSize: context.sp(11, min: 10, max: 13),
                 fontWeight: FontWeight.w700,
               ),
@@ -855,7 +855,7 @@ class _TodayMatchChip extends StatelessWidget {
             Text(
               match.score,
               style: TextStyle(
-                color: Color(0xFFBFD2FF),
+                color: const Color(0xFFBFD2FF),
                 fontWeight: FontWeight.w800,
                 fontSize: context.sp(14, min: 12, max: 18),
               ),

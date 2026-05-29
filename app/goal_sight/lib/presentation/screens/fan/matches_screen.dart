@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/services/haptic_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
-import '../../state_management/match_analysis_providers.dart';
+import '../../../providers/match_analysis_providers.dart';
 import '../../widgets/fan/match_list_card.dart';
 import '../../widgets/fan/match_status_badge.dart';
 
@@ -51,7 +51,6 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen>
   // Animation
   late final AnimationController _searchBarController;
   late final Animation<double> _searchBarFade;
-  late final Animation<double> _searchBarWidth;
 
   // For animated filter chip selection
   late final AnimationController _chipController;
@@ -67,9 +66,6 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen>
     _searchBarFade = CurvedAnimation(
       parent: _searchBarController,
       curve: Curves.easeOutCubic,
-    );
-    _searchBarWidth = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: _searchBarController, curve: Curves.easeOutCubic),
     );
 
     _chipController = AnimationController(
@@ -105,8 +101,6 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen>
       // League filter (basic match against competition strings in mock data)
       if (_leagueFilter != 'All Leagues') {
         final league = _leagueFilter.toLowerCase();
-        final home = m.homeTeam.toLowerCase();
-        final away = m.awayTeam.toLowerCase();
         // For mock data we match by intensity / team heuristic
         // In production, the model would carry a `competition` field
         final mockLeagueMap = {
@@ -334,34 +328,65 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Matches',
-                style: AppTextStyles.headline(color: AppColors.textPrimary)
-                    .copyWith(fontSize: context.rs(32, min: 28, max: 36)),
-              ),
-              SizedBox(height: context.rs(4, min: 2, max: 6)),
-              Text(
-                '$resultCount fixture${resultCount != 1 ? 's' : ''} found',
-                style: AppTextStyles.body(color: AppColors.textSecondary)
-                    .copyWith(fontSize: context.rs(13, min: 12, max: 14)),
-              ),
-            ],
+    return Container(
+      padding: EdgeInsets.all(context.rs(16, min: 14, max: 20)),
+      decoration: BoxDecoration(
+        borderRadius: AppRadius.cardLarge,
+        color: AppColors.surfaceElevated.withValues(alpha: 0.72),
+        border: Border.all(color: AppColors.outlineSubtle),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: context.rs(12, min: 10, max: 14),
+                    vertical: context.rs(6, min: 5, max: 8),
+                  ),
+                  decoration: const BoxDecoration(
+                    gradient: AppGradients.brand,
+                    borderRadius: AppRadius.chip,
+                  ),
+                  child: Text(
+                    'FIXTURE FEED',
+                    style: AppTextStyles.caption(color: Colors.white).copyWith(
+                      fontSize: context.rs(10, min: 9, max: 11),
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1.0,
+                    ),
+                  ),
+                ),
+                SizedBox(height: context.rs(10, min: 8, max: 12)),
+                Text(
+                  'Matches',
+                  style: AppTextStyles.headline(color: AppColors.textPrimary)
+                      .copyWith(
+                    fontSize: context.rs(30, min: 26, max: 36),
+                    height: 1.05,
+                  ),
+                ),
+                SizedBox(height: context.rs(4, min: 3, max: 6)),
+                Text(
+                  '$resultCount fixture${resultCount != 1 ? 's' : ''} · AI analysis available',
+                  style: AppTextStyles.body(color: AppColors.textSecondary)
+                      .copyWith(fontSize: context.rs(13, min: 12, max: 15)),
+                ),
+              ],
+            ),
           ),
-        ),
-        // Search toggle button
-        _IconBtn(
-          icon: searchOpen ? Icons.close_rounded : Icons.search_rounded,
-          active: searchOpen,
-          onTap: onToggleSearch,
-        ),
-      ],
+          SizedBox(width: context.rs(10, min: 8, max: 12)),
+          // Search toggle button
+          _IconBtn(
+            icon: searchOpen ? Icons.close_rounded : Icons.search_rounded,
+            active: searchOpen,
+            onTap: onToggleSearch,
+          ),
+        ],
+      ),
     );
   }
 }
@@ -694,12 +719,12 @@ class _DateFilterRow extends StatelessWidget {
         ],
         const Spacer(),
         // Live matches badge
-        MatchStatusBadge(
+        const MatchStatusBadge(
           status: MatchStatus.live,
           compact: true,
         ),
         SizedBox(width: context.rs(6, min: 4, max: 8)),
-        MatchStatusBadge(
+        const MatchStatusBadge(
           status: MatchStatus.analysisReady,
           compact: true,
         ),

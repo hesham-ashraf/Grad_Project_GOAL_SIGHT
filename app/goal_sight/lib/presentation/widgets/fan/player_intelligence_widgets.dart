@@ -9,24 +9,23 @@ import '../../../shared/widgets/gs_pitch_painter.dart';
 // ─── Shared helpers ───────────────────────────────────────────────────────────
 
 class _GlassCard extends StatelessWidget {
-  const _GlassCard({required this.child, this.gradient, this.borderColor, this.padding});
+  const _GlassCard({required this.child, this.gradient, this.borderColor});
   final Widget child;
   final Gradient? gradient;
   final Color? borderColor;
-  final EdgeInsets? padding;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        gradient: gradient ?? LinearGradient(
+        gradient: gradient ?? const LinearGradient(
           begin: Alignment.topLeft, end: Alignment.bottomRight,
           colors: [AppColors.surfaceElevated, AppColors.surface],
         ),
         borderRadius: AppRadius.cardLarge,
         border: Border.all(color: borderColor ?? AppColors.outlineSubtle),
       ),
-      padding: padding ?? EdgeInsets.all(context.rs(18, min: 14, max: 22)),
+      padding: EdgeInsets.all(context.rs(18, min: 14, max: 22)),
       child: child,
     );
   }
@@ -307,7 +306,7 @@ class SpeedDistanceCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SectionHeader(
+          const _SectionHeader(
               title: 'Speed & Distance',
               icon: Icons.speed_rounded,
               color: AppColors.accentGreen,
@@ -458,7 +457,7 @@ class FatigueWorkloadCard extends StatelessWidget {
                   children: [
                     _WorkloadStat('Appearances', '${player.appearances}', AppColors.textSecondary),
                     const SizedBox(height: 8),
-                    _WorkloadStat('Avg Minutes', '82', AppColors.textSecondary),
+                    const _WorkloadStat('Avg Minutes', '82', AppColors.textSecondary),
                     const SizedBox(height: 8),
                     _WorkloadStat('Risk Level',
                         fatigueIndex >= 80 ? 'HIGH' :
@@ -678,7 +677,7 @@ class PlayerStrengthsWeaknessesCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SectionHeader(
+          const _SectionHeader(
               title: 'Strengths & Weaknesses',
               icon: Icons.balance_rounded,
               color: AppColors.primaryPurple,
@@ -787,7 +786,7 @@ class PlayerAIInsightsCard extends StatelessWidget {
       _Insight('Pattern Detected',
           '$name consistently peaks in matches following 48+ hour rest periods. Schedule management critical.',
           Icons.pattern_rounded, AppColors.accentCyan),
-      _Insight('Injury Radar',
+      const _Insight('Injury Radar',
           'Sprint speed variance detected in last 3 matches — soft tissue risk elevated. Physical staff alert.',
           Icons.health_and_safety_rounded, AppColors.warning),
       _Insight('Tactical Fit',
@@ -813,7 +812,7 @@ class PlayerAIInsightsCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(children: [
-            _SectionHeader(
+            const _SectionHeader(
                 title: 'AI Player Insights',
                 icon: Icons.auto_awesome_rounded,
                 color: AppColors.primaryPurple,
@@ -911,7 +910,7 @@ class MatchHistoryCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SectionHeader(
+          const _SectionHeader(
               title: 'Match History',
               icon: Icons.history_rounded,
               color: AppColors.primaryBlue,
@@ -1016,7 +1015,7 @@ class PlayerRiskCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SectionHeader(
+          const _SectionHeader(
               title: 'Risk Dashboard',
               icon: Icons.gpp_bad_rounded,
               color: AppColors.danger,

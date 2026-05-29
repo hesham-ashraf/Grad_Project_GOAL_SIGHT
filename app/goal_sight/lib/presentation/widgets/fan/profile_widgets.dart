@@ -131,7 +131,7 @@ class ProfileItem extends StatelessWidget {
         children: [
           Container(
             padding: EdgeInsets.all(context.rs(8, min: 6, max: 10)),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: AppColors.surfaceRaised,
               shape: BoxShape.circle,
             ),

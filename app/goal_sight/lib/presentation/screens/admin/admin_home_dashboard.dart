@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/services/haptic_service.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/responsive.dart';
 import '../../widgets/admin/admin_dashboard_widgets.dart';
 import '../../widgets/admin/tactical_insight_widget.dart';
 import '../../../features/admin/data/admin_mock_data.dart';
@@ -114,32 +115,37 @@ class _AdminHomeDashboardState extends State<AdminHomeDashboard>
         backgroundColor: AppColors.surface,
         strokeWidth: 2.5,
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 4, 20, 120),
+          padding: EdgeInsets.fromLTRB(
+            context.rs(20, min: 16, max: 28),
+            context.rs(4, min: 2, max: 8),
+            context.rs(20, min: 16, max: 28),
+            context.rs(120, min: 100, max: 140),
+          ),
           physics: const BouncingScrollPhysics(
             parent: AlwaysScrollableScrollPhysics(),
           ),
         children: [
           // 0 — Hero Header
           _reveal(0, const AdminDashboardHero()),
-          const SizedBox(height: 20),
+          SizedBox(height: context.rs(20, min: 16, max: 26)),
 
           // 1 — Tactical Analytics
           _reveal(1, const AdminTacticalAnalyticsSection()),
-          const SizedBox(height: 20),
+          SizedBox(height: context.rs(20, min: 16, max: 26)),
 
           // 2 — Squad Condition
           _reveal(2, const AdminSquadConditionSection()),
-          const SizedBox(height: 20),
+          SizedBox(height: context.rs(20, min: 16, max: 26)),
 
           // 3 — Quick Actions
           _reveal(3, AdminQuickActionsSection(
             onAddManager: _showAddManagerSheet,
           )),
-          const SizedBox(height: 20),
+          SizedBox(height: context.rs(20, min: 16, max: 26)),
 
           // 4 — Activity Feed
           _reveal(4, const AdminActivityFeedSection()),
-          const SizedBox(height: 20),
+          SizedBox(height: context.rs(20, min: 16, max: 26)),
 
           // 5 — AI Tactical Insights
           _reveal(5, Column(
@@ -149,23 +155,31 @@ class _AdminHomeDashboardState extends State<AdminHomeDashboard>
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text('AI Tactical Insights',
-                      style: AppTextStyles.title(color: Colors.white).copyWith(fontSize: 16)),
+                      style: AppTextStyles.title(color: AppColors.textPrimary).copyWith(
+                        fontSize: context.sp(16, min: 14, max: 18),
+                      )),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: context.rs(8, min: 6, max: 10),
+                      vertical: context.rs(3, min: 2, max: 5),
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.accentCyan.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(AppRadius.pill),
+                      borderRadius: AppRadius.chip,
+                      border: Border.all(color: AppColors.accentCyan.withValues(alpha: 0.3)),
                     ),
                     child: Text('AI Generated',
-                        style: AppTextStyles.caption(color: AppColors.accentCyan).copyWith(fontSize: 10)),
+                        style: AppTextStyles.caption(color: AppColors.accentCyan).copyWith(
+                          fontSize: context.sp(10, min: 9, max: 11),
+                        )),
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: context.rs(12, min: 8, max: 16)),
               ...insights.take(3).map((insight) => TacticalInsightWidget(insight: insight)),
             ],
           )),
-          const SizedBox(height: 20),
+          SizedBox(height: context.rs(20, min: 16, max: 26)),
 
           // 6 — Alerts
           _reveal(6, const AdminAlertsSection()),
@@ -321,11 +335,11 @@ class _SheetField extends StatelessWidget {
             fillColor: AppColors.surfaceRaised,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppRadius.md),
-              borderSide: BorderSide(color: AppColors.outline),
+              borderSide: const BorderSide(color: AppColors.outline),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppRadius.md),
-              borderSide: BorderSide(color: AppColors.outline),
+              borderSide: const BorderSide(color: AppColors.outline),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppRadius.md),

@@ -1,21 +1,20 @@
-/// ---------------------------------------------------------------------------
-/// GoalSight — Clubs Mock Data Provider
-///
-/// Simulates the exact structure returned by the backend API.
-/// To go live: replace [mockClubsProvider] with an AsyncNotifierProvider
-/// that fetches from Supabase and calls [ClubModel.fromJson].
-/// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+//GoalSight — Clubs Mock Data Provider
+//
+//Simulates the exact structure returned by the backend API.
+//To go live: replace [mockClubsProvider] with an AsyncNotifierProvider
+//that fetches from Supabase and calls [ClubModel.fromJson].
+// ---------------------------------------------------------------------------
 
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/theme/app_theme.dart';
-import '../../data/models/club_model.dart';
+import '../core/theme/app_theme.dart';
+import '../data/models/club_model.dart';
 
-/// All clubs. Mirrors GET /api/clubs response shape.
+//All clubs. Mirrors GET /api/clubs response shape.
 final mockClubsProvider = Provider<List<ClubModel>>((ref) => _mockClubs);
 
-/// Single club by ID. Mirrors GET /api/clubs/:id.
+//Single club by ID. Mirrors GET /api/clubs/:id.
 final mockClubByIdProvider = Provider.family<ClubModel?, String>((ref, id) {
   try {
     return _mockClubs.firstWhere((c) => c.id == id);

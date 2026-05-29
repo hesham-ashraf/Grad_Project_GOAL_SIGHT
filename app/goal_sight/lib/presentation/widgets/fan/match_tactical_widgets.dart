@@ -1,4 +1,3 @@
-// ignore_for_file: unused_local_variable
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
@@ -6,7 +5,6 @@ import '../../../data/models/match_analysis_model.dart';
 import '../../../shared/widgets/gs_animated_bar.dart';
 import '../../../shared/widgets/gs_mini_line_chart.dart';
 import '../../../shared/widgets/gs_pitch_painter.dart';
-import 'analysis_widgets.dart';
 
 // ─── Section Header (reused from club_detail_widgets via inline) ──────────────
 class _SectionHeader extends StatelessWidget {
@@ -48,18 +46,17 @@ class _SectionHeader extends StatelessWidget {
 
 // ─── Glassmorphism card ───────────────────────────────────────────────────────
 class _GlassCard extends StatelessWidget {
-  const _GlassCard({required this.child, this.gradient, this.borderColor, this.padding});
+  const _GlassCard({required this.child, this.gradient, this.borderColor});
   final Widget child;
   final Gradient? gradient;
   final Color? borderColor;
-  final EdgeInsets? padding;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         gradient: gradient ??
-            LinearGradient(
+            const LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [AppColors.surfaceElevated, AppColors.surface],
@@ -67,7 +64,7 @@ class _GlassCard extends StatelessWidget {
         borderRadius: AppRadius.cardLarge,
         border: Border.all(color: borderColor ?? AppColors.outlineSubtle),
       ),
-      padding: padding ?? EdgeInsets.all(context.rs(18, min: 14, max: 22)),
+      padding: EdgeInsets.all(context.rs(18, min: 14, max: 22)),
       child: child,
     );
   }
@@ -106,7 +103,7 @@ class TacticalSummaryCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SectionHeader(
+          const _SectionHeader(
               title: 'Tactical Summary',
               icon: Icons.psychology_rounded,
               color: AppColors.primaryPurple,
@@ -123,7 +120,7 @@ class TacticalSummaryCard extends StatelessWidget {
             ],
           ),
           SizedBox(height: context.rs(14, min: 10, max: 18)),
-          Divider(color: AppColors.outlineSubtle),
+          const Divider(color: AppColors.outlineSubtle),
           SizedBox(height: context.rs(14, min: 10, max: 18)),
           // Team identities
           Row(
@@ -232,7 +229,7 @@ class TeamComparisonCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SectionHeader(
+          const _SectionHeader(
               title: 'Team Comparison',
               icon: Icons.compare_arrows_rounded,
               color: AppColors.accentCyan,
@@ -348,7 +345,7 @@ class PossessionChartCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SectionHeader(
+          const _SectionHeader(
               title: 'Possession Analysis',
               icon: Icons.pie_chart_rounded,
               color: AppColors.accentCyan,
@@ -504,7 +501,7 @@ class _PiePainter extends CustomPainter {
     if (total == 0) return;
 
     final homeAngle = (home / total) * 2 * pi * progress;
-    final strokeW = 10.0;
+    const strokeW = 10.0;
 
     canvas.drawArc(
         Rect.fromCircle(center: center, radius: radius),
@@ -558,7 +555,7 @@ class MomentumGraphCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SectionHeader(
+          const _SectionHeader(
               title: 'Match Momentum',
               icon: Icons.trending_up_rounded,
               color: AppColors.warning,
@@ -566,14 +563,14 @@ class MomentumGraphCard extends StatelessWidget {
           SizedBox(height: context.rs(16, min: 12, max: 20)),
 
           // Momentum key events
-          Row(
+          const Row(
             children: [
               _MomentumEvent(minute: '12\'', event: '1st Goal', color: AppColors.accentCyan),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               _MomentumEvent(minute: '38\'', event: 'Equalizer', color: AppColors.danger),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               _MomentumEvent(minute: '67\'', event: '2nd Goal', color: AppColors.accentCyan),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               _MomentumEvent(minute: '88\'', event: 'Penalty', color: AppColors.accentGreen),
             ],
           ),
@@ -686,7 +683,7 @@ class TacticalStrengthsCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SectionHeader(
+          const _SectionHeader(
               title: 'Tactical Strengths',
               icon: Icons.military_tech_rounded,
               color: AppColors.accentGreen),
@@ -797,7 +794,7 @@ class TacticalWeaknessesCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SectionHeader(
+          const _SectionHeader(
               title: 'Tactical Weaknesses',
               icon: Icons.crisis_alert_rounded,
               color: AppColors.danger),
@@ -940,7 +937,7 @@ class AttackZonesCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SectionHeader(
+          const _SectionHeader(
               title: 'Attack Zones',
               icon: Icons.location_on_rounded,
               color: AppColors.primaryBlue,
@@ -1070,7 +1067,7 @@ class CoachRecommendationsCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              _SectionHeader(
+              const _SectionHeader(
                 title: 'Coach Recommendations',
                 icon: Icons.lightbulb_rounded,
                 color: AppColors.accentGreen,
@@ -1227,7 +1224,7 @@ class PlayerImpactCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SectionHeader(
+          const _SectionHeader(
               title: 'Player Impact',
               icon: Icons.bolt_rounded,
               color: AppColors.accentCyan,
@@ -1331,7 +1328,7 @@ class _PlayerImpactRow extends StatelessWidget {
           const SizedBox(width: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
                 color: AppColors.surface, borderRadius: AppRadius.chip),
             child: Text(player.impact,
                 style: AppTextStyles.caption(color: AppColors.textSecondary)
@@ -1373,7 +1370,7 @@ class FatigueAnalysisCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SectionHeader(
+          const _SectionHeader(
               title: 'Fatigue Analysis',
               icon: Icons.battery_alert_rounded,
               color: AppColors.warning,
@@ -1510,7 +1507,7 @@ class RiskAnalysisCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SectionHeader(
+          const _SectionHeader(
               title: 'Risk Intelligence',
               icon: Icons.gpp_bad_rounded,
               color: AppColors.danger,
@@ -1536,7 +1533,7 @@ class RiskAnalysisCard extends StatelessWidget {
           '${criticalPlayers.first.name} fatigue at ${criticalPlayers.first.fatigue}%'));
     }
     if (match.intensity >= 85) {
-      risks.add(_Risk('Fatigue Risk', _Severity.high,
+      risks.add(const _Risk('Fatigue Risk', _Severity.high,
           'High-intensity match — squad recovery period required.'));
     }
     final worstPlayers = players.where((p) => p.isWorst).toList();
@@ -1544,7 +1541,7 @@ class RiskAnalysisCard extends StatelessWidget {
       risks.add(_Risk('Inconsistency Risk', _Severity.medium,
           '${worstPlayers.first.name} underperformed — needs tactical review.'));
     }
-    risks.add(_Risk('Tactical Risk', _Severity.low,
+    risks.add(const _Risk('Tactical Risk', _Severity.low,
         'Over-reliance on Hassan Ali detected across 3 consecutive matches.'));
     return risks;
   }
@@ -1653,7 +1650,7 @@ class HeatmapCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SectionHeader(
+          const _SectionHeader(
               title: 'Movement Heatmaps',
               icon: Icons.thermostat_rounded,
               color: AppColors.primaryBlue,
@@ -1685,9 +1682,9 @@ class HeatmapCard extends StatelessWidget {
         pts.add(HeatmapPoint(isHome ? 0.15 : 0.85, 0.25, 0.9));
         pts.add(HeatmapPoint(isHome ? 0.25 : 0.75, 0.45, 0.7));
       } else if (lz.contains('central') || lz.contains('center')) {
-        pts.add(HeatmapPoint(0.5, 0.35, 0.95));
-        pts.add(HeatmapPoint(0.45, 0.55, 0.75));
-        pts.add(HeatmapPoint(0.55, 0.5, 0.65));
+        pts.add(const HeatmapPoint(0.5, 0.35, 0.95));
+        pts.add(const HeatmapPoint(0.45, 0.55, 0.75));
+        pts.add(const HeatmapPoint(0.55, 0.5, 0.65));
       } else if (lz.contains('right')) {
         pts.add(HeatmapPoint(isHome ? 0.75 : 0.25, 0.3, 0.85));
         pts.add(HeatmapPoint(isHome ? 0.8 : 0.2, 0.5, 0.6));
@@ -1745,7 +1742,7 @@ class FormationCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SectionHeader(
+          const _SectionHeader(
               title: 'Formation & Shape',
               icon: Icons.sports_soccer_rounded,
               color: AppColors.accentGreen,
@@ -1761,7 +1758,7 @@ class FormationCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis),
               Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                       color: AppColors.surface, borderRadius: AppRadius.chip),
                   child: Text('4-3-3',
                       style: AppTextStyles.caption(color: AppColors.textSecondary)
@@ -1870,7 +1867,7 @@ class BirdEyeCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SectionHeader(
+          const _SectionHeader(
               title: 'Bird-Eye Tactical View',
               icon: Icons.satellite_alt_rounded,
               color: AppColors.primaryBlue,
@@ -1984,7 +1981,7 @@ class AIInsightsCard extends StatelessWidget {
         AppColors.accentCyan,
         'Positional',
       ),
-      _AIInsight(
+      const _AIInsight(
         'Midfield Compactness Weakened',
         'Central compactness dropped in the last 20 minutes as fatigue set in — creating exploitable gaps between lines 2 and 3.',
         Icons.compress_rounded,
@@ -2021,7 +2018,7 @@ class AIInsightsCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              _SectionHeader(
+              const _SectionHeader(
                 title: 'AI Match Insights',
                 icon: Icons.auto_awesome_rounded,
                 color: AppColors.primaryPurple,

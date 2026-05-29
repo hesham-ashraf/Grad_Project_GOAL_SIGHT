@@ -7,7 +7,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
 import '../../../data/models/match_analysis_model.dart';
 import '../manager_upload_mock_data.dart';
-import '../upload_job_model.dart';
+import '../../../data/models/upload_job_model.dart';
 import '../widgets/ai_processing_widgets.dart';
 import '../widgets/upload_widgets.dart';
 
@@ -136,13 +136,13 @@ class _UploadMatchScreenState extends State<UploadMatchScreen>
 
   void _showValidationSnackBar() {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
+      const SnackBar(
         content: Row(
           children: [
             Icon(Icons.warning_amber_rounded,
                 color: AppColors.warning, size: 18),
-            const SizedBox(width: 10),
-            const Text('Please fill in all required fields.'),
+            SizedBox(width: 10),
+            Text('Please fill in all required fields.'),
           ],
         ),
         backgroundColor: AppColors.surfaceElevated,
@@ -169,7 +169,7 @@ class _UploadMatchScreenState extends State<UploadMatchScreen>
   void _advanceStage() {
     if (!mounted) return;
 
-    final stages = ProcessingStage.values;
+    const stages = ProcessingStage.values;
     _stageIndex++;
 
     if (_stageIndex >= stages.length) {
@@ -197,7 +197,7 @@ class _UploadMatchScreenState extends State<UploadMatchScreen>
     // Animate progress toward target over the stage duration
     const stageDurationMs = 2400; // ~2.4s per stage
     const tickMs = 80;
-    final ticks = stageDurationMs ~/ tickMs;
+    const ticks = stageDurationMs ~/ tickMs;
     final startProgress = _overallProgress;
     int tick = 0;
 
@@ -418,7 +418,7 @@ class _UploadMatchScreenState extends State<UploadMatchScreen>
     return '$dominant dominated with a $style approach. '
         '${analysis.homeTeam} avg rating: $homeAR · '
         '${analysis.awayTeam} avg rating: $awayAR. '
-        '${analysis.recommendations.isNotEmpty ? analysis.recommendations.first + "." : ""}';
+        '${analysis.recommendations.isNotEmpty ? '${analysis.recommendations.first}.' : ''}';
   }
 }
 
@@ -514,7 +514,7 @@ class _MatchDetailsStep extends StatelessWidget {
                   AppColors.textPrimary.withValues(alpha: 0.5),
               padding: EdgeInsets.symmetric(
                   vertical: context.rs(15, min: 12, max: 18)),
-              shape: RoundedRectangleBorder(
+              shape: const RoundedRectangleBorder(
                   borderRadius: AppRadius.button),
               elevation: 0,
             ),
@@ -574,7 +574,7 @@ class _TopBar extends StatelessWidget {
                   color: AppColors.surfaceElevated,
                   border: Border.all(color: AppColors.outlineSubtle),
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.arrow_back_rounded,
                   size: 18,
                   color: AppColors.textSecondary,
@@ -605,7 +605,7 @@ class _TopBar extends StatelessWidget {
                 color: AppColors.surfaceElevated,
                 border: Border.all(color: AppColors.outlineSubtle),
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.history_rounded,
                 size: 18,
                 color: AppColors.textSecondary,
@@ -684,7 +684,7 @@ class _StepDot extends StatelessWidget {
     if (isCompleted) {
       dotColor = AppColors.primaryPurple;
       textColor = AppColors.textSecondary;
-      dotChild = Icon(Icons.check_rounded, size: 12, color: Colors.white);
+      dotChild = const Icon(Icons.check_rounded, size: 12, color: Colors.white);
     } else if (isCurrent) {
       dotColor = AppColors.primaryPurple;
       textColor = AppColors.textPrimary;
@@ -701,7 +701,7 @@ class _StepDot extends StatelessWidget {
       textColor = AppColors.textMuted;
       dotChild = Text(
         '$index',
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.w600,
           color: AppColors.textMuted,

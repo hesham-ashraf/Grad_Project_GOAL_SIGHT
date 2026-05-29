@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 import '../../../data/models/match_model.dart';
 import '../../../core/utils/responsive.dart';
@@ -56,9 +56,9 @@ class MatchTile extends StatelessWidget {
                 Container(
                   padding: context.padSym(h: 8, v: 4),
                   decoration: BoxDecoration(
-                    color: badgeColor.withOpacity(0.15),
+                    color: badgeColor.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(context.rs(24, min: 16, max: 28)),
-                    border: Border.all(color: badgeColor.withOpacity(0.45)),
+                    border: Border.all(color: badgeColor.withValues(alpha: 0.45)),
                   ),
                   child: Text(
                     status.toUpperCase(),

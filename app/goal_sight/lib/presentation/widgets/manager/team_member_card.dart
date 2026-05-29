@@ -76,7 +76,7 @@ class TeamMemberCard extends StatelessWidget {
             Text(
               '${player.position} • ${player.age} yrs',
               style: TextStyle(
-                color: Color(0xFF9DB0D8),
+                color: const Color(0xFF9DB0D8),
                 fontSize: context.sp(12, min: 10, max: 15),
               ),
             ),

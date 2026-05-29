@@ -5,7 +5,7 @@ import '../../../core/services/haptic_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
 import '../upload_history_mock_data.dart';
-import '../upload_job_model.dart';
+import '../../../data/models/upload_job_model.dart';
 import '../widgets/upload_history_widgets.dart';
 
 class UploadHistoryScreen extends StatefulWidget {
@@ -114,6 +114,7 @@ class _UploadHistoryScreenState extends State<UploadHistoryScreen>
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: SafeArea(
+        bottom: false,
         child: Column(
           children: [
             // ── Top bar ──
@@ -293,7 +294,7 @@ class _HistoryTopBar extends StatelessWidget {
               color: AppColors.surfaceElevated,
               border: Border.all(color: AppColors.outlineSubtle),
             ),
-            child: Icon(
+            child: const Icon(
               Icons.arrow_back_rounded,
               size: 18,
               color: AppColors.textSecondary,
@@ -321,7 +322,7 @@ class _HistoryTopBar extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.history_rounded,
+              const Icon(Icons.history_rounded,
                   size: 13, color: AppColors.primaryPurple),
               const SizedBox(width: 5),
               Text(
@@ -417,9 +418,9 @@ class _JobDetailSheet extends StatelessWidget {
 
     return Container(
       padding: EdgeInsets.fromLTRB(hp, 20, hp, 32),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: AppColors.surfaceElevated,
-        borderRadius: const BorderRadius.vertical(
+        borderRadius: BorderRadius.vertical(
           top: Radius.circular(24),
         ),
         border: Border(
@@ -467,7 +468,7 @@ class _JobDetailSheet extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          Divider(height: 1, color: AppColors.outlineSubtle),
+          const Divider(height: 1, color: AppColors.outlineSubtle),
           const SizedBox(height: 16),
 
           // Detail rows
@@ -519,7 +520,7 @@ class _JobDetailSheet extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.auto_awesome_rounded,
+                      const Icon(Icons.auto_awesome_rounded,
                           size: 14,
                           color: AppColors.primaryPurple),
                       const SizedBox(width: 6),
@@ -557,7 +558,7 @@ class _JobDetailSheet extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.error_outline_rounded,
+                      const Icon(Icons.error_outline_rounded,
                           size: 14, color: AppColors.danger),
                       const SizedBox(width: 6),
                       Text(
@@ -591,7 +592,7 @@ class _JobDetailSheet extends StatelessWidget {
                 foregroundColor: AppColors.textPrimary,
                 padding:
                     const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
+                shape: const RoundedRectangleBorder(
                     borderRadius: AppRadius.button),
                 elevation: 0,
               ),
@@ -609,7 +610,7 @@ class _JobDetailSheet extends StatelessWidget {
                 foregroundColor: AppColors.textPrimary,
                 padding:
                     const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
+                shape: const RoundedRectangleBorder(
                     borderRadius: AppRadius.button),
                 elevation: 0,
               ),

@@ -158,8 +158,26 @@ Located in `lib/shared/animations/`:
 - `GsSuccessOverlay` — full-screen animated success overlay; call `GsSuccessOverlay.show(context, type: GsSuccessType.uploadComplete)`; `GsSuccessSnackBar.show()` for lightweight variant
 - `GsAiLoader` — futuristic AI processing overlay with rotating rings, scan lines, stage timeline; use `GsAiStageCard` for compact inline version
 - `GsInsightReveal` — staggered AI insight list reveal with fade+slide per item
+- `GsShimmer` — shimmer loading animation wrapper; convenience constructors: `GsShimmer.bar(width, height)`, `GsShimmer.line(height)`, `GsShimmer.circle(size)`, `GsShimmer.card(height, radius)`; convenience layouts: `GsShimmerListItem`, `GsShimmerStatCard`, `GsShimmerPage`
 
 `HapticService` in `lib/core/services/haptic_service.dart` — centralised haptic patterns: `selection()`, `light()`, `medium()`, `success()`, `error()`, `refresh()`, `aiReveal()`, `longPress()`.
+
+### Auth screen components
+
+All auth screens (`login`, `register`, `forgot_password`, `email_verification`) use the **dark premium glassmorphism** aesthetic — same `#050816` background as the rest of the app. Do **not** wrap auth screens with `Theme(data: AppTheme.lightTheme(), ...)`.
+
+Shared auth widgets in `lib/presentation/widgets/auth_card_widgets.dart`:
+
+- `AuthBackground` — dark `Scaffold` + gradient orbs (wrap each auth screen's return value)
+- `AuthCard` — glassmorphism container (`AppColors.surfaceElevated` + outline border + shadow)
+- `AuthGradientTitle` — brand gradient headline via `ShaderMask`
+- `AuthErrorBox` — styled error container (danger border + icon)
+- `AuthSuccessBox` — styled success container (green border + icon)
+- `AuthDividerLabel` — horizontal divider with center text
+- `DemoLoginSection` — quick role-login chips (Fan / Manager / Admin)
+- `PasswordToggleIcon` — eye icon for password visibility toggle
+
+`GoalSightLogo` widget — use `showSubtitle: false` on auth screens and splash (the screens provide their own tagline text below the logo). The logo always renders the icon + "GOALSIGHT" gradient text. The optional subtitle ("Football Analytics Platform") is for standalone brand moments only.
 
 ### Supabase / backend
 

@@ -69,7 +69,7 @@ class AnalysisOverviewCard extends StatelessWidget {
           SizedBox(height: context.rs(16, min: 12, max: 20)),
           Container(
             padding: EdgeInsets.all(context.rs(14, min: 12, max: 16)),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: AppColors.surface,
               borderRadius: AppRadius.card,
             ),
@@ -212,7 +212,7 @@ class KeyMomentsCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          AnalysisSectionHeader(title: 'Key Moments', icon: Icons.timeline_rounded, color: AppColors.warning),
+          const AnalysisSectionHeader(title: 'Key Moments', icon: Icons.timeline_rounded, color: AppColors.warning),
           SizedBox(height: context.rs(14, min: 10, max: 18)),
           ...moments.asMap().entries.map((e) => Padding(
             padding: const EdgeInsets.only(bottom: 10),
@@ -336,11 +336,11 @@ class TacticalAnalysisCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          AnalysisSectionHeader(title: 'Tactical Analysis', icon: Icons.analytics_rounded, color: AppColors.primaryPurple),
+          const AnalysisSectionHeader(title: 'Tactical Analysis', icon: Icons.analytics_rounded, color: AppColors.primaryPurple),
           SizedBox(height: context.rs(16, min: 12, max: 20)),
           _TeamTactics(team: match.homeAnalysis, color: AppColors.accentCyan),
           SizedBox(height: context.rs(14, min: 10, max: 18)),
-          Divider(color: AppColors.outlineSubtle),
+          const Divider(color: AppColors.outlineSubtle),
           SizedBox(height: context.rs(14, min: 10, max: 18)),
           _TeamTactics(team: match.awayAnalysis, color: AppColors.primaryPurple),
         ],
@@ -561,7 +561,7 @@ class RecommendationsCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          AnalysisSectionHeader(title: 'AI Recommendations', icon: Icons.lightbulb_rounded, color: AppColors.accentGreen),
+          const AnalysisSectionHeader(title: 'AI Recommendations', icon: Icons.lightbulb_rounded, color: AppColors.accentGreen),
           SizedBox(height: context.rs(14, min: 10, max: 18)),
           ...items.asMap().entries.map((e) => Padding(
             padding: const EdgeInsets.only(bottom: 12),

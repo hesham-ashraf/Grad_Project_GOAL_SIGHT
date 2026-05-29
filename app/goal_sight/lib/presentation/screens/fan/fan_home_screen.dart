@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/services/haptic_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
-import '../../state_management/app_providers.dart';
+import '../../../providers/app_providers.dart';
 import '../../widgets/fan/ai_recommendations_section.dart';
 import '../../widgets/fan/fan_home_widgets.dart';
 import '../../widgets/fan/live_indicators.dart';
@@ -213,7 +213,7 @@ class _FanHomeScreenState extends ConsumerState<FanHomeScreen>
                       _Reveal(
                         opacity: _liveFade,
                         position: _liveSlide,
-                        child: LiveMatchBanner(
+                        child: const LiveMatchBanner(
                           liveMatchCount: 1,
                           matchDescription: 'Storm United vs Delta FC — Champions League',
                         ),
@@ -240,7 +240,7 @@ class _FanHomeScreenState extends ConsumerState<FanHomeScreen>
                       _Reveal(
                         opacity: _playersFade,
                         position: _playersSlide,
-                        child: _PlayersSection(players: _topPlayers),
+                        child: const _PlayersSection(players: _topPlayers),
                       ),
                       SizedBox(height: gap),
 
@@ -248,7 +248,7 @@ class _FanHomeScreenState extends ConsumerState<FanHomeScreen>
                       _Reveal(
                         opacity: _statsFade,
                         position: _statsSlide,
-                        child: _QuickStatsSection(stats: _quickStats),
+                        child: const _QuickStatsSection(stats: _quickStats),
                       ),
                       SizedBox(height: gap),
 

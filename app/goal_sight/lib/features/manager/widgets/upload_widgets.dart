@@ -216,7 +216,7 @@ class _UploadDropZoneState extends State<UploadDropZone>
               padding: EdgeInsets.symmetric(
                 vertical: context.rs(14, min: 12, max: 18),
               ),
-              shape: RoundedRectangleBorder(
+              shape: const RoundedRectangleBorder(
                 borderRadius: AppRadius.button,
               ),
               elevation: 0,
@@ -249,21 +249,21 @@ class _UploadDropZoneState extends State<UploadDropZone>
 
   List<Widget> _buildInfoCards(BuildContext context) {
     return [
-      _InfoTile(
+      const _InfoTile(
         icon: Icons.schedule_rounded,
         color: AppColors.primaryBlue,
         title: 'Processing Time',
         subtitle: '2–5 min per match',
       ),
       SizedBox(height: context.isPhone ? 10 : 0),
-      _InfoTile(
+      const _InfoTile(
         icon: Icons.auto_awesome_rounded,
         color: AppColors.primaryPurple,
         title: 'AI Analysis',
         subtitle: '8 intelligent stages',
       ),
       SizedBox(height: context.isPhone ? 10 : 0),
-      _InfoTile(
+      const _InfoTile(
         icon: Icons.analytics_rounded,
         color: AppColors.accentGreen,
         title: 'Full Report',
@@ -448,7 +448,7 @@ class SelectedFileCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(10),
               color: AppColors.accentGreen.withValues(alpha: 0.12),
             ),
-            child: Icon(
+            child: const Icon(
               Icons.video_file_rounded,
               color: AppColors.accentGreen,
               size: 22,
@@ -469,7 +469,7 @@ class SelectedFileCard extends StatelessWidget {
                 const SizedBox(height: 2),
                 Row(
                   children: [
-                    Icon(Icons.check_circle_rounded,
+                    const Icon(Icons.check_circle_rounded,
                         size: 12, color: AppColors.accentGreen),
                     const SizedBox(width: 4),
                     Text(
@@ -490,7 +490,7 @@ class SelectedFileCard extends StatelessWidget {
                 shape: BoxShape.circle,
                 color: AppColors.danger.withValues(alpha: 0.12),
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.close_rounded,
                 size: 16,
                 color: AppColors.danger,
@@ -563,7 +563,7 @@ class _TeamSelectionFormState extends State<TeamSelectionForm> {
           // VS divider
           Row(
             children: [
-              Expanded(
+              const Expanded(
                 child: Divider(
                   color: AppColors.outlineSubtle,
                   height: 1,
@@ -587,7 +587,7 @@ class _TeamSelectionFormState extends State<TeamSelectionForm> {
                   ),
                 ),
               ),
-              Expanded(
+              const Expanded(
                 child: Divider(
                   color: AppColors.outlineSubtle,
                   height: 1,
@@ -683,7 +683,7 @@ class _MatchMetadataFormState extends State<MatchMetadataForm> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.dark(
+            colorScheme: const ColorScheme.dark(
               primary: AppColors.primaryPurple,
               onPrimary: AppColors.textPrimary,
               surface: AppColors.surfaceElevated,
@@ -856,7 +856,7 @@ class UploadConfirmationCard extends StatelessWidget {
                   shape: BoxShape.circle,
                   color: AppColors.primaryPurple.withValues(alpha: 0.15),
                 ),
-                child: Icon(Icons.auto_awesome_rounded,
+                child: const Icon(Icons.auto_awesome_rounded,
                     size: 20, color: AppColors.primaryPurple),
               ),
               const SizedBox(width: 12),
@@ -895,7 +895,7 @@ class UploadConfirmationCard extends StatelessWidget {
               padding: EdgeInsets.symmetric(
                 vertical: context.rs(15, min: 12, max: 18),
               ),
-              shape: RoundedRectangleBorder(
+              shape: const RoundedRectangleBorder(
                 borderRadius: AppRadius.button,
               ),
               elevation: 0,
@@ -913,14 +913,14 @@ class UploadConfirmationCard extends StatelessWidget {
             label: const Text('Edit Details'),
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.textSecondary,
-              side: BorderSide(
+              side: const BorderSide(
                 color: AppColors.outline,
                 width: 1.5,
               ),
               padding: EdgeInsets.symmetric(
                 vertical: context.rs(13, min: 10, max: 16),
               ),
-              shape: RoundedRectangleBorder(
+              shape: const RoundedRectangleBorder(
                 borderRadius: AppRadius.button,
               ),
             ),
@@ -980,7 +980,7 @@ class UploadFailedCard extends StatelessWidget {
                   shape: BoxShape.circle,
                   color: AppColors.danger.withValues(alpha: 0.12),
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.error_outline_rounded,
                   size: 34,
                   color: AppColors.danger,
@@ -994,7 +994,7 @@ class UploadFailedCard extends StatelessWidget {
               const SizedBox(height: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   borderRadius: AppRadius.card,
                   color: AppColors.surfaceElevated,
                 ),
@@ -1028,7 +1028,7 @@ class UploadFailedCard extends StatelessWidget {
                         shape: BoxShape.circle,
                         color: AppColors.warning.withValues(alpha: 0.15),
                       ),
-                      child: Icon(
+                      child: const Icon(
                         Icons.lightbulb_outline_rounded,
                         size: 11,
                         color: AppColors.warning,
@@ -1073,7 +1073,7 @@ class UploadFailedCard extends StatelessWidget {
               foregroundColor: AppColors.textPrimary,
               padding: EdgeInsets.symmetric(
                   vertical: context.rs(14, min: 12, max: 18)),
-              shape: RoundedRectangleBorder(borderRadius: AppRadius.button),
+              shape: const RoundedRectangleBorder(borderRadius: AppRadius.button),
               elevation: 0,
             ),
           ),
@@ -1089,10 +1089,10 @@ class UploadFailedCard extends StatelessWidget {
             label: const Text('Edit Match Details'),
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.textSecondary,
-              side: BorderSide(color: AppColors.outline, width: 1.5),
+              side: const BorderSide(color: AppColors.outline, width: 1.5),
               padding: EdgeInsets.symmetric(
                   vertical: context.rs(13, min: 10, max: 16)),
-              shape: RoundedRectangleBorder(borderRadius: AppRadius.button),
+              shape: const RoundedRectangleBorder(borderRadius: AppRadius.button),
             ),
           ),
         ),
@@ -1149,7 +1149,7 @@ class _FormSection extends StatelessWidget {
               ],
             ),
           ),
-          Divider(height: 1, color: AppColors.outlineSubtle),
+          const Divider(height: 1, color: AppColors.outlineSubtle),
           Padding(
             padding: const EdgeInsets.all(16),
             child: child,
@@ -1206,11 +1206,11 @@ class _GsTextField extends StatelessWidget {
               horizontal: 14,
               vertical: 12,
             ),
-            border: OutlineInputBorder(
+            border: const OutlineInputBorder(
               borderRadius: AppRadius.input,
               borderSide: BorderSide(color: AppColors.outline, width: 1),
             ),
-            enabledBorder: OutlineInputBorder(
+            enabledBorder: const OutlineInputBorder(
               borderRadius: AppRadius.input,
               borderSide: BorderSide(color: AppColors.outline, width: 1),
             ),
@@ -1258,7 +1258,7 @@ class _GsDropdownField<T> extends StatelessWidget {
           onChanged: onChanged,
           style: AppTextStyles.body(color: AppColors.textPrimary),
           dropdownColor: AppColors.surfaceElevated,
-          icon: Icon(Icons.keyboard_arrow_down_rounded,
+          icon: const Icon(Icons.keyboard_arrow_down_rounded,
               color: AppColors.textMuted, size: 20),
           decoration: InputDecoration(
             prefixIcon:
@@ -1269,15 +1269,15 @@ class _GsDropdownField<T> extends StatelessWidget {
               horizontal: 14,
               vertical: 12,
             ),
-            border: OutlineInputBorder(
+            border: const OutlineInputBorder(
               borderRadius: AppRadius.input,
               borderSide: BorderSide(color: AppColors.outline, width: 1),
             ),
-            enabledBorder: OutlineInputBorder(
+            enabledBorder: const OutlineInputBorder(
               borderRadius: AppRadius.input,
               borderSide: BorderSide(color: AppColors.outline, width: 1),
             ),
-            focusedBorder: OutlineInputBorder(
+            focusedBorder: const OutlineInputBorder(
               borderRadius: AppRadius.input,
               borderSide:
                   BorderSide(color: AppColors.accentCyan, width: 1.5),
@@ -1337,7 +1337,7 @@ class _GsReadonlyField extends StatelessWidget {
                 style: AppTextStyles.body(color: AppColors.textPrimary),
               ),
               const Spacer(),
-              Icon(Icons.edit_calendar_rounded,
+              const Icon(Icons.edit_calendar_rounded,
                   size: 16, color: AppColors.textMuted),
             ],
           ),
@@ -1394,7 +1394,7 @@ class _ConfirmSection extends StatelessWidget {
               ],
             ),
           ),
-          Divider(height: 1, color: AppColors.outlineSubtle),
+          const Divider(height: 1, color: AppColors.outlineSubtle),
           Padding(
             padding: const EdgeInsets.all(14),
             child: Column(

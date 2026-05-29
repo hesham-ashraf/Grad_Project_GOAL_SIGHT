@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/constants/app_roles.dart';
 import '../../../core/utils/responsive.dart';
-import '../../state_management/app_providers.dart';
+import '../../../providers/app_providers.dart';
 import '../../widgets/fan/profile_widgets.dart';
 import '../../widgets/fan/fan_profile_advanced_widgets.dart';
 

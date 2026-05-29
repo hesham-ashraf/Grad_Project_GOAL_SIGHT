@@ -1,11 +1,11 @@
-/// ---------------------------------------------------------------------------
-/// GoalSight — Match Analysis Models
-///
-/// These models mirror the exact JSON shape produced by the AI backend.
-/// When Supabase is connected, swap the mock provider with a real repository
-/// and call [MatchAnalysisModel.fromJson] / [PlayerModel.fromJson], etc.
-/// Zero UI changes will be required.
-/// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// GoalSight — Match Analysis Models
+//
+// These models mirror the exact JSON shape produced by the AI backend.
+// When Supabase is connected, swap the mock provider with a real repository
+// and call [MatchAnalysisModel.fromJson] / [PlayerModel.fromJson], etc.
+// Zero UI changes will be required.
+// ---------------------------------------------------------------------------
 
 // ─── Player ──────────────────────────────────────────────────────────────────
 

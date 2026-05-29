@@ -1,10 +1,11 @@
-import 'dart:ui';
+﻿import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
-import '../../state_management/app_providers.dart';
+import '../../../providers/app_providers.dart';
 import '../../widgets/fan/player_intelligence_widgets.dart';
 
 class PlayerProfileScreen extends ConsumerStatefulWidget {
@@ -194,7 +195,7 @@ class _PlayerProfileScreenState extends ConsumerState<PlayerProfileScreen>
               child: IconButton(
                 icon: const Icon(Icons.arrow_back_ios_new_rounded,
                     color: AppColors.textPrimary, size: 18),
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed: () => context.pop(),
               ),
             ),
           ),
@@ -368,3 +369,4 @@ class _PositionBadgeCard extends StatelessWidget {
     );
   }
 }
+

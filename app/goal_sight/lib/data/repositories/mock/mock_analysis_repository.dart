@@ -19,7 +19,7 @@ final class MockAnalysisRepository implements IAnalysisRepository {
 
   static final List<MatchAnalysisModel> _analyses = [
     // ma_001 — GoalSight FC 3-1 City Panthers (PL, GW38)
-    MatchAnalysisModel(
+    const MatchAnalysisModel(
       matchId: 'ma_001',
       homeTeam: 'GoalSight FC',
       awayTeam: 'City Panthers',
@@ -29,42 +29,42 @@ final class MockAnalysisRepository implements IAnalysisRepository {
       intensity: 88,
       highlightText: 'Title decider thriller',
       players: [
-        const PlayerModel(
+        PlayerModel(
           id: 'gs_p7', name: 'Erling Haaland', position: 'ST',
           rating: 9.4, fatigue: 58, performanceStatus: PerformanceStatus.excellent,
           insight: 'Hat-trick hero — clinical in all three chances',
           contribution: ContributionType.attack, impact: 'Game Changer',
           goals: 3, assists: 0, tackles: 1, keyPasses: 2, isMOTM: true,
         ),
-        const PlayerModel(
+        PlayerModel(
           id: 'gs_p2', name: 'Kevin De Bruyne', position: 'CM',
           rating: 9.3, fatigue: 40, performanceStatus: PerformanceStatus.excellent,
           insight: 'Orchestrated every attack — 3 key assists',
           contribution: ContributionType.balanced, impact: 'Architect',
           goals: 1, assists: 3, tackles: 6, keyPasses: 9,
         ),
-        const PlayerModel(
+        PlayerModel(
           id: 'gs_p1', name: 'Mo Salah', position: 'RW',
           rating: 9.1, fatigue: 44, performanceStatus: PerformanceStatus.excellent,
           insight: 'Relentless pressing and pace destabilised defence',
           contribution: ContributionType.attack, impact: 'Disruptor',
           goals: 2, assists: 1, tackles: 4, keyPasses: 5,
         ),
-        const PlayerModel(
+        PlayerModel(
           id: 'gs_p3', name: 'Virgil van Dijk', position: 'CB',
           rating: 8.9, fatigue: 42, performanceStatus: PerformanceStatus.excellent,
           insight: 'Aerial dominance neutralised Panthers attack',
           contribution: ContributionType.defense, impact: 'Wall',
           goals: 0, assists: 1, tackles: 9, keyPasses: 2,
         ),
-        const PlayerModel(
+        PlayerModel(
           id: 'cp_p2', name: 'Jamal Wright', position: 'LW',
           rating: 8.9, fatigue: 52, performanceStatus: PerformanceStatus.excellent,
           insight: 'Brilliant goal — beat 2 defenders before finish',
           contribution: ContributionType.attack, impact: 'Threat',
           goals: 1, assists: 1, tackles: 3, keyPasses: 4,
         ),
-        const PlayerModel(
+        PlayerModel(
           id: 'cp_p1', name: 'Rodri Manzano', position: 'CDM',
           rating: 7.8, fatigue: 55, performanceStatus: PerformanceStatus.good,
           insight: 'Couldn\'t stem the tide despite high interception count',
@@ -72,7 +72,7 @@ final class MockAnalysisRepository implements IAnalysisRepository {
           goals: 0, assists: 0, tackles: 12, keyPasses: 3, isWorst: true,
         ),
       ],
-      homeAnalysis: const TeamAnalysisModel(
+      homeAnalysis: TeamAnalysisModel(
         teamName: 'GoalSight FC',
         possession: 58,
         style: 'High-Press',
@@ -83,7 +83,7 @@ final class MockAnalysisRepository implements IAnalysisRepository {
         topPlayers: ['gs_p7', 'gs_p2', 'gs_p1'],
         worstPlayers: [],
       ),
-      awayAnalysis: const TeamAnalysisModel(
+      awayAnalysis: TeamAnalysisModel(
         teamName: 'City Panthers',
         possession: 42,
         style: 'Positional Play',
@@ -94,7 +94,7 @@ final class MockAnalysisRepository implements IAnalysisRepository {
         topPlayers: ['cp_p2'],
         worstPlayers: ['cp_p1'],
       ),
-      summary: const MatchSummaryModel(
+      summary: MatchSummaryModel(
         dominantTeam: 'GoalSight FC',
         homeAvgRating: 9.0,
         awayAvgRating: 7.8,
@@ -119,7 +119,7 @@ final class MockAnalysisRepository implements IAnalysisRepository {
     ),
 
     // ma_002 — Falcons United 1-2 GoalSight FC
-    MatchAnalysisModel(
+    const MatchAnalysisModel(
       matchId: 'ma_002',
       homeTeam: 'Falcons United',
       awayTeam: 'GoalSight FC',
@@ -129,35 +129,35 @@ final class MockAnalysisRepository implements IAnalysisRepository {
       intensity: 72,
       highlightText: 'Away win seals momentum',
       players: [
-        const PlayerModel(
+        PlayerModel(
           id: 'gs_p7', name: 'Erling Haaland', position: 'ST',
           rating: 9.0, fatigue: 48, performanceStatus: PerformanceStatus.excellent,
           insight: 'Two goals from three shots — ruthless',
           contribution: ContributionType.attack, impact: 'Game Changer',
           goals: 2, assists: 1, tackles: 2, keyPasses: 1, isMOTM: true,
         ),
-        const PlayerModel(
+        PlayerModel(
           id: 'f_p2', name: 'Jake Morrison', position: 'ST',
           rating: 8.1, fatigue: 62, performanceStatus: PerformanceStatus.good,
           insight: 'Lone goal from brilliant first touch',
           contribution: ContributionType.attack, impact: 'Reliable',
           goals: 2, assists: 0, tackles: 2, keyPasses: 3,
         ),
-        const PlayerModel(
+        PlayerModel(
           id: 'f_p3', name: 'Carlos Diaz', position: 'CM',
           rating: 7.8, fatigue: 55, performanceStatus: PerformanceStatus.good,
           insight: 'Energetic performance but lacking end-product',
           contribution: ContributionType.balanced, impact: 'Solid',
           goals: 0, assists: 1, tackles: 8, keyPasses: 5,
         ),
-        const PlayerModel(
+        PlayerModel(
           id: 'gs_p2', name: 'Kevin De Bruyne', position: 'CM',
           rating: 9.0, fatigue: 36, performanceStatus: PerformanceStatus.excellent,
           insight: 'Pinpoint assists — controlled tempo throughout',
           contribution: ContributionType.balanced, impact: 'Maestro',
           goals: 0, assists: 2, tackles: 7, keyPasses: 10,
         ),
-        const PlayerModel(
+        PlayerModel(
           id: 'f_p1', name: 'Marcus Webb', position: 'GK',
           rating: 6.8, fatigue: 48, performanceStatus: PerformanceStatus.poor,
           insight: 'Positioning error led to first goal',
@@ -165,7 +165,7 @@ final class MockAnalysisRepository implements IAnalysisRepository {
           goals: 0, assists: 0, tackles: 0, keyPasses: 0, isWorst: true,
         ),
       ],
-      homeAnalysis: const TeamAnalysisModel(
+      homeAnalysis: TeamAnalysisModel(
         teamName: 'Falcons United',
         possession: 46,
         style: 'Counter-Attack',
@@ -176,7 +176,7 @@ final class MockAnalysisRepository implements IAnalysisRepository {
         topPlayers: ['f_p2'],
         worstPlayers: ['f_p1'],
       ),
-      awayAnalysis: const TeamAnalysisModel(
+      awayAnalysis: TeamAnalysisModel(
         teamName: 'GoalSight FC',
         possession: 54,
         style: 'High-Press',
@@ -187,7 +187,7 @@ final class MockAnalysisRepository implements IAnalysisRepository {
         topPlayers: ['gs_p7', 'gs_p2'],
         worstPlayers: [],
       ),
-      summary: const MatchSummaryModel(
+      summary: MatchSummaryModel(
         dominantTeam: 'GoalSight FC',
         homeAvgRating: 7.2,
         awayAvgRating: 8.8,
@@ -210,7 +210,7 @@ final class MockAnalysisRepository implements IAnalysisRepository {
     ),
 
     // ma_003 — GoalSight FC 2-0 Red Lions FC
-    MatchAnalysisModel(
+    const MatchAnalysisModel(
       matchId: 'ma_003',
       homeTeam: 'GoalSight FC',
       awayTeam: 'Red Lions FC',
@@ -219,28 +219,28 @@ final class MockAnalysisRepository implements IAnalysisRepository {
       status: 'FT',
       intensity: 65,
       players: [
-        const PlayerModel(
+        PlayerModel(
           id: 'gs_p7', name: 'Erling Haaland', position: 'ST',
           rating: 9.3, fatigue: 50, performanceStatus: PerformanceStatus.excellent,
           insight: 'Brace from two clinical finishes',
           contribution: ContributionType.attack, impact: 'Game Changer',
           goals: 3, assists: 0, tackles: 1, keyPasses: 2, isMOTM: true,
         ),
-        const PlayerModel(
+        PlayerModel(
           id: 'gs_p3', name: 'Virgil van Dijk', position: 'CB',
           rating: 8.8, fatigue: 40, performanceStatus: PerformanceStatus.excellent,
           insight: 'Shut out Red Lions physical threat completely',
           contribution: ContributionType.defense, impact: 'Wall',
           goals: 0, assists: 0, tackles: 12, keyPasses: 2,
         ),
-        const PlayerModel(
+        PlayerModel(
           id: 'rl_p1', name: 'Diego Santos', position: 'ST',
           rating: 8.0, fatigue: 70, performanceStatus: PerformanceStatus.good,
           insight: 'Won headers but no clear chances created',
           contribution: ContributionType.attack, impact: 'Isolated',
           goals: 1, assists: 0, tackles: 2, keyPasses: 3,
         ),
-        const PlayerModel(
+        PlayerModel(
           id: 'rl_p3', name: 'Ahmed Hassan', position: 'RW',
           rating: 7.9, fatigue: 60, performanceStatus: PerformanceStatus.good,
           insight: 'Dangerous runs but final ball quality lacking',
@@ -248,7 +248,7 @@ final class MockAnalysisRepository implements IAnalysisRepository {
           goals: 1, assists: 0, tackles: 5, keyPasses: 4,
         ),
       ],
-      homeAnalysis: const TeamAnalysisModel(
+      homeAnalysis: TeamAnalysisModel(
         teamName: 'GoalSight FC',
         possession: 62,
         style: 'High-Press',
@@ -259,7 +259,7 @@ final class MockAnalysisRepository implements IAnalysisRepository {
         topPlayers: ['gs_p7', 'gs_p3'],
         worstPlayers: [],
       ),
-      awayAnalysis: const TeamAnalysisModel(
+      awayAnalysis: TeamAnalysisModel(
         teamName: 'Red Lions FC',
         possession: 38,
         style: 'Direct Play',
@@ -270,7 +270,7 @@ final class MockAnalysisRepository implements IAnalysisRepository {
         topPlayers: ['rl_p1'],
         worstPlayers: [],
       ),
-      summary: const MatchSummaryModel(
+      summary: MatchSummaryModel(
         dominantTeam: 'GoalSight FC',
         homeAvgRating: 8.9,
         awayAvgRating: 7.5,
@@ -292,7 +292,7 @@ final class MockAnalysisRepository implements IAnalysisRepository {
     ),
 
     // ma_004 — City Panthers 4-2 Thunder Athletic
-    MatchAnalysisModel(
+    const MatchAnalysisModel(
       matchId: 'ma_004',
       homeTeam: 'City Panthers',
       awayTeam: 'Thunder Athletic',
@@ -302,28 +302,28 @@ final class MockAnalysisRepository implements IAnalysisRepository {
       intensity: 82,
       highlightText: 'Panthers on fire',
       players: [
-        const PlayerModel(
+        PlayerModel(
           id: 'cp_p1', name: 'Rodri Manzano', position: 'CDM',
           rating: 9.3, fatigue: 32, performanceStatus: PerformanceStatus.excellent,
           insight: 'Controlled the game from deep — 2G 1A',
           contribution: ContributionType.balanced, impact: 'Architect',
           goals: 2, assists: 1, tackles: 16, keyPasses: 10, isMOTM: true,
         ),
-        const PlayerModel(
+        PlayerModel(
           id: 'cp_p2', name: 'Jamal Wright', position: 'LW',
           rating: 9.0, fatigue: 50, performanceStatus: PerformanceStatus.excellent,
           insight: 'Explosive pace won 3 direct duels',
           contribution: ContributionType.attack, impact: 'Destroyer',
           goals: 3, assists: 1, tackles: 2, keyPasses: 4,
         ),
-        const PlayerModel(
+        PlayerModel(
           id: 'th_p1', name: 'Luca Romano', position: 'CAM',
           rating: 8.3, fatigue: 48, performanceStatus: PerformanceStatus.good,
           insight: '2 assists in a losing effort — showed class',
           contribution: ContributionType.attack, impact: 'Bright Spot',
           goals: 1, assists: 2, tackles: 3, keyPasses: 8,
         ),
-        const PlayerModel(
+        PlayerModel(
           id: 'th_p3', name: 'Omar Ndiaye', position: 'ST',
           rating: 8.4, fatigue: 54, performanceStatus: PerformanceStatus.good,
           insight: 'Brace but team couldn\'t contain Panthers',
@@ -331,7 +331,7 @@ final class MockAnalysisRepository implements IAnalysisRepository {
           goals: 2, assists: 0, tackles: 2, keyPasses: 2,
         ),
       ],
-      homeAnalysis: const TeamAnalysisModel(
+      homeAnalysis: TeamAnalysisModel(
         teamName: 'City Panthers',
         possession: 68,
         style: 'Positional Play',
@@ -342,7 +342,7 @@ final class MockAnalysisRepository implements IAnalysisRepository {
         topPlayers: ['cp_p1', 'cp_p2'],
         worstPlayers: [],
       ),
-      awayAnalysis: const TeamAnalysisModel(
+      awayAnalysis: TeamAnalysisModel(
         teamName: 'Thunder Athletic',
         possession: 32,
         style: 'High Line',
@@ -353,7 +353,7 @@ final class MockAnalysisRepository implements IAnalysisRepository {
         topPlayers: ['th_p3', 'th_p1'],
         worstPlayers: [],
       ),
-      summary: const MatchSummaryModel(
+      summary: MatchSummaryModel(
         dominantTeam: 'City Panthers',
         homeAvgRating: 9.0,
         awayAvgRating: 8.0,
@@ -379,7 +379,7 @@ final class MockAnalysisRepository implements IAnalysisRepository {
     ),
 
     // ma_005 — Red Lions FC 1-3 City Panthers
-    MatchAnalysisModel(
+    const MatchAnalysisModel(
       matchId: 'ma_005',
       homeTeam: 'Red Lions FC',
       awayTeam: 'City Panthers',
@@ -388,28 +388,28 @@ final class MockAnalysisRepository implements IAnalysisRepository {
       status: 'FT',
       intensity: 74,
       players: [
-        const PlayerModel(
+        PlayerModel(
           id: 'cp_p4', name: 'Bernardo Costa', position: 'CAM',
           rating: 8.8, fatigue: 38, performanceStatus: PerformanceStatus.excellent,
           insight: 'Brilliant creative display — 2 assists and a goal',
           contribution: ContributionType.attack, impact: 'Game Changer',
           goals: 1, assists: 2, tackles: 4, keyPasses: 8, isMOTM: true,
         ),
-        const PlayerModel(
+        PlayerModel(
           id: 'cp_p1', name: 'Rodri Manzano', position: 'CDM',
           rating: 9.1, fatigue: 36, performanceStatus: PerformanceStatus.excellent,
           insight: 'Dominant midfield display — won every duel',
           contribution: ContributionType.balanced, impact: 'Anchor',
           goals: 0, assists: 3, tackles: 12, keyPasses: 9,
         ),
-        const PlayerModel(
+        PlayerModel(
           id: 'rl_p1', name: 'Diego Santos', position: 'ST',
           rating: 7.8, fatigue: 72, performanceStatus: PerformanceStatus.good,
           insight: 'Lone goal but starved of service throughout',
           contribution: ContributionType.attack, impact: 'Isolated',
           goals: 2, assists: 0, tackles: 1, keyPasses: 2,
         ),
-        const PlayerModel(
+        PlayerModel(
           id: 'rl_p2', name: 'Sam Clarke', position: 'CM',
           rating: 6.8, fatigue: 65, performanceStatus: PerformanceStatus.poor,
           insight: 'Overrun in midfield — couldn\'t match Panthers intensity',
@@ -417,7 +417,7 @@ final class MockAnalysisRepository implements IAnalysisRepository {
           goals: 0, assists: 0, tackles: 8, keyPasses: 2, isWorst: true,
         ),
       ],
-      homeAnalysis: const TeamAnalysisModel(
+      homeAnalysis: TeamAnalysisModel(
         teamName: 'Red Lions FC',
         possession: 34,
         style: 'Direct Play',
@@ -428,7 +428,7 @@ final class MockAnalysisRepository implements IAnalysisRepository {
         topPlayers: ['rl_p1'],
         worstPlayers: ['rl_p2'],
       ),
-      awayAnalysis: const TeamAnalysisModel(
+      awayAnalysis: TeamAnalysisModel(
         teamName: 'City Panthers',
         possession: 66,
         style: 'Positional Play',
@@ -439,7 +439,7 @@ final class MockAnalysisRepository implements IAnalysisRepository {
         topPlayers: ['cp_p4', 'cp_p1'],
         worstPlayers: [],
       ),
-      summary: const MatchSummaryModel(
+      summary: MatchSummaryModel(
         dominantTeam: 'City Panthers',
         homeAvgRating: 7.0,
         awayAvgRating: 8.9,
@@ -463,7 +463,7 @@ final class MockAnalysisRepository implements IAnalysisRepository {
     ),
 
     // ma_006 — Red Lions FC 2-2 Thunder Athletic
-    MatchAnalysisModel(
+    const MatchAnalysisModel(
       matchId: 'ma_006',
       homeTeam: 'Red Lions FC',
       awayTeam: 'Thunder Athletic',
@@ -473,28 +473,28 @@ final class MockAnalysisRepository implements IAnalysisRepository {
       intensity: 79,
       highlightText: 'Last minute equaliser',
       players: [
-        const PlayerModel(
+        PlayerModel(
           id: 'th_p3', name: 'Omar Ndiaye', position: 'ST',
           rating: 8.3, fatigue: 56, performanceStatus: PerformanceStatus.excellent,
           insight: 'Both goals — including stunning 90+2 equaliser',
           contribution: ContributionType.attack, impact: 'Hero',
           goals: 2, assists: 1, tackles: 2, keyPasses: 2, isMOTM: true,
         ),
-        const PlayerModel(
+        PlayerModel(
           id: 'rl_p1', name: 'Diego Santos', position: 'ST',
           rating: 8.1, fatigue: 65, performanceStatus: PerformanceStatus.good,
           insight: 'Double helped Red Lions race into two-goal lead',
           contribution: ContributionType.attack, impact: 'Fighter',
           goals: 2, assists: 1, tackles: 2, keyPasses: 3,
         ),
-        const PlayerModel(
+        PlayerModel(
           id: 'th_p1', name: 'Luca Romano', position: 'CAM',
           rating: 8.2, fatigue: 52, performanceStatus: PerformanceStatus.good,
           insight: 'Two assists in crucial comeback effort',
           contribution: ContributionType.attack, impact: 'Provider',
           goals: 2, assists: 1, tackles: 4, keyPasses: 7,
         ),
-        const PlayerModel(
+        PlayerModel(
           id: 'rl_p2', name: 'Sam Clarke', position: 'CM',
           rating: 7.4, fatigue: 60, performanceStatus: PerformanceStatus.average,
           insight: 'Steady but lacking in transitional moments',
@@ -502,7 +502,7 @@ final class MockAnalysisRepository implements IAnalysisRepository {
           goals: 0, assists: 1, tackles: 9, keyPasses: 3,
         ),
       ],
-      homeAnalysis: const TeamAnalysisModel(
+      homeAnalysis: TeamAnalysisModel(
         teamName: 'Red Lions FC',
         possession: 48,
         style: 'Direct Play',
@@ -513,7 +513,7 @@ final class MockAnalysisRepository implements IAnalysisRepository {
         topPlayers: ['rl_p1'],
         worstPlayers: [],
       ),
-      awayAnalysis: const TeamAnalysisModel(
+      awayAnalysis: TeamAnalysisModel(
         teamName: 'Thunder Athletic',
         possession: 52,
         style: 'High Line',
@@ -524,7 +524,7 @@ final class MockAnalysisRepository implements IAnalysisRepository {
         topPlayers: ['th_p3', 'th_p1'],
         worstPlayers: [],
       ),
-      summary: const MatchSummaryModel(
+      summary: MatchSummaryModel(
         dominantTeam: 'Thunder Athletic',
         homeAvgRating: 7.8,
         awayAvgRating: 8.1,
@@ -548,7 +548,7 @@ final class MockAnalysisRepository implements IAnalysisRepository {
     ),
 
     // ma_007 — Thunder Athletic 3-1 Falcons United
-    MatchAnalysisModel(
+    const MatchAnalysisModel(
       matchId: 'ma_007',
       homeTeam: 'Thunder Athletic',
       awayTeam: 'Falcons United',
@@ -557,28 +557,28 @@ final class MockAnalysisRepository implements IAnalysisRepository {
       status: 'FT',
       intensity: 76,
       players: [
-        const PlayerModel(
+        PlayerModel(
           id: 'th_p3', name: 'Omar Ndiaye', position: 'ST',
           rating: 8.5, fatigue: 50, performanceStatus: PerformanceStatus.excellent,
           insight: 'Hat-trick threat — 3 goals, relentless movement',
           contribution: ContributionType.attack, impact: 'Unstoppable',
           goals: 3, assists: 0, tackles: 2, keyPasses: 1, isMOTM: true,
         ),
-        const PlayerModel(
+        PlayerModel(
           id: 'th_p1', name: 'Luca Romano', position: 'CAM',
           rating: 8.4, fatigue: 46, performanceStatus: PerformanceStatus.excellent,
           insight: 'Three assists — sublime vision and execution',
           contribution: ContributionType.attack, impact: 'Maestro',
           goals: 1, assists: 3, tackles: 2, keyPasses: 9,
         ),
-        const PlayerModel(
+        PlayerModel(
           id: 'f_p2', name: 'Jake Morrison', position: 'ST',
           rating: 7.9, fatigue: 58, performanceStatus: PerformanceStatus.good,
           insight: 'Consolation goal but isolated from team play',
           contribution: ContributionType.attack, impact: 'Consolation',
           goals: 1, assists: 1, tackles: 2, keyPasses: 2,
         ),
-        const PlayerModel(
+        PlayerModel(
           id: 'f_p4', name: 'Luis Ferreira', position: 'CB',
           rating: 6.5, fatigue: 62, performanceStatus: PerformanceStatus.poor,
           insight: 'Beaten repeatedly on Ndiaye\'s runs',
@@ -586,7 +586,7 @@ final class MockAnalysisRepository implements IAnalysisRepository {
           goals: 0, assists: 0, tackles: 10, keyPasses: 1, isWorst: true,
         ),
       ],
-      homeAnalysis: const TeamAnalysisModel(
+      homeAnalysis: TeamAnalysisModel(
         teamName: 'Thunder Athletic',
         possession: 56,
         style: 'High Line',
@@ -597,7 +597,7 @@ final class MockAnalysisRepository implements IAnalysisRepository {
         topPlayers: ['th_p3', 'th_p1'],
         worstPlayers: [],
       ),
-      awayAnalysis: const TeamAnalysisModel(
+      awayAnalysis: TeamAnalysisModel(
         teamName: 'Falcons United',
         possession: 44,
         style: 'Counter-Attack',
@@ -608,7 +608,7 @@ final class MockAnalysisRepository implements IAnalysisRepository {
         topPlayers: ['f_p2'],
         worstPlayers: ['f_p4'],
       ),
-      summary: const MatchSummaryModel(
+      summary: MatchSummaryModel(
         dominantTeam: 'Thunder Athletic',
         homeAvgRating: 8.4,
         awayAvgRating: 7.0,
@@ -632,7 +632,7 @@ final class MockAnalysisRepository implements IAnalysisRepository {
     ),
 
     // ma_008 — Falcons United 2-0 Red Lions FC
-    MatchAnalysisModel(
+    const MatchAnalysisModel(
       matchId: 'ma_008',
       homeTeam: 'Falcons United',
       awayTeam: 'Red Lions FC',
@@ -641,28 +641,28 @@ final class MockAnalysisRepository implements IAnalysisRepository {
       status: 'FT',
       intensity: 68,
       players: [
-        const PlayerModel(
+        PlayerModel(
           id: 'f_p2', name: 'Jake Morrison', position: 'ST',
           rating: 8.0, fatigue: 52, performanceStatus: PerformanceStatus.excellent,
           insight: 'Two goals — aerial and technical quality',
           contribution: ContributionType.attack, impact: 'Decisive',
           goals: 2, assists: 1, tackles: 2, keyPasses: 3, isMOTM: true,
         ),
-        const PlayerModel(
+        PlayerModel(
           id: 'f_p3', name: 'Carlos Diaz', position: 'CM',
           rating: 7.8, fatigue: 50, performanceStatus: PerformanceStatus.good,
           insight: 'Energetic midfield display with 2 assists',
           contribution: ContributionType.balanced, impact: 'Engine',
           goals: 0, assists: 2, tackles: 10, keyPasses: 5,
         ),
-        const PlayerModel(
+        PlayerModel(
           id: 'rl_p2', name: 'Sam Clarke', position: 'CM',
           rating: 7.0, fatigue: 58, performanceStatus: PerformanceStatus.average,
           insight: 'Lacked creativity in midfield',
           contribution: ContributionType.defense, impact: 'Neutral',
           goals: 0, assists: 0, tackles: 7, keyPasses: 2,
         ),
-        const PlayerModel(
+        PlayerModel(
           id: 'f_p1', name: 'Marcus Webb', position: 'GK',
           rating: 8.2, fatigue: 38, performanceStatus: PerformanceStatus.excellent,
           insight: 'Three vital saves kept the clean sheet intact',
@@ -670,7 +670,7 @@ final class MockAnalysisRepository implements IAnalysisRepository {
           goals: 0, assists: 0, tackles: 0, keyPasses: 0,
         ),
       ],
-      homeAnalysis: const TeamAnalysisModel(
+      homeAnalysis: TeamAnalysisModel(
         teamName: 'Falcons United',
         possession: 48,
         style: 'Counter-Attack',
@@ -681,7 +681,7 @@ final class MockAnalysisRepository implements IAnalysisRepository {
         topPlayers: ['f_p2', 'f_p3'],
         worstPlayers: [],
       ),
-      awayAnalysis: const TeamAnalysisModel(
+      awayAnalysis: TeamAnalysisModel(
         teamName: 'Red Lions FC',
         possession: 52,
         style: 'Direct Play',
@@ -692,7 +692,7 @@ final class MockAnalysisRepository implements IAnalysisRepository {
         topPlayers: [],
         worstPlayers: ['rl_p2'],
       ),
-      summary: const MatchSummaryModel(
+      summary: MatchSummaryModel(
         dominantTeam: 'Falcons United',
         homeAvgRating: 7.8,
         awayAvgRating: 7.2,

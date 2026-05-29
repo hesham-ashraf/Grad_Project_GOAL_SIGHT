@@ -17,7 +17,7 @@ class _GlassCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         gradient: gradient ??
-            LinearGradient(
+            const LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [AppColors.surfaceElevated, AppColors.surface],
@@ -517,7 +517,7 @@ class TacticalIdentityOverview extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _SectionTitle(
+        const _SectionTitle(
           title: 'Tactical Identity',
           icon: Icons.layers_rounded,
         ),
@@ -541,8 +541,8 @@ class TacticalIdentityOverview extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 10, vertical: 5),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(colors: [
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(colors: [
                       AppColors.primaryPurple,
                       AppColors.accentCyan
                     ]),
@@ -561,16 +561,16 @@ class TacticalIdentityOverview extends StatelessWidget {
               context.adaptiveLayout(
                 narrow: Column(
                   children: [
-                    _IdentityRow('Playing Style', 'High Possession Build-Up',
+                    const _IdentityRow('Playing Style', 'High Possession Build-Up',
                         Icons.sports_soccer_rounded, AppColors.accentCyan),
                     SizedBox(height: context.rs(8, min: 6, max: 10)),
-                    _IdentityRow('Pressure Style', 'High Press + Gegenpressing',
+                    const _IdentityRow('Pressure Style', 'High Press + Gegenpressing',
                         Icons.compress_rounded, AppColors.primaryPurple),
                     SizedBox(height: context.rs(8, min: 6, max: 10)),
-                    _IdentityRow('Transition', 'Fast Vertical Counter',
+                    const _IdentityRow('Transition', 'Fast Vertical Counter',
                         Icons.double_arrow_rounded, AppColors.accentGreen),
                     SizedBox(height: context.rs(8, min: 6, max: 10)),
-                    _IdentityRow('Attack Zone', 'Central + Left Wing',
+                    const _IdentityRow('Attack Zone', 'Central + Left Wing',
                         Icons.grid_on_rounded, AppColors.warning),
                   ],
                 ),
@@ -580,25 +580,25 @@ class TacticalIdentityOverview extends StatelessWidget {
                   children: [
                     SizedBox(
                       width: (context.screenWidth - context.rs(100)) / 2,
-                      child: _IdentityRow('Playing Style',
+                      child: const _IdentityRow('Playing Style',
                           'High Possession Build-Up',
                           Icons.sports_soccer_rounded, AppColors.accentCyan),
                     ),
                     SizedBox(
                       width: (context.screenWidth - context.rs(100)) / 2,
-                      child: _IdentityRow('Pressure Style',
+                      child: const _IdentityRow('Pressure Style',
                           'High Press + Gegenpressing',
                           Icons.compress_rounded, AppColors.primaryPurple),
                     ),
                     SizedBox(
                       width: (context.screenWidth - context.rs(100)) / 2,
-                      child: _IdentityRow('Transition',
+                      child: const _IdentityRow('Transition',
                           'Fast Vertical Counter',
                           Icons.double_arrow_rounded, AppColors.accentGreen),
                     ),
                     SizedBox(
                       width: (context.screenWidth - context.rs(100)) / 2,
-                      child: _IdentityRow('Attack Zone', 'Central + Left Wing',
+                      child: const _IdentityRow('Attack Zone', 'Central + Left Wing',
                           Icons.grid_on_rounded, AppColors.warning),
                     ),
                   ],
@@ -619,12 +619,12 @@ class TacticalIdentityOverview extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 6),
-              GsAnimatedBar(
+              const GsAnimatedBar(
                 value: 0.78,
                 color: AppColors.accentCyan,
                 backgroundColor: AppColors.surface,
                 height: 6,
-                delay: const Duration(milliseconds: 300),
+                delay: Duration(milliseconds: 300),
               ),
             ],
           ),
@@ -686,7 +686,7 @@ class ClubAnalyticsDashboard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _SectionTitle(
+        const _SectionTitle(
           title: 'Club Analytics',
           icon: Icons.analytics_rounded,
         ),
@@ -694,39 +694,39 @@ class ClubAnalyticsDashboard extends StatelessWidget {
         context.adaptiveLayout(
           narrow: Column(children: [
             Row(children: [
-              Expanded(
+              const Expanded(
                   child: _AnalyticMetric('Avg Possession', '58%',
                       Icons.donut_large_rounded, AppColors.accentCyan, 0.58)),
               SizedBox(width: context.rs(8, min: 6, max: 10)),
-              Expanded(
+              const Expanded(
                   child: _AnalyticMetric('Sprint Intensity', '74%',
                       Icons.speed_rounded, AppColors.accentGreen, 0.74)),
             ]),
             SizedBox(height: context.rs(8, min: 6, max: 10)),
             Row(children: [
-              Expanded(
+              const Expanded(
                   child: _AnalyticMetric('Team Rating', '7.82',
                       Icons.stars_rounded, AppColors.primaryPurple, 0.782)),
               SizedBox(width: context.rs(8, min: 6, max: 10)),
-              Expanded(
+              const Expanded(
                   child: _AnalyticMetric('Press Score', '68%',
                       Icons.compress_rounded, AppColors.warning, 0.68)),
             ]),
           ]),
           wide: Row(children: [
-            Expanded(
+            const Expanded(
                 child: _AnalyticMetric('Avg Possession', '58%',
                     Icons.donut_large_rounded, AppColors.accentCyan, 0.58)),
             SizedBox(width: context.rs(8, min: 6, max: 10)),
-            Expanded(
+            const Expanded(
                 child: _AnalyticMetric('Sprint Intensity', '74%',
                     Icons.speed_rounded, AppColors.accentGreen, 0.74)),
             SizedBox(width: context.rs(8, min: 6, max: 10)),
-            Expanded(
+            const Expanded(
                 child: _AnalyticMetric('Team Rating', '7.82',
                     Icons.stars_rounded, AppColors.primaryPurple, 0.782)),
             SizedBox(width: context.rs(8, min: 6, max: 10)),
-            Expanded(
+            const Expanded(
                 child: _AnalyticMetric('Press Score', '68%',
                     Icons.compress_rounded, AppColors.warning, 0.68)),
           ]),
@@ -822,7 +822,7 @@ class PerformanceTrendSection extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Rating trend
-              _TrendChartRow(
+              const _TrendChartRow(
                 label: 'Team Rating',
                 data: _ratingData,
                 color: AppColors.primaryPurple,

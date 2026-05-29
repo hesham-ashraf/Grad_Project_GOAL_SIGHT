@@ -8,7 +8,7 @@
 
 import 'dart:async';
 
-import '../../../features/manager/upload_job_model.dart';
+import '../../models/upload_job_model.dart';
 import '../interfaces/i_upload_repository.dart';
 import 'mock_club_repository.dart';
 

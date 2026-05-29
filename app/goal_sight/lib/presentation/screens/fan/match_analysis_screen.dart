@@ -1,5 +1,6 @@
-import 'dart:ui';
+﻿import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
 import '../../../data/models/match_analysis_model.dart';
@@ -185,7 +186,7 @@ class _MatchAnalysisScreenState extends State<MatchAnalysisScreen>
               child: IconButton(
                 icon: const Icon(Icons.arrow_back_ios_new_rounded,
                     color: AppColors.textPrimary, size: 18),
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed: () => context.pop(),
               ),
             ),
           ),
@@ -293,3 +294,4 @@ class _PlayerListSection extends StatelessWidget {
     );
   }
 }
+

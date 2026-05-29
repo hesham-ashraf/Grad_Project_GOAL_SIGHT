@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
-import '../../../core/utils/responsive.dart';
 import '../../widgets/fan/fan_bottom_navigation_bar.dart';
 import 'clubs_screen.dart';
 import 'fan_home_screen.dart';

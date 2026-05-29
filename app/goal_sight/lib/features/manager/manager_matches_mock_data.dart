@@ -5,7 +5,7 @@ import '../../data/models/match_analysis_model.dart';
 /// existing MatchAnalysisScreen via router extras.
 
 final List<MatchAnalysisModel> kManagerMockMatches = [
-  MatchAnalysisModel(
+  const MatchAnalysisModel(
     matchId: 'm-20260503-01',
     homeTeam: 'Red Lions',
     awayTeam: 'Blue Hawks',
@@ -75,7 +75,7 @@ final List<MatchAnalysisModel> kManagerMockMatches = [
     intensity: 56,
   ),
 
-  MatchAnalysisModel(
+  const MatchAnalysisModel(
     matchId: 'm-20260425-02',
     homeTeam: 'Green Falcons',
     awayTeam: 'Red Lions',
@@ -131,7 +131,7 @@ final List<MatchAnalysisModel> kManagerMockMatches = [
     intensity: 62,
   ),
 
-  MatchAnalysisModel(
+  const MatchAnalysisModel(
     matchId: 'm-20260310-03',
     homeTeam: 'Blue Hawks',
     awayTeam: 'Green Falcons',

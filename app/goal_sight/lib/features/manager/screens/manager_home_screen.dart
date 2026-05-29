@@ -49,7 +49,7 @@ class _ManagerHomeScreenState extends State<ManagerHomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    final data = kManagerDashboardMockData;
+    const data = kManagerDashboardMockData;
     final stats = data.keyStats;
     final players = data.topPerformers;
     final insights = data.insights;
@@ -97,7 +97,7 @@ class _ManagerHomeScreenState extends State<ManagerHomeScreen>
                     controller: _controller,
                     start: 0.1,
                     end: 0.34,
-                    child: _SectionTitle(
+                    child: const _SectionTitle(
                       title: 'Key Stats',
                       icon: Icons.query_stats_rounded,
                     ),
@@ -119,7 +119,7 @@ class _ManagerHomeScreenState extends State<ManagerHomeScreen>
                     controller: _controller,
                     start: 0.42,
                     end: 0.62,
-                    child: _SectionTitle(
+                    child: const _SectionTitle(
                       title: 'Top Performers',
                       icon: Icons.workspace_premium_rounded,
                     ),
@@ -134,7 +134,7 @@ class _ManagerHomeScreenState extends State<ManagerHomeScreen>
                     controller: _controller,
                     start: 0.58,
                     end: 0.74,
-                    child: _SectionTitle(
+                    child: const _SectionTitle(
                       title: 'Alerts & Insights',
                       icon: Icons.tips_and_updates_rounded,
                     ),
@@ -151,7 +151,7 @@ class _ManagerHomeScreenState extends State<ManagerHomeScreen>
                     controller: _controller,
                     start: 0.72,
                     end: 0.86,
-                    child: TacticalRecommendationsSection(),
+                    child: const TacticalRecommendationsSection(),
                   ),
                   SizedBox(height: sectionSpacing),
 
@@ -160,7 +160,7 @@ class _ManagerHomeScreenState extends State<ManagerHomeScreen>
                     controller: _controller,
                     start: 0.76,
                     end: 0.90,
-                    child: UnderperformingPlayersSection(),
+                    child: const UnderperformingPlayersSection(),
                   ),
                   SizedBox(height: sectionSpacing),
 
@@ -169,7 +169,7 @@ class _ManagerHomeScreenState extends State<ManagerHomeScreen>
                     controller: _controller,
                     start: 0.80,
                     end: 0.94,
-                    child: TacticalIdentityOverview(),
+                    child: const TacticalIdentityOverview(),
                   ),
                   SizedBox(height: sectionSpacing),
 
@@ -178,7 +178,7 @@ class _ManagerHomeScreenState extends State<ManagerHomeScreen>
                     controller: _controller,
                     start: 0.84,
                     end: 0.97,
-                    child: ClubAnalyticsDashboard(),
+                    child: const ClubAnalyticsDashboard(),
                   ),
                   SizedBox(height: sectionSpacing),
 
@@ -187,7 +187,7 @@ class _ManagerHomeScreenState extends State<ManagerHomeScreen>
                     controller: _controller,
                     start: 0.88,
                     end: 1.00,
-                    child: PerformanceTrendSection(),
+                    child: const PerformanceTrendSection(),
                   ),
                 ],
               ),
@@ -212,34 +212,104 @@ class _DashboardHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: AppSpacing.card,
+      padding: EdgeInsets.all(context.rs(16, min: 14, max: 20)),
       decoration: BoxDecoration(
         borderRadius: AppRadius.cardLarge,
+        color: AppColors.surfaceElevated.withValues(alpha: 0.72),
         border: Border.all(color: AppColors.outlineSubtle),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            AppColors.surfaceElevated,
-            AppColors.surface,
-          ],
-        ),
         boxShadow: AppShadows.card,
       ),
-      child: Column(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            clubName,
-            style: AppTextStyles.headline().copyWith(
-              fontSize: context.sp(30, min: 22, max: 36),
+          // ── Text content ───────────────────────────────────────────────────
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Badge row
+                Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: context.rs(12, min: 10, max: 14),
+                        vertical: context.rs(6, min: 5, max: 8),
+                      ),
+                      decoration: const BoxDecoration(
+                        gradient: AppGradients.brand,
+                        borderRadius: AppRadius.chip,
+                      ),
+                      child: Text(
+                        'MANAGER HUB',
+                        style: AppTextStyles.caption(color: Colors.white).copyWith(
+                          fontSize: context.rs(10, min: 9, max: 11),
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 1.0,
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: context.rs(10, min: 8, max: 12)),
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: context.rs(10, min: 8, max: 12),
+                        vertical: context.rs(5, min: 4, max: 7),
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryPurple.withValues(alpha: 0.12),
+                        borderRadius: AppRadius.chip,
+                        border: Border.all(
+                          color: AppColors.primaryPurple.withValues(alpha: 0.35),
+                        ),
+                      ),
+                      child: Text(
+                        'AI ACTIVE',
+                        style: AppTextStyles.caption(color: AppColors.primaryPurple).copyWith(
+                          fontSize: context.rs(10, min: 9, max: 11),
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 1.2,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: context.rs(10, min: 8, max: 14)),
+                // Club name headline
+                Text(
+                  clubName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTextStyles.headline(color: AppColors.textPrimary).copyWith(
+                    fontSize: context.rs(28, min: 22, max: 34),
+                    height: 1.05,
+                  ),
+                ),
+                SizedBox(height: context.rs(4, min: 3, max: 6)),
+                // Subtitle
+                Text(
+                  subtitle,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTextStyles.body(color: AppColors.textSecondary).copyWith(
+                    fontSize: context.rs(13, min: 12, max: 15),
+                  ),
+                ),
+              ],
             ),
           ),
-          SizedBox(height: context.rs(6, min: 4, max: 8)),
-          Text(
-            subtitle,
-            style: AppTextStyles.body(color: AppColors.textSecondary).copyWith(
-              fontSize: context.sp(14, min: 12, max: 16),
+          SizedBox(width: context.rs(10, min: 8, max: 12)),
+          // ── Icon avatar ────────────────────────────────────────────────────
+          Container(
+            width: context.rs(52, min: 44, max: 58),
+            height: context.rs(52, min: 44, max: 58),
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: AppGradients.brand,
+              boxShadow: AppShadows.buttonGlow,
+            ),
+            child: Icon(
+              Icons.analytics_rounded,
+              size: context.rs(24, min: 20, max: 28),
+              color: Colors.white,
             ),
           ),
         ],
@@ -261,12 +331,13 @@ class _SectionTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(icon, size: 18, color: AppColors.accentCyan),
-        const SizedBox(width: 8),
+        Icon(icon, size: context.rs(18, min: 16, max: 20), color: AppColors.accentCyan),
+        SizedBox(width: context.rs(8, min: 6, max: 10)),
         Text(
           title,
-          style: AppTextStyles.title().copyWith(
-            fontSize: context.sp(18, min: 16, max: 22),
+          style: AppTextStyles.title(color: AppColors.textPrimary).copyWith(
+            fontSize: context.sp(17, min: 15, max: 21),
+            fontWeight: FontWeight.w600,
           ),
         ),
       ],

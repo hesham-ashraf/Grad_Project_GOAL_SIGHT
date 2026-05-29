@@ -150,7 +150,7 @@ class AdminMockData {
   // ── Squad ─────────────────────────────────────────────────────────────────
 
   static final List<PlayerAnalysisModel> squad = [
-    PlayerAnalysisModel(
+    const PlayerAnalysisModel(
       id: 'p1',
       name: 'Mo Salah',
       position: 'RW',
@@ -164,7 +164,7 @@ class AdminMockData {
       weaknesses: ['Defensive Contribution'],
       recentRatings: {'Match 1': 8.5, 'Match 2': 9.2, 'Match 3': 7.8, 'Match 4': 8.9, 'Match 5': 9.0},
     ),
-    PlayerAnalysisModel(
+    const PlayerAnalysisModel(
       id: 'p2',
       name: 'Kevin De Bruyne',
       position: 'CM',
@@ -178,7 +178,7 @@ class AdminMockData {
       weaknesses: ['Pace'],
       recentRatings: {'Match 1': 9.0, 'Match 2': 8.8, 'Match 3': 9.5, 'Match 4': 7.2, 'Match 5': 9.1},
     ),
-    PlayerAnalysisModel(
+    const PlayerAnalysisModel(
       id: 'p3',
       name: 'Virgil van Dijk',
       position: 'CB',
@@ -192,7 +192,7 @@ class AdminMockData {
       weaknesses: ['Acceleration'],
       recentRatings: {'Match 1': 8.0, 'Match 2': 8.5, 'Match 3': 8.2, 'Match 4': 9.0, 'Match 5': 8.7},
     ),
-    PlayerAnalysisModel(
+    const PlayerAnalysisModel(
       id: 'p4',
       name: 'Bukayo Saka',
       position: 'RW',
@@ -206,7 +206,7 @@ class AdminMockData {
       weaknesses: ['Weak Foot'],
       recentRatings: {'Match 1': 8.2, 'Match 2': 7.5, 'Match 3': 8.9, 'Match 4': 6.8, 'Match 5': 7.9},
     ),
-    PlayerAnalysisModel(
+    const PlayerAnalysisModel(
       id: 'p5',
       name: 'Phil Foden',
       position: 'CAM',
@@ -220,7 +220,7 @@ class AdminMockData {
       weaknesses: ['Aerial'],
       recentRatings: {'Match 1': 9.1, 'Match 2': 8.5, 'Match 3': 8.8, 'Match 4': 9.2, 'Match 5': 8.6},
     ),
-    PlayerAnalysisModel(
+    const PlayerAnalysisModel(
       id: 'p6',
       name: 'Declan Rice',
       position: 'CDM',
@@ -234,7 +234,7 @@ class AdminMockData {
       weaknesses: ['Long Range Shooting'],
       recentRatings: {'Match 1': 8.0, 'Match 2': 8.3, 'Match 3': 7.9, 'Match 4': 8.6, 'Match 5': 8.7},
     ),
-    PlayerAnalysisModel(
+    const PlayerAnalysisModel(
       id: 'p7',
       name: 'Erling Haaland',
       position: 'ST',
@@ -248,7 +248,7 @@ class AdminMockData {
       weaknesses: ['Build-Up Play'],
       recentRatings: {'Match 1': 9.5, 'Match 2': 8.0, 'Match 3': 9.8, 'Match 4': 7.5, 'Match 5': 9.2},
     ),
-    PlayerAnalysisModel(
+    const PlayerAnalysisModel(
       id: 'p8',
       name: 'Trent Alexander-Arnold',
       position: 'RB',
@@ -444,7 +444,7 @@ class AdminMockData {
   // ── Manager Performance Records ────────────────────────────────────────────
 
   static final Map<String, ManagerPerformanceRecord> managerPerformance = {
-    'm1': ManagerPerformanceRecord(
+    'm1': const ManagerPerformanceRecord(
       managerId: 'm1',
       weeklyRatings: [8.1, 8.4, 9.0, 8.7, 9.2, 8.9, 9.1, 9.2],
       uploadsThisWeek: 4,
@@ -458,7 +458,7 @@ class AdminMockData {
         'Generated fitness report',
       ],
     ),
-    'm2': ManagerPerformanceRecord(
+    'm2': const ManagerPerformanceRecord(
       managerId: 'm2',
       weeklyRatings: [9.0, 9.1, 9.3, 9.2, 9.5, 9.4, 9.5, 9.5],
       uploadsThisWeek: 6,
@@ -472,7 +472,7 @@ class AdminMockData {
         'Analyzed opponent set pieces',
       ],
     ),
-    'm3': ManagerPerformanceRecord(
+    'm3': const ManagerPerformanceRecord(
       managerId: 'm3',
       weeklyRatings: [8.5, 8.6, 8.7, 8.4, 8.7, 8.5, 8.8, 8.7],
       uploadsThisWeek: 2,
@@ -484,7 +484,7 @@ class AdminMockData {
         'Reviewed defensive shape',
       ],
     ),
-    'm4': ManagerPerformanceRecord(
+    'm4': const ManagerPerformanceRecord(
       managerId: 'm4',
       weeklyRatings: [8.3, 8.5, 8.9, 8.7, 9.0, 8.8, 8.9, 8.9],
       uploadsThisWeek: 3,
@@ -497,7 +497,7 @@ class AdminMockData {
         'Reviewed fatigue metrics',
       ],
     ),
-    'm5': ManagerPerformanceRecord(
+    'm5': const ManagerPerformanceRecord(
       managerId: 'm5',
       weeklyRatings: [7.8, 8.0, 8.2, 8.1, 8.4, 8.3, 8.4, 8.4],
       uploadsThisWeek: 2,
@@ -509,7 +509,7 @@ class AdminMockData {
         'Reviewed pressing report',
       ],
     ),
-    'm6': ManagerPerformanceRecord(
+    'm6': const ManagerPerformanceRecord(
       managerId: 'm6',
       weeklyRatings: [7.5, 7.8, 8.0, 7.9, 8.1, 8.0, 8.1, 8.1],
       uploadsThisWeek: 0,
@@ -523,13 +523,13 @@ class AdminMockData {
   // ── Club Performance Trends ────────────────────────────────────────────────
 
   static final List<ClubPerformanceTrend> performanceTrends = [
-    ClubPerformanceTrend(label: 'W1', possession: 54, pressureIndex: 72, xg: 1.4, teamRating: 7.6),
-    ClubPerformanceTrend(label: 'W2', possession: 58, pressureIndex: 75, xg: 1.8, teamRating: 7.9),
-    ClubPerformanceTrend(label: 'W3', possession: 61, pressureIndex: 80, xg: 2.2, teamRating: 8.3),
-    ClubPerformanceTrend(label: 'W4', possession: 59, pressureIndex: 78, xg: 1.9, teamRating: 8.0),
-    ClubPerformanceTrend(label: 'W5', possession: 63, pressureIndex: 84, xg: 2.4, teamRating: 8.6),
-    ClubPerformanceTrend(label: 'W6', possession: 62, pressureIndex: 82, xg: 2.1, teamRating: 8.4),
-    ClubPerformanceTrend(label: 'W7', possession: 65, pressureIndex: 86, xg: 2.6, teamRating: 8.8),
-    ClubPerformanceTrend(label: 'W8', possession: 66, pressureIndex: 88, xg: 2.8, teamRating: 9.0),
+    const ClubPerformanceTrend(label: 'W1', possession: 54, pressureIndex: 72, xg: 1.4, teamRating: 7.6),
+    const ClubPerformanceTrend(label: 'W2', possession: 58, pressureIndex: 75, xg: 1.8, teamRating: 7.9),
+    const ClubPerformanceTrend(label: 'W3', possession: 61, pressureIndex: 80, xg: 2.2, teamRating: 8.3),
+    const ClubPerformanceTrend(label: 'W4', possession: 59, pressureIndex: 78, xg: 1.9, teamRating: 8.0),
+    const ClubPerformanceTrend(label: 'W5', possession: 63, pressureIndex: 84, xg: 2.4, teamRating: 8.6),
+    const ClubPerformanceTrend(label: 'W6', possession: 62, pressureIndex: 82, xg: 2.1, teamRating: 8.4),
+    const ClubPerformanceTrend(label: 'W7', possession: 65, pressureIndex: 86, xg: 2.6, teamRating: 8.8),
+    const ClubPerformanceTrend(label: 'W8', possession: 66, pressureIndex: 88, xg: 2.8, teamRating: 9.0),
   ];
 }

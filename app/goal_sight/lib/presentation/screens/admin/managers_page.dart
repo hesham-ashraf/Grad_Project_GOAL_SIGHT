@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/responsive.dart';
 import '../../../features/admin/data/admin_mock_data.dart';
 import '../../../data/models/manager_model.dart';
 import '../../widgets/admin/admin_manager_widgets.dart';
@@ -79,7 +80,7 @@ class _ManagersPageState extends State<ManagersPage>
           children: [
             const Icon(Icons.manage_accounts_outlined, color: AppColors.accentCyan, size: 20),
             const SizedBox(width: 8),
-            Text('Managers', style: AppTextStyles.title(color: Colors.white).copyWith(fontSize: 18)),
+            Text('Managers', style: AppTextStyles.title(color: AppColors.textPrimary).copyWith(fontSize: context.sp(17, min: 15, max: 20))),
           ],
         ),
         backgroundColor: Colors.transparent,
@@ -102,7 +103,7 @@ class _ManagersPageState extends State<ManagersPage>
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 4, 20, 0),
+            padding: EdgeInsets.fromLTRB(context.rs(20, min: 16, max: 28), context.rs(4, min: 2, max: 8), context.rs(20, min: 16, max: 28), 0),
             child: Column(
               children: [
                 // 0 — Stats header
@@ -185,7 +186,7 @@ class _ManagersPageState extends State<ManagersPage>
             child: managers.isEmpty
                 ? _reveal(2, _EmptyState(query: _searchQuery))
                 : ListView.builder(
-                    padding: const EdgeInsets.fromLTRB(20, 4, 20, 100),
+                    padding: EdgeInsets.fromLTRB(context.rs(20, min: 16, max: 28), context.rs(4, min: 2, max: 8), context.rs(20, min: 16, max: 28), context.rs(100, min: 80, max: 120)),
                     physics: const BouncingScrollPhysics(),
                     itemCount: managers.length,
                     itemBuilder: (context, i) => EnhancedManagerCard(manager: managers[i]),
@@ -220,7 +221,7 @@ class _EmptyState extends StatelessWidget {
         children: [
           Container(
             padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: AppColors.surfaceElevated,
               shape: BoxShape.circle,
             ),
@@ -324,7 +325,7 @@ class _AddManagerSheetState extends State<_AddManagerSheet> {
                   child: OutlinedButton(
                     onPressed: () => Navigator.of(context).pop(),
                     style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: AppColors.outline),
+                      side: const BorderSide(color: AppColors.outline),
                       foregroundColor: AppColors.textSecondary,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg)),

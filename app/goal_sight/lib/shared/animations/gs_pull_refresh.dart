@@ -137,8 +137,8 @@ class _GsSkeletonLoaderState extends State<_GsSkeletonLoader>
     return AnimatedBuilder(
       animation: _shimmer,
       builder: (_, __) {
-        final base = AppColors.surface;
-        final highlight = AppColors.surfaceElevated;
+        const base = AppColors.surface;
+        const highlight = AppColors.surfaceElevated;
         final shimmerColor = Color.lerp(base, highlight, _shimmer.value)!;
 
         return ListView.builder(

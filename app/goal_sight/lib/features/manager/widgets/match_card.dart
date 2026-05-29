@@ -16,15 +16,15 @@ class MatchCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final surface = AppTheme.darkSurface;
-    final accent = AppTheme.accentCyan;
+    const surface = AppTheme.darkSurface;
+    const accent = AppTheme.accentCyan;
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8.0),
       child: Material(
         color: surface,
         elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: AppRadius.card),
+        shape: const RoundedRectangleBorder(borderRadius: AppRadius.card),
         child: InkWell(
           borderRadius: AppRadius.card,
           onTap: onTap,
@@ -52,7 +52,7 @@ class MatchCard extends StatelessWidget {
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
-                                color: accent.withOpacity(0.12),
+                                color: accent.withValues(alpha: 0.12),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Text('Recent',
@@ -70,19 +70,19 @@ class MatchCard extends StatelessWidget {
                       const SizedBox(height: 8),
                       Row(
                         children: [
-                          Icon(Icons.calendar_today_outlined,
+                          const Icon(Icons.calendar_today_outlined,
                               size: 14, color: AppColors.textMuted),
                           const SizedBox(width: 6),
                           Text(match.date, style: AppTextStyles.caption()),
                           const SizedBox(width: 12),
-                          Icon(Icons.whatshot_outlined,
+                          const Icon(Icons.whatshot_outlined,
                               size: 14, color: AppColors.warning),
                           const SizedBox(width: 6),
                           Text('${match.intensity}%',
                               style: AppTextStyles.caption()),
                         ],
                       ),
-                      if ((match.summary.overallNarrative ?? '').isNotEmpty)
+                      if (match.summary.overallNarrative.isNotEmpty)
                         Padding(
                           padding: const EdgeInsets.only(top: 10),
                           child: Text(
@@ -100,7 +100,7 @@ class MatchCard extends StatelessWidget {
 
                 // right: chevron
                 const SizedBox(width: 12),
-                Icon(Icons.chevron_right_rounded,
+                const Icon(Icons.chevron_right_rounded,
                     color: AppColors.textSecondary),
               ],
             ),

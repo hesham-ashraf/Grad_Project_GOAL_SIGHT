@@ -17,7 +17,7 @@ class _GlassCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         gradient: gradient ??
-            LinearGradient(
+            const LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [AppColors.surfaceElevated, AppColors.surface],
@@ -108,8 +108,8 @@ class FanStatsBanner extends StatelessWidget {
           Row(children: [
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-              decoration: BoxDecoration(
-                  gradient: const LinearGradient(colors: [
+              decoration: const BoxDecoration(
+                  gradient: LinearGradient(colors: [
                     AppColors.primaryPurple,
                     AppColors.accentCyan
                   ]),
@@ -146,28 +146,28 @@ class FanStatsBanner extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 6),
-          GsAnimatedBar(
+          const GsAnimatedBar(
             value: 0.648,
             color: AppColors.primaryPurple,
             backgroundColor: AppColors.surface,
             height: 8,
-            delay: const Duration(milliseconds: 400),
+            delay: Duration(milliseconds: 400),
           ),
           SizedBox(height: context.rs(14, min: 10, max: 18)),
           // Stats row
           Row(children: [
-            Expanded(
+            const Expanded(
                 child:
                     _FanStat('Matches\nViewed', '47', AppColors.accentCyan)),
             _Divider(),
-            Expanded(
+            const Expanded(
                 child:
                     _FanStat('Analyses\nRead', '23', AppColors.accentGreen)),
             _Divider(),
-            Expanded(
+            const Expanded(
                 child: _FanStat('Clubs\nFollowed', '3', AppColors.warning)),
             _Divider(),
-            Expanded(
+            const Expanded(
                 child: _FanStat(
                     'Saved\nMatches', '12', AppColors.primaryPurple)),
           ]),
@@ -255,7 +255,7 @@ class _NotificationSettingsCardState extends State<NotificationSettingsCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SectionHeader(
+          const _SectionHeader(
               title: 'Notifications',
               icon: Icons.notifications_rounded,
               color: AppColors.accentCyan,
@@ -330,7 +330,7 @@ class _NotifToggle extends StatelessWidget {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeColor: color,
+            activeThumbColor: color,
             activeTrackColor: color.withValues(alpha: 0.25),
             inactiveThumbColor: AppColors.textMuted,
             inactiveTrackColor: AppColors.surface,
@@ -366,7 +366,7 @@ class FavoritesCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SectionHeader(
+          const _SectionHeader(
               title: 'Favourites',
               icon: Icons.favorite_rounded,
               color: AppColors.danger,
@@ -699,7 +699,7 @@ class _PreferencesCardState extends State<PreferencesCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SectionHeader(
+          const _SectionHeader(
               title: 'Preferences',
               icon: Icons.tune_rounded,
               color: AppColors.primaryPurple,
@@ -887,7 +887,7 @@ class _TogglePrefRow extends StatelessWidget {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeColor: color,
+            activeThumbColor: color,
             activeTrackColor: color.withValues(alpha: 0.25),
             inactiveThumbColor: AppColors.textMuted,
             inactiveTrackColor: AppColors.surface,
@@ -1094,7 +1094,7 @@ class AccountManagementCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SectionHeader(
+          const _SectionHeader(
               title: 'Account',
               icon: Icons.manage_accounts_rounded,
               color: AppColors.primaryBlue,
@@ -1149,8 +1149,8 @@ class AccountManagementCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(
                     horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                    gradient: const LinearGradient(colors: [
+                decoration: const BoxDecoration(
+                    gradient: LinearGradient(colors: [
                       AppColors.primaryPurple,
                       AppColors.accentCyan
                     ]),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
-import '../upload_job_model.dart';
+import '../../../data/models/upload_job_model.dart';
 
 // ─── Status Badge ─────────────────────────────────────────────────────────────
 
@@ -114,7 +114,7 @@ class UploadHistoryCard extends StatelessWidget {
                         const SizedBox(height: 3),
                         Row(
                           children: [
-                            Icon(Icons.emoji_events_rounded,
+                            const Icon(Icons.emoji_events_rounded,
                                 size: 11,
                                 color: AppColors.accentCyan),
                             const SizedBox(width: 4),
@@ -127,7 +127,7 @@ class UploadHistoryCard extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(width: 8),
-                            Icon(Icons.calendar_today_rounded,
+                            const Icon(Icons.calendar_today_rounded,
                                 size: 10, color: AppColors.textMuted),
                             const SizedBox(width: 3),
                             Text(
@@ -200,7 +200,7 @@ class _CompletedContent extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Divider(height: 1, color: AppColors.outlineSubtle),
+          const Divider(height: 1, color: AppColors.outlineSubtle),
           const SizedBox(height: 10),
           // Score + intensity row
           Row(
@@ -251,7 +251,7 @@ class _CompletedContent extends StatelessWidget {
                     const EdgeInsets.symmetric(vertical: 9),
                 textStyle: AppTextStyles.caption()
                     .copyWith(fontWeight: FontWeight.w700),
-                shape: RoundedRectangleBorder(
+                shape: const RoundedRectangleBorder(
                     borderRadius: AppRadius.button),
               ),
             ),
@@ -296,7 +296,7 @@ class _ProcessingContentState extends State<_ProcessingContent>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Divider(height: 1, color: AppColors.outlineSubtle),
+          const Divider(height: 1, color: AppColors.outlineSubtle),
           const SizedBox(height: 10),
           if (stage != null) ...[
             Row(
@@ -332,7 +332,7 @@ class _ProcessingContentState extends State<_ProcessingContent>
                   value: widget.job.progress,
                   minHeight: 6,
                   backgroundColor: AppColors.surfaceRaised,
-                  valueColor: AlwaysStoppedAnimation<Color>(
+                  valueColor: const AlwaysStoppedAnimation<Color>(
                     AppColors.primaryPurple,
                   ),
                 ),
@@ -374,7 +374,7 @@ class _FailedContent extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Divider(height: 1, color: AppColors.outlineSubtle),
+          const Divider(height: 1, color: AppColors.outlineSubtle),
           const SizedBox(height: 10),
           if (job.failureReason != null) ...[
             Container(
@@ -389,7 +389,7 @@ class _FailedContent extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.error_outline_rounded,
+                  const Icon(Icons.error_outline_rounded,
                       size: 14, color: AppColors.danger),
                   const SizedBox(width: 6),
                   Expanded(
@@ -419,7 +419,7 @@ class _FailedContent extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 9),
                   textStyle: AppTextStyles.caption()
                       .copyWith(fontWeight: FontWeight.w700),
-                  shape: RoundedRectangleBorder(
+                  shape: const RoundedRectangleBorder(
                       borderRadius: AppRadius.button),
                 ),
               ),
@@ -439,7 +439,7 @@ class _CardFooter extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(14, 8, 14, 10),
       decoration: BoxDecoration(
-        border: Border(
+        border: const Border(
           top: BorderSide(color: AppColors.outlineSubtle, width: 1),
         ),
         color: AppColors.surface.withValues(alpha: 0.5),
@@ -450,7 +450,7 @@ class _CardFooter extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(Icons.video_file_rounded,
+          const Icon(Icons.video_file_rounded,
               size: 11, color: AppColors.textMuted),
           const SizedBox(width: 5),
           Expanded(
@@ -634,7 +634,7 @@ class HistorySearchBar extends StatelessWidget {
       decoration: InputDecoration(
         hintText: 'Search by team, competition or file…',
         hintStyle: AppTextStyles.body(color: AppColors.textMuted),
-        prefixIcon: Icon(Icons.search_rounded,
+        prefixIcon: const Icon(Icons.search_rounded,
             size: 20, color: AppColors.textMuted),
         suffixIcon: controller.text.isNotEmpty
             ? GestureDetector(
@@ -642,7 +642,7 @@ class HistorySearchBar extends StatelessWidget {
                   controller.clear();
                   onChanged('');
                 },
-                child: Icon(Icons.close_rounded,
+                child: const Icon(Icons.close_rounded,
                     size: 18, color: AppColors.textMuted),
               )
             : null,
@@ -652,17 +652,17 @@ class HistorySearchBar extends StatelessWidget {
           horizontal: 16,
           vertical: 12,
         ),
-        border: OutlineInputBorder(
+        border: const OutlineInputBorder(
           borderRadius: AppRadius.input,
           borderSide:
               BorderSide(color: AppColors.outline, width: 1),
         ),
-        enabledBorder: OutlineInputBorder(
+        enabledBorder: const OutlineInputBorder(
           borderRadius: AppRadius.input,
           borderSide:
               BorderSide(color: AppColors.outline, width: 1),
         ),
-        focusedBorder: OutlineInputBorder(
+        focusedBorder: const OutlineInputBorder(
           borderRadius: AppRadius.input,
           borderSide:
               BorderSide(color: AppColors.accentCyan, width: 1.5),
@@ -729,7 +729,7 @@ class HistoryEmptyState extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primaryPurple,
                   foregroundColor: AppColors.textPrimary,
-                  shape: RoundedRectangleBorder(
+                  shape: const RoundedRectangleBorder(
                       borderRadius: AppRadius.button),
                   elevation: 0,
                 ),

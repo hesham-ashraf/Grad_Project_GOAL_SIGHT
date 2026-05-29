@@ -53,32 +53,32 @@ class AdminTacticalAnalyticsSection extends StatelessWidget {
           ),
           const SizedBox(height: 18),
           // KPI Row
-          Row(
+          const Row(
             children: [
               _KpiChip(label: 'Possession', value: '62%', color: AppColors.accentCyan),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               _KpiChip(label: 'xG/Match', value: '2.8', color: AppColors.accentGreen),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               _KpiChip(label: 'Press %', value: '84%', color: AppColors.primaryPurple),
             ],
           ),
           const SizedBox(height: 18),
           // Efficiency Bars
-          _EfficiencyBar(label: 'Tactical Efficiency', value: 0.84, color: AppColors.accentCyan),
+          const _EfficiencyBar(label: 'Tactical Efficiency', value: 0.84, color: AppColors.accentCyan),
           const SizedBox(height: 10),
-          _EfficiencyBar(label: 'Pressing Intensity', value: 0.78, color: AppColors.primaryPurple),
+          const _EfficiencyBar(label: 'Pressing Intensity', value: 0.78, color: AppColors.primaryPurple),
           const SizedBox(height: 10),
-          _EfficiencyBar(label: 'Chance Creation', value: 0.72, color: AppColors.accentGreen),
+          const _EfficiencyBar(label: 'Chance Creation', value: 0.72, color: AppColors.accentGreen),
           const SizedBox(height: 16),
           // Ratings Row
-          Row(
+          const Row(
             children: [
               Expanded(child: _RatingCell(label: 'Attack', value: '8.7', color: AppColors.accentGreen)),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               Expanded(child: _RatingCell(label: 'Midfield', value: '8.2', color: AppColors.accentCyan)),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               Expanded(child: _RatingCell(label: 'Defence', value: '7.9', color: AppColors.warning)),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               Expanded(child: _RatingCell(label: 'Pressing', value: '8.4', color: AppColors.primaryPurple)),
             ],
           ),
@@ -840,7 +840,7 @@ class AdminDashboardHero extends StatelessWidget {
               _VertDivider(),
               _HeroStat(value: '${squad.length}', label: 'Players Tracked', icon: Icons.groups_outlined, color: AppColors.primaryPurple),
               _VertDivider(),
-              _HeroStat(value: '391', label: 'Total Analyses', icon: Icons.analytics_outlined, color: AppColors.accentGreen),
+              const _HeroStat(value: '391', label: 'Total Analyses', icon: Icons.analytics_outlined, color: AppColors.accentGreen),
             ],
           ),
         ],

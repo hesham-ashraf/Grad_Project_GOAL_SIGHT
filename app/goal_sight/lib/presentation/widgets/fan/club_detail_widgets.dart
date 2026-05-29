@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
 import '../../../data/models/club_model.dart';
-import 'tap_scale.dart';
 
 // ─── Player Item ────────────────────────────────────────────────────────────
 

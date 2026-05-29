@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/responsive.dart';
 import '../../../features/admin/data/admin_mock_data.dart';
 import '../../../data/models/player_analysis_model.dart';
 import '../../widgets/admin/admin_squad_widgets.dart';
@@ -78,7 +79,7 @@ class _SquadOverviewPageState extends State<SquadOverviewPage>
           children: [
             const Icon(Icons.groups_outlined, color: AppColors.accentCyan, size: 20),
             const SizedBox(width: 8),
-            Text('Squad Intelligence', style: AppTextStyles.title(color: Colors.white).copyWith(fontSize: 18)),
+            Text('Squad Intelligence', style: AppTextStyles.title(color: AppColors.textPrimary).copyWith(fontSize: context.sp(17, min: 15, max: 20))),
           ],
         ),
         backgroundColor: Colors.transparent,
@@ -115,7 +116,12 @@ class _SquadOverviewPageState extends State<SquadOverviewPage>
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 4, 20, 100),
+        padding: EdgeInsets.fromLTRB(
+          context.rs(20, min: 16, max: 28),
+          context.rs(4, min: 2, max: 8),
+          context.rs(20, min: 16, max: 28),
+          context.rs(100, min: 80, max: 120),
+        ),
         physics: const BouncingScrollPhysics(),
         children: [
           // 0 — Condition header
@@ -190,8 +196,8 @@ class _SquadOverviewPageState extends State<SquadOverviewPage>
           const SizedBox(height: 16),
 
           // 3 — Tactical contribution + strengths
-          _reveal(3, Column(
-            children: const [
+          _reveal(3, const Column(
+            children: [
               SquadTacticalContributionSection(),
               SizedBox(height: 20),
               SquadRiskRankingSection(),

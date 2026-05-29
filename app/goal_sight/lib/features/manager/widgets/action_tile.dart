@@ -8,7 +8,7 @@ class ActionTile extends StatelessWidget {
   final VoidCallback onTap;
   final bool destructive;
 
-  const ActionTile({Key? key, required this.label, required this.icon, required this.onTap, this.destructive = false}) : super(key: key);
+  const ActionTile({super.key, required this.label, required this.icon, required this.onTap, this.destructive = false});
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +22,7 @@ class ActionTile extends StatelessWidget {
             Icon(icon, color: destructive ? AppColors.danger : AppColors.textPrimary, size: context.rs(20)),
             SizedBox(width: context.rs(AppSpacing.md)),
             Expanded(child: Text(label, style: AppTextStyles.body(color: destructive ? AppColors.danger : AppColors.textPrimary))),
-            Icon(Icons.chevron_right, color: AppColors.textMuted),
+            const Icon(Icons.chevron_right, color: AppColors.textMuted),
           ],
         ),
       ),

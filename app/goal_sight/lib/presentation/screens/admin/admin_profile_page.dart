@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_theme.dart';
-import '../../state_management/app_providers.dart';
+import '../../../providers/app_providers.dart';
 
 class AdminProfilePage extends ConsumerStatefulWidget {
   const AdminProfilePage({super.key});
@@ -199,7 +199,7 @@ class _ProfileHeader extends StatelessWidget {
                 Text('admin@goalsight.com',
                     style: AppTextStyles.caption(color: AppColors.textMuted)),
                 const SizedBox(height: 8),
-                Wrap(
+                const Wrap(
                   spacing: 8,
                   children: [
                     _Badge(label: 'ADMIN', color: AppColors.primaryPurple),

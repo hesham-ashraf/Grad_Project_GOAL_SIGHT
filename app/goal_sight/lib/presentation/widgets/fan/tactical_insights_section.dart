@@ -150,8 +150,8 @@ class _TacticalInsightsSectionState extends State<TacticalInsightsSection>
             Container(
               width: context.rs(40, min: 36, max: 44),
               height: context.rs(40, min: 36, max: 44),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [AppColors.primaryPurple, AppColors.accentCyan],
@@ -196,8 +196,8 @@ class _TacticalInsightsSectionState extends State<TacticalInsightsSection>
                 horizontal: context.rs(8, min: 7, max: 10),
                 vertical: context.rs(4, min: 3, max: 5),
               ),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
                   colors: [AppColors.primaryPurple, AppColors.accentCyan],
                 ),
                 borderRadius: AppRadius.chip,

@@ -1,21 +1,21 @@
-/// ---------------------------------------------------------------------------
-/// GoalSight — AI Match Analysis Mock Data
-///
-/// Each [MatchAnalysisModel] here replicates the exact JSON shape the AI
-/// backend returns. When Supabase is live, replace this provider with a real
-/// [AsyncNotifierProvider] that fetches from the API — the UI stays unchanged.
-/// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+//GoalSight — AI Match Analysis Mock Data
+//
+//Each [MatchAnalysisModel] here replicates the exact JSON shape the AI
+//backend returns. When Supabase is live, replace this provider with a real
+//[AsyncNotifierProvider] that fetches from the API — the UI stays unchanged.
+// ---------------------------------------------------------------------------
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/models/match_analysis_model.dart';
+import '../data/models/match_analysis_model.dart';
 
-/// Provides the full list of analysed matches (list screen data).
+//Provides the full list of analysed matches (list screen data).
 final mockAnalysisMatchesProvider = Provider<List<MatchAnalysisModel>>((ref) {
   return _mockMatches;
 });
 
-/// Provides a single [MatchAnalysisModel] by ID (detail screen data).
+//Provides a single [MatchAnalysisModel] by ID (detail screen data).
 final mockMatchAnalysisProvider =
     Provider.family<MatchAnalysisModel?, String>((ref, matchId) {
   try {

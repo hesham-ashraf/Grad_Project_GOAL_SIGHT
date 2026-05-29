@@ -8,22 +8,22 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/models/club_model.dart';
-import '../../data/models/manager_model.dart';
-import '../../data/models/match_analysis_model.dart';
-import '../../data/models/player_profile_model.dart';
-import '../../data/models/risk_analysis_model.dart';
-import '../../data/repositories/interfaces/i_analysis_repository.dart';
-import '../../data/repositories/interfaces/i_club_repository.dart';
-import '../../data/repositories/interfaces/i_manager_repository.dart';
-import '../../data/repositories/interfaces/i_player_repository.dart';
-import '../../data/repositories/interfaces/i_upload_repository.dart';
-import '../../data/repositories/mock/mock_analysis_repository.dart';
-import '../../data/repositories/mock/mock_club_repository.dart';
-import '../../data/repositories/mock/mock_manager_repository.dart';
-import '../../data/repositories/mock/mock_player_repository.dart';
-import '../../data/repositories/mock/mock_upload_repository.dart';
-import '../../features/manager/upload_job_model.dart';
+import '../data/models/club_model.dart';
+import '../data/models/manager_model.dart';
+import '../data/models/match_analysis_model.dart';
+import '../data/models/player_profile_model.dart';
+import '../data/models/risk_analysis_model.dart';
+import '../data/repositories/interfaces/i_analysis_repository.dart';
+import '../data/repositories/interfaces/i_club_repository.dart';
+import '../data/repositories/interfaces/i_manager_repository.dart';
+import '../data/repositories/interfaces/i_player_repository.dart';
+import '../data/repositories/interfaces/i_upload_repository.dart';
+import '../data/repositories/mock/mock_analysis_repository.dart';
+import '../data/repositories/mock/mock_club_repository.dart';
+import '../data/repositories/mock/mock_manager_repository.dart';
+import '../data/repositories/mock/mock_player_repository.dart';
+import '../data/repositories/mock/mock_upload_repository.dart';
+import '../data/models/upload_job_model.dart';
 
 // ── Repository singletons ─────────────────────────────────────────────────
 

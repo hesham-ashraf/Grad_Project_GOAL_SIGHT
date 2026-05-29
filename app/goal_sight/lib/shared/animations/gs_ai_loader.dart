@@ -17,7 +17,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/animations/motion_tokens.dart';
 import '../../core/theme/app_theme.dart';
-import '../../features/manager/upload_job_model.dart';
+import '../../data/models/upload_job_model.dart';
 
 // ═════════════════════════════════════════════════════════════════════════════
 // 1. GsAiLoader — full-screen AI processing overlay
@@ -121,8 +121,8 @@ class _GsAiLoaderState extends State<GsAiLoader>
                       animation: _ring1,
                       builder: (_, __) => Transform.rotate(
                         angle: _ring1.value * 2 * pi,
-                        child: CustomPaint(
-                          size: const Size(160, 160),
+                        child: const CustomPaint(
+                          size: Size(160, 160),
                           painter: _RingPainter(
                             color: AppColors.accentCyan,
                             strokeWidth: 2,
@@ -136,8 +136,8 @@ class _GsAiLoaderState extends State<GsAiLoader>
                       animation: _ring2,
                       builder: (_, __) => Transform.rotate(
                         angle: -_ring2.value * 2 * pi,
-                        child: CustomPaint(
-                          size: const Size(110, 110),
+                        child: const CustomPaint(
+                          size: Size(110, 110),
                           painter: _RingPainter(
                             color: AppColors.primaryPurple,
                             strokeWidth: 1.5,
@@ -554,7 +554,7 @@ class _GsStageTimeline extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final stages = ProcessingStage.values;
+    const stages = ProcessingStage.values;
     final currentIdx = stages.indexOf(currentStage);
 
     return Padding(

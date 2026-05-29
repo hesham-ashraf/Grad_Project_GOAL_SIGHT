@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/utils/responsive.dart';
 import '../../../features/match/match_state.dart';
-import '../../state_management/app_providers.dart';
+import '../../../providers/app_providers.dart';
 import '../../widgets/dashboard_card.dart';
 import '../../widgets/error_state.dart';
 import '../../widgets/loading_state.dart';
@@ -48,11 +48,12 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
             ),
             FilledButton(
               onPressed: () async {
+                final nav = Navigator.of(context);
                 await ref.read(adminControllerProvider.notifier).addMatch(
                       homeTeam: homeController.text,
                       awayTeam: awayController.text,
                     );
-                if (mounted) Navigator.pop(context);
+                if (mounted) nav.pop();
               },
               child: const Text('Create Match'),
             ),

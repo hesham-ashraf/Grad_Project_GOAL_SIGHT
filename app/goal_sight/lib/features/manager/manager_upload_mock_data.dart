@@ -110,10 +110,10 @@ MatchAnalysisModel generateMockMatchAnalysis() {
       style: _styles[_random.nextInt(_styles.length)],
       pressureStyle: _pressureStyles[_random.nextInt(_pressureStyles.length)],
       compactness: _compactness[_random.nextInt(_compactness.length)],
-      attackingZones: [
+      attackingZones: {
         _zones[_random.nextInt(_zones.length)],
         _zones[_random.nextInt(_zones.length)],
-      ].toSet().toList(),
+      }.toList(),
       avgRating: homeAvgRating,
       topPlayers: homeTopPlayers,
       worstPlayers: homeWorstPlayers,
@@ -124,10 +124,10 @@ MatchAnalysisModel generateMockMatchAnalysis() {
       style: _styles[_random.nextInt(_styles.length)],
       pressureStyle: _pressureStyles[_random.nextInt(_pressureStyles.length)],
       compactness: _compactness[_random.nextInt(_compactness.length)],
-      attackingZones: [
+      attackingZones: {
         _zones[_random.nextInt(_zones.length)],
         _zones[_random.nextInt(_zones.length)],
-      ].toSet().toList(),
+      }.toList(),
       avgRating: awayAvgRating,
       topPlayers: awayPlayers.map((p) => p.id).toList(),
       worstPlayers: homePlayers.map((p) => p.id).toList(),
@@ -150,7 +150,7 @@ MatchAnalysisModel generateMockMatchAnalysis() {
 List<PlayerModel> _generateTeamPlayers(String teamName, int count) {
   final players = <PlayerModel>[];
   for (int i = 0; i < count; i++) {
-    final performanceValues = PerformanceStatus.values;
+    const performanceValues = PerformanceStatus.values;
     final performance = performanceValues[_random.nextInt(performanceValues.length)];
     final rating = _ratingForPerformance(performance);
 
@@ -239,10 +239,10 @@ List<String> _generateKeyMoments(int homeScore, int awayScore) {
 
   while (homeGoals > 0 || awayGoals > 0) {
     if (homeGoals > 0 && _random.nextBool()) {
-      moments.add("${minute}' Goal - Home team");
+      moments.add("$minute' Goal - Home team");
       homeGoals--;
     } else if (awayGoals > 0) {
-      moments.add("${minute}' Goal - Away team");
+      moments.add("$minute' Goal - Away team");
       awayGoals--;
     }
     minute += _random.nextInt(20) + 10;

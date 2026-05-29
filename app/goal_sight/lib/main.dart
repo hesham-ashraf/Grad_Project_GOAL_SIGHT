@@ -4,7 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'core/supabase/supabase_config.dart';
 import 'core/theme/app_theme.dart';
-import 'presentation/state_management/router_provider.dart';
+import 'providers/router_provider.dart';
 import 'shared/goalsight_ui.dart';
 
 Future<void> main() async {
