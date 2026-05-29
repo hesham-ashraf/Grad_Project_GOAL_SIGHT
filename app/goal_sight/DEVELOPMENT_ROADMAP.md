@@ -162,13 +162,13 @@ Finish the full Flutter application visually and functionally with realistic moc
 
 #### Manager Dashboard
 
-- [ ] Add tactical recommendations | Sign-off: ______ | Date: ______
+- [x] Add tactical recommendations | Sign-off: ______ | Date: ______
 - [x] Add fatigue alerts | Sign-off: ______ | Date: ______
-- [ ] Add underperforming players section | Sign-off: ______ | Date: ______
+- [x] Add underperforming players section | Sign-off: ______ | Date: ______
 - [x] Add AI insight feed | Sign-off: ______ | Date: ______
-- [ ] Add tactical identity overview | Sign-off: ______ | Date: ______
-- [ ] Add club analytics widgets | Sign-off: ______ | Date: ______
-- [ ] Add performance trend charts | Sign-off: ______ | Date: ______
+- [x] Add tactical identity overview | Sign-off: ______ | Date: ______
+- [x] Add club analytics widgets | Sign-off: ______ | Date: ______
+- [x] Add performance trend charts | Sign-off: ______ | Date: ______
 
 #### Upload Workflow
 
@@ -176,40 +176,39 @@ Finish the full Flutter application visually and functionally with realistic moc
 
 - [x] Build dedicated upload page | Sign-off: ______ | Date: ______
 - [x] Add video picker | Sign-off: ______ | Date: ______
-- [ ] Add drag and drop UI | Sign-off: ______ | Date: ______
-- [ ] Add team selection form | Sign-off: ______ | Date: ______
-- [ ] Add match metadata form | Sign-off: ______ | Date: ______
-- [ ] Add upload confirmation flow | Sign-off: ______ | Date: ______
+- [x] Add drag and drop UI | Sign-off: ______ | Date: ______
+- [x] Add team selection form | Sign-off: ______ | Date: ______
+- [x] Add match metadata form | Sign-off: ______ | Date: ______
+- [x] Add upload confirmation flow | Sign-off: ______ | Date: ______
 
 ##### AI Processing Experience
 
 - [x] Create upload progress screen | Sign-off: ______ | Date: ______
-- [ ] Create AI processing animations | Sign-off: ______ | Date: ______
-- [ ] Create staged progress system | Sign-off: ______ | Date: ______
+- [x] Create AI processing animations | Sign-off: ______ | Date: ______
+- [x] Create staged progress system | Sign-off: ______ | Date: ______
 
 ##### Processing Stages
-
-- [ ] Detecting players... | Sign-off: ______ | Date: ______
-- [ ] Tracking ball... | Sign-off: ______ | Date: ______
-- [ ] Estimating possession... | Sign-off: ______ | Date: ______
-- [ ] Calculating speed... | Sign-off: ______ | Date: ______
-- [ ] Generating tactical insights... | Sign-off: ______ | Date: ______
-- [ ] Finalizing report... | Sign-off: ______ | Date: ______
+- [x] Detecting players... | Sign-off: ______ | Date: ______
+- [x] Tracking ball... | Sign-off: ______ | Date: ______
+- [x] Estimating possession... | Sign-off: ______ | Date: ______
+- [x] Calculating speed... | Sign-off: ______ | Date: ______
+- [x] Generating tactical insights... | Sign-off: ______ | Date: ______
+- [x] Finalizing report... | Sign-off: ______ | Date: ______
 
 ##### Upload Results
 
 - [x] Create analysis completed screen | Sign-off: ______ | Date: ______
-- [ ] Create upload failed screen | Sign-off: ______ | Date: ______
-- [ ] Create retry upload flow | Sign-off: ______ | Date: ______
-- [ ] Create upload success animations | Sign-off: ______ | Date: ______
+- [x] Create upload failed screen | Sign-off: ______ | Date: ______
+- [x] Create retry upload flow | Sign-off: ______ | Date: ______
+- [x] Create upload success animations | Sign-off: ______ | Date: ______
 
 #### Upload History
 
-- [ ] Build upload history page | Sign-off: ______ | Date: ______
-- [ ] Add processing status badges | Sign-off: ______ | Date: ______
-- [ ] Add completed analyses list | Sign-off: ______ | Date: ______
-- [ ] Add failed uploads list | Sign-off: ______ | Date: ______
-- [ ] Add upload filtering/search | Sign-off: ______ | Date: ______
+- [x] Build upload history page | Sign-off: ______ | Date: ______
+- [x] Add processing status badges | Sign-off: ______ | Date: ______
+- [x] Add completed analyses list | Sign-off: ______ | Date: ______
+- [x] Add failed uploads list | Sign-off: ______ | Date: ______
+- [x] Add upload filtering/search | Sign-off: ______ | Date: ______
 
 #### Match Analysis Dashboard
 
