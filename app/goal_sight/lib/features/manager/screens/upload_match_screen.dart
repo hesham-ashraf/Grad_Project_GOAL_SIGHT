@@ -1,11 +1,28 @@
+import 'dart:async';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/responsive.dart';
 import '../../../data/models/match_analysis_model.dart';
 import '../manager_upload_mock_data.dart';
+import '../upload_job_model.dart';
+import '../widgets/ai_processing_widgets.dart';
+import '../widgets/upload_widgets.dart';
 
-enum _UploadState { initial, selected, loading, success }
+// ─── Step Enum ────────────────────────────────────────────────────────────────
+
+enum _UploadStep {
+  fileSelection,
+  matchDetails,
+  confirmation,
+  processing,
+  success,
+  failed,
+}
+
+// ─── Screen ───────────────────────────────────────────────────────────────────
 
 class UploadMatchScreen extends StatefulWidget {
   const UploadMatchScreen({super.key});
@@ -15,70 +32,210 @@ class UploadMatchScreen extends StatefulWidget {
 }
 
 class _UploadMatchScreenState extends State<UploadMatchScreen>
-    with SingleTickerProviderStateMixin {
-  _UploadState _state = _UploadState.initial;
-  String? _selectedFileName;
-  double _uploadProgress = 0;
+    with TickerProviderStateMixin {
+  _UploadStep _step = _UploadStep.fileSelection;
+  UploadFormData _formData = UploadFormData();
   MatchAnalysisModel? _generatedAnalysis;
 
-  late final AnimationController _fadeController;
-  late final Animation<double> _fadeAnimation;
+  // Processing state
+  ProcessingStage? _currentStage;
+  double _overallProgress = 0.0;
+  Timer? _processingTimer;
+  int _stageIndex = -1;
+
+  // Failure state
+  String _failureReason = '';
+
+  // Page scroll controller
+  final _scrollController = ScrollController();
+
+  // Step transition animation
+  late final AnimationController _stepCtrl;
+  late final Animation<double> _stepFade;
 
   @override
   void initState() {
     super.initState();
-    _fadeController = AnimationController(
-      duration: const Duration(milliseconds: 450),
+    _stepCtrl = AnimationController(
       vsync: this,
+      duration: const Duration(milliseconds: 350),
+    )..forward();
+    _stepFade = CurvedAnimation(
+      parent: _stepCtrl,
+      curve: Curves.easeOutCubic,
     );
-    _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: _fadeController, curve: Curves.easeInOutCubic),
-    );
-    _fadeController.forward();
   }
 
   @override
   void dispose() {
-    _fadeController.dispose();
+    _processingTimer?.cancel();
+    _stepCtrl.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
-  void _selectVideo() {
-    setState(() {
-      _selectedFileName = 'match_video_${DateTime.now().millisecond}.mp4';
-      _state = _UploadState.selected;
-    });
-    _fadeController.forward(from: 0);
-  }
+  // ── Navigation helpers ──────────────────────────────────────────────────────
 
-  void _startAnalysis() async {
-    setState(() {
-      _state = _UploadState.loading;
-      _uploadProgress = 0;
-    });
-    _fadeController.forward(from: 0);
-
-    // Simulate upload and processing over 3 seconds
-    for (int i = 0; i <= 30; i++) {
-      await Future.delayed(const Duration(milliseconds: 100));
-      if (mounted) {
-        setState(() {
-          _uploadProgress = (i / 30).clamp(0, 1);
-        });
+  void _goTo(_UploadStep step) {
+    setState(() => _step = step);
+    _stepCtrl.forward(from: 0);
+    // Scroll to top when step changes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          0,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOutCubic,
+        );
       }
+    });
+  }
+
+  // ── File selection ──────────────────────────────────────────────────────────
+
+  void _onFileSelected() {
+    // Simulate picking a file — generate a mock name/size
+    final r = math.Random();
+    final sizes = ['842 MB', '1.2 GB', '2.1 GB', '650 MB', '1.8 GB'];
+    final mockName =
+        'match_footage_${DateTime.now().millisecondsSinceEpoch}.mp4';
+    final mockSize = sizes[r.nextInt(sizes.length)];
+
+    setState(() {
+      _formData = _formData.copyWith(
+        fileName: mockName,
+        fileSize: mockSize,
+      );
+    });
+    _goTo(_UploadStep.matchDetails);
+  }
+
+  void _onFileRemoved() {
+    setState(() {
+      _formData = UploadFormData();
+    });
+    _goTo(_UploadStep.fileSelection);
+  }
+
+  // ── Form ──────────────────────────────────────────────────────────────────
+
+  void _onFormDataChanged(UploadFormData data) {
+    setState(() => _formData = data);
+  }
+
+  bool get _isMatchDetailsValid =>
+      _formData.isTeamFormValid && _formData.isMetadataFormValid;
+
+  void _proceedToConfirmation() {
+    if (!_isMatchDetailsValid) {
+      _showValidationSnackBar();
+      return;
+    }
+    _goTo(_UploadStep.confirmation);
+  }
+
+  void _showValidationSnackBar() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(Icons.warning_amber_rounded,
+                color: AppColors.warning, size: 18),
+            const SizedBox(width: 10),
+            const Text('Please fill in all required fields.'),
+          ],
+        ),
+        backgroundColor: AppColors.surfaceElevated,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: AppRadius.card),
+      ),
+    );
+  }
+
+  // ── Processing simulation ───────────────────────────────────────────────────
+
+  void _startProcessing() {
+    _goTo(_UploadStep.processing);
+    setState(() {
+      _currentStage = null;
+      _overallProgress = 0.0;
+      _stageIndex = -1;
+    });
+
+    // Simulate initial upload delay then begin stages
+    Future.delayed(const Duration(milliseconds: 800), _advanceStage);
+  }
+
+  void _advanceStage() {
+    if (!mounted) return;
+
+    final stages = ProcessingStage.values;
+    _stageIndex++;
+
+    if (_stageIndex >= stages.length) {
+      // All stages done — generate analysis
+      final analysis = generateMockMatchAnalysis();
+      setState(() {
+        _overallProgress = 1.0;
+        _currentStage = stages.last;
+        _generatedAnalysis = analysis;
+      });
+      // Short pause then go to success
+      Future.delayed(const Duration(milliseconds: 600), () {
+        if (mounted) _goTo(_UploadStep.success);
+      });
+      return;
     }
 
-    // Generate mock analysis
-    if (mounted) {
-      final mockData = generateMockMatchAnalysis();
+    final stage = stages[_stageIndex];
+    final targetProgress = stage.completionProgress;
+
+    setState(() {
+      _currentStage = stage;
+    });
+
+    // Animate progress toward target over the stage duration
+    const stageDurationMs = 2400; // ~2.4s per stage
+    const tickMs = 80;
+    final ticks = stageDurationMs ~/ tickMs;
+    final startProgress = _overallProgress;
+    int tick = 0;
+
+    _processingTimer?.cancel();
+    _processingTimer =
+        Timer.periodic(const Duration(milliseconds: tickMs), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      tick++;
+      final t = (tick / ticks).clamp(0.0, 1.0);
+      final eased = Curves.easeInOut
+          .transform(t.clamp(0.0, 1.0));
       setState(() {
-        _generatedAnalysis = mockData;
-        _state = _UploadState.success;
-        _uploadProgress = 1;
+        _overallProgress =
+            (startProgress + (targetProgress - startProgress) * eased)
+                .clamp(0.0, 1.0);
       });
-      _fadeController.forward(from: 0);
-    }
+
+      if (tick >= ticks) {
+        timer.cancel();
+        // Brief pause between stages
+        Future.delayed(const Duration(milliseconds: 300), _advanceStage);
+      }
+    });
   }
+
+  void _retryProcessing() {
+    _processingTimer?.cancel();
+    _startProcessing();
+  }
+
+  void _retryFromDetails() {
+    _goTo(_UploadStep.matchDetails);
+  }
+
+  // ── Analysis navigation ─────────────────────────────────────────────────────
 
   void _viewAnalysis() {
     if (_generatedAnalysis != null) {
@@ -86,453 +243,498 @@ class _UploadMatchScreenState extends State<UploadMatchScreen>
     }
   }
 
-  void _reset() {
-    setState(() {
-      _state = _UploadState.initial;
-      _selectedFileName = null;
-      _uploadProgress = 0;
-      _generatedAnalysis = null;
-    });
-    _fadeController.forward(from: 0);
+  void _viewHistory() {
+    context.push('/manager/upload-history');
   }
+
+  void _reset() {
+    _processingTimer?.cancel();
+    setState(() {
+      _step = _UploadStep.fileSelection;
+      _formData = UploadFormData();
+      _generatedAnalysis = null;
+      _currentStage = null;
+      _overallProgress = 0.0;
+      _stageIndex = -1;
+      _failureReason = '';
+    });
+    _stepCtrl.forward(from: 0);
+  }
+
+  // ── Step indicator ──────────────────────────────────────────────────────────
+
+  int get _currentStepIndex {
+    switch (_step) {
+      case _UploadStep.fileSelection:
+        return 0;
+      case _UploadStep.matchDetails:
+        return 1;
+      case _UploadStep.confirmation:
+        return 2;
+      case _UploadStep.processing:
+        return 3;
+      case _UploadStep.success:
+      case _UploadStep.failed:
+        return 3;
+    }
+  }
+
+  // ── Build ───────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
+    final hp = context.rs(20, min: 14, max: 28);
+    final showBack = _step == _UploadStep.matchDetails ||
+        _step == _UploadStep.confirmation;
+
     return Scaffold(
-      backgroundColor: AppTheme.darkBackground,
-      appBar: AppBar(
-        title: const Text('Upload & Analyze'),
-        elevation: 0,
-      ),
+      backgroundColor: Colors.transparent,
       body: SafeArea(
-        bottom: false,
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Padding(
-            padding: AppSpacing.page,
-            child: FadeTransition(
-              opacity: _fadeAnimation,
-              child: _buildStateContent(),
+        child: Column(
+          children: [
+            // ── Top bar ──
+            _TopBar(
+              step: _step,
+              onBack: showBack ? _handleBack : null,
+              onHistoryTap: _viewHistory,
             ),
-          ),
+
+            // ── Step indicator (hide on processing/success/failed) ──
+            if (_step != _UploadStep.processing &&
+                _step != _UploadStep.success &&
+                _step != _UploadStep.failed) ...[
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: hp),
+                child: _StepIndicator(
+                  currentIndex: _currentStepIndex,
+                ),
+              ),
+              const SizedBox(height: 8),
+            ],
+
+            // ── Content ──
+            Expanded(
+              child: SingleChildScrollView(
+                controller: _scrollController,
+                physics: const BouncingScrollPhysics(
+                  parent: AlwaysScrollableScrollPhysics(),
+                ),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 680),
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(hp, 16, hp, 40),
+                      child: FadeTransition(
+                        opacity: _stepFade,
+                        child: _buildStepContent(),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildStateContent() {
-    switch (_state) {
-      case _UploadState.initial:
-        return _UploadAreaWidget(onSelectVideo: _selectVideo);
-      case _UploadState.selected:
-        return _FileSelectedWidget(
-          fileName: _selectedFileName!,
-          onAnalyze: _startAnalysis,
+  void _handleBack() {
+    switch (_step) {
+      case _UploadStep.matchDetails:
+        _goTo(_UploadStep.fileSelection);
+        break;
+      case _UploadStep.confirmation:
+        _goTo(_UploadStep.matchDetails);
+        break;
+      default:
+        break;
+    }
+  }
+
+  Widget _buildStepContent() {
+    switch (_step) {
+      case _UploadStep.fileSelection:
+        return _FileSelectionStep(
+          formData: _formData,
+          onFileSelected: _onFileSelected,
         );
-      case _UploadState.loading:
-        return _LoadingWidget(progress: _uploadProgress);
-      case _UploadState.success:
-        return _SuccessWidget(
-          match: _generatedAnalysis!,
+
+      case _UploadStep.matchDetails:
+        return _MatchDetailsStep(
+          formData: _formData,
+          onChanged: _onFormDataChanged,
+          onFileRemoved: _onFileRemoved,
+          onContinue: _proceedToConfirmation,
+          isValid: _isMatchDetailsValid,
+        );
+
+      case _UploadStep.confirmation:
+        return UploadConfirmationCard(
+          formData: _formData,
+          onConfirm: _startProcessing,
+          onEdit: () => _goTo(_UploadStep.matchDetails),
+        );
+
+      case _UploadStep.processing:
+        return AiProcessingView(
+          currentStage: _currentStage,
+          overallProgress: _overallProgress,
+          homeTeam: _formData.homeTeam,
+          awayTeam: _formData.awayTeam,
+          competition: _formData.competition,
+        );
+
+      case _UploadStep.success:
+        final analysis = _generatedAnalysis;
+        if (analysis == null) return const SizedBox.shrink();
+        return ProcessingSuccessCard(
+          homeTeam: _formData.homeTeam,
+          awayTeam: _formData.awayTeam,
+          competition: _formData.competition,
+          matchScore: analysis.score,
+          intensityScore: analysis.intensity,
+          tacticalSummary: _buildTacticalSummary(analysis),
           onViewAnalysis: _viewAnalysis,
-          onReset: _reset,
+          onUploadAnother: _reset,
+          onViewHistory: _viewHistory,
+        );
+
+      case _UploadStep.failed:
+        return UploadFailedCard(
+          reason: _failureReason,
+          onRetry: _retryProcessing,
+          onEditDetails: _retryFromDetails,
+          formData: _formData,
         );
     }
   }
+
+  String _buildTacticalSummary(MatchAnalysisModel analysis) {
+    final dominant = analysis.summary.dominantTeam;
+    final homeAR = analysis.homeAnalysis.avgRating.toStringAsFixed(1);
+    final awayAR = analysis.awayAnalysis.avgRating.toStringAsFixed(1);
+    final style = analysis.homeAnalysis.style;
+    return '$dominant dominated with a $style approach. '
+        '${analysis.homeTeam} avg rating: $homeAR · '
+        '${analysis.awayTeam} avg rating: $awayAR. '
+        '${analysis.recommendations.isNotEmpty ? analysis.recommendations.first + "." : ""}';
+  }
 }
 
-// ─── Upload Area Widget ───────────────────────────────────────────────────────
+// ─── File Selection Step ──────────────────────────────────────────────────────
 
-class _UploadAreaWidget extends StatelessWidget {
-  const _UploadAreaWidget({required this.onSelectVideo});
+class _FileSelectionStep extends StatelessWidget {
+  const _FileSelectionStep({
+    required this.formData,
+    required this.onFileSelected,
+  });
 
-  final VoidCallback onSelectVideo;
+  final UploadFormData formData;
+  final VoidCallback onFileSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return UploadDropZone(onSelectFile: onFileSelected);
+  }
+}
+
+// ─── Match Details Step ───────────────────────────────────────────────────────
+
+class _MatchDetailsStep extends StatelessWidget {
+  const _MatchDetailsStep({
+    required this.formData,
+    required this.onChanged,
+    required this.onFileRemoved,
+    required this.onContinue,
+    required this.isValid,
+  });
+
+  final UploadFormData formData;
+  final ValueChanged<UploadFormData> onChanged;
+  final VoidCallback onFileRemoved;
+  final VoidCallback onContinue;
+  final bool isValid;
 
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const SizedBox(height: 40),
-        Container(
-          decoration: BoxDecoration(
-            borderRadius: AppRadius.card,
-            boxShadow: AppShadows.card,
-          ),
-          child: Material(
-            color: AppTheme.darkSurfaceAlt,
-            borderRadius: AppRadius.card,
-            child: InkWell(
-              borderRadius: AppRadius.card,
-              onTap: onSelectVideo,
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 36, horizontal: 24),
-                child: Column(
-                  children: [
-                    Icon(
-                      Icons.video_camera_back_outlined,
-                      size: 72,
-                      color: AppColors.accentCyan,
-                    ),
-                    const SizedBox(height: 24),
-                    Text(
-                      'Upload Match Video',
-                      style: AppTextStyles.title(),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Select a video file to analyze',
-                      style: AppTextStyles.body(color: AppColors.textSecondary),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+        Text(
+          'Match Details',
+          style: AppTextStyles.headline().copyWith(
+            fontSize: context.sp(24, min: 20, max: 30),
           ),
         ),
-        const SizedBox(height: 20),
+        SizedBox(height: context.rs(4, min: 3, max: 6)),
+        Text(
+          'Enter the teams and match information for accurate analysis.',
+          style: AppTextStyles.body(color: AppColors.textSecondary),
+        ),
+        SizedBox(height: context.rs(16, min: 12, max: 20)),
+
+        // Selected file card
+        if (formData.fileName != null) ...[
+          SelectedFileCard(
+            fileName: formData.fileName!,
+            fileSize: formData.fileSize ?? '—',
+            onRemove: onFileRemoved,
+          ),
+          SizedBox(height: context.rs(16, min: 12, max: 20)),
+        ],
+
+        // Team form
+        TeamSelectionForm(
+          formData: formData,
+          onChanged: onChanged,
+        ),
+        SizedBox(height: context.rs(14, min: 10, max: 18)),
+
+        // Metadata form
+        MatchMetadataForm(
+          formData: formData,
+          onChanged: onChanged,
+        ),
+        SizedBox(height: context.rs(24, min: 18, max: 32)),
+
+        // Continue button
         SizedBox(
           width: double.infinity,
           child: ElevatedButton.icon(
-            onPressed: onSelectVideo,
-            icon: const Icon(Icons.cloud_upload_outlined),
-            label: const Text('Select Video'),
+            onPressed: isValid ? onContinue : null,
+            icon: const Icon(Icons.arrow_forward_rounded),
+            label: const Text('Review & Confirm'),
             style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 14),
               backgroundColor: AppColors.primaryPurple,
+              foregroundColor: AppColors.textPrimary,
+              disabledBackgroundColor:
+                  AppColors.primaryPurple.withValues(alpha: 0.35),
+              disabledForegroundColor:
+                  AppColors.textPrimary.withValues(alpha: 0.5),
+              padding: EdgeInsets.symmetric(
+                  vertical: context.rs(15, min: 12, max: 18)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: AppRadius.button),
+              elevation: 0,
             ),
           ),
         ),
-        const SizedBox(height: 24),
-        _InfoCard(
-          icon: Icons.info_outline,
-          title: 'Supported Formats',
-          subtitle: 'MP4, MOV, AVI (max 5GB)',
-        ),
-        const SizedBox(height: 16),
-        _InfoCard(
-          icon: Icons.schedule_outlined,
-          title: 'Processing Time',
-          subtitle: 'Analysis typically takes 2–3 minutes',
-        ),
       ],
     );
   }
 }
 
-// ─── File Selected Widget ──────────────────────────────────────────────────────
+// ─── Top Bar ──────────────────────────────────────────────────────────────────
 
-class _FileSelectedWidget extends StatelessWidget {
-  const _FileSelectedWidget({
-    required this.fileName,
-    required this.onAnalyze,
+class _TopBar extends StatelessWidget {
+  const _TopBar({
+    required this.step,
+    required this.onBack,
+    required this.onHistoryTap,
   });
 
-  final String fileName;
-  final VoidCallback onAnalyze;
+  final _UploadStep step;
+  final VoidCallback? onBack;
+  final VoidCallback onHistoryTap;
 
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const SizedBox(height: 32),
-        Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            borderRadius: AppRadius.card,
-            color: AppTheme.darkSurfaceAlt,
-            boxShadow: AppShadows.card,
-          ),
-          padding: AppSpacing.card,
-          child: Row(
-            children: [
-              Icon(
-                Icons.insert_drive_file_outlined,
-                size: 40,
-                color: AppColors.accentCyan,
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'File Ready',
-                      style: AppTextStyles.caption(color: AppColors.textMuted),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      fileName,
-                      style: AppTextStyles.body(),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-              Icon(
-                Icons.check_circle_outlined,
-                color: AppColors.success,
-                size: 24,
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 32),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton.icon(
-            onPressed: onAnalyze,
-            icon: const Icon(Icons.auto_awesome_outlined),
-            label: const Text('Start Analysis'),
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              backgroundColor: AppColors.accentGreen,
-              foregroundColor: Colors.black,
-            ),
-          ),
-        ),
-        const SizedBox(height: 24),
-        _InfoCard(
-          icon: Icons.analytics_outlined,
-          title: 'What You\'ll Get',
-          subtitle: 'Player ratings, team tactics, key moments, and AI insights',
-        ),
-      ],
-    );
+  String get _title {
+    switch (step) {
+      case _UploadStep.fileSelection:
+        return 'Upload & Analyze';
+      case _UploadStep.matchDetails:
+        return 'Match Details';
+      case _UploadStep.confirmation:
+        return 'Review';
+      case _UploadStep.processing:
+        return 'AI Processing';
+      case _UploadStep.success:
+        return 'Analysis Ready';
+      case _UploadStep.failed:
+        return 'Upload Failed';
+    }
   }
-}
-
-// ─── Loading Widget ───────────────────────────────────────────────────────────
-
-class _LoadingWidget extends StatelessWidget {
-  const _LoadingWidget({required this.progress});
-
-  final double progress;
 
   @override
   Widget build(BuildContext context) {
-    final percentage = (progress * 100).toStringAsFixed(0);
+    final hp = context.rs(20, min: 14, max: 28);
 
-    return Column(
-      children: [
-        const SizedBox(height: 60),
-        SizedBox(
-          width: 120,
-          height: 120,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              SizedBox.expand(
-                child: CircularProgressIndicator(
-                  value: progress,
-                  strokeWidth: 4,
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    AppColors.accentCyan,
-                  ),
-                  backgroundColor: AppColors.outline.withOpacity(0.3),
-                ),
-              ),
-              Text(
-                '$percentage%',
-                style: AppTextStyles.title(color: AppColors.accentCyan),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 32),
-        Text(
-          'Analyzing Match...',
-          style: AppTextStyles.title(),
-        ),
-        const SizedBox(height: 12),
-        Text(
-          'AI is processing team tactics, player performance, and key moments',
-          style: AppTextStyles.body(color: AppColors.textSecondary),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 32),
-        Container(
-          decoration: BoxDecoration(
-            borderRadius: AppRadius.card,
-            color: AppTheme.darkSurfaceAlt,
-            boxShadow: AppShadows.card,
-          ),
-          padding: AppSpacing.card,
-          child: Row(
-            children: [
-              SizedBox(
-                width: 32,
-                height: 32,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    AppColors.primaryBlue,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  'Processing...',
-                  style: AppTextStyles.body(),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-// ─── Success Widget ───────────────────────────────────────────────────────────
-
-class _SuccessWidget extends StatelessWidget {
-  const _SuccessWidget({
-    required this.match,
-    required this.onViewAnalysis,
-    required this.onReset,
-  });
-
-  final MatchAnalysisModel match;
-  final VoidCallback onViewAnalysis;
-  final VoidCallback onReset;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const SizedBox(height: 32),
-        Icon(
-          Icons.check_circle_outline,
-          size: 80,
-          color: AppColors.success,
-        ),
-        const SizedBox(height: 24),
-        Text(
-          'Analysis Complete!',
-          style: AppTextStyles.headline(color: AppColors.success),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'Your match data has been successfully analyzed.',
-          style: AppTextStyles.body(color: AppColors.textSecondary),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 32),
-        Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            borderRadius: AppRadius.card,
-            color: AppTheme.darkSurfaceAlt,
-            boxShadow: AppShadows.card,
-          ),
-          padding: AppSpacing.card,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '${match.homeTeam} vs ${match.awayTeam}',
-                style: AppTextStyles.title(),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Score: ${match.score}',
-                style: AppTextStyles.body(color: AppColors.accentCyan),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Date: ${match.date}',
-                style: AppTextStyles.caption(),
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Icon(Icons.whatshot_outlined,
-                      size: 16, color: AppColors.warning),
-                  const SizedBox(width: 6),
-                  Text(
-                    'Intensity: ${match.intensity}%',
-                    style: AppTextStyles.caption(),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 24),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton.icon(
-            onPressed: onViewAnalysis,
-            icon: const Icon(Icons.analytics_outlined),
-            label: const Text('View Full Analysis'),
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 14),
-              backgroundColor: AppColors.accentGreen,
-              foregroundColor: Colors.black,
-            ),
-          ),
-        ),
-        const SizedBox(height: 12),
-        SizedBox(
-          width: double.infinity,
-          child: OutlinedButton.icon(
-            onPressed: onReset,
-            icon: const Icon(Icons.add_circle_outline),
-            label: const Text('Upload Another'),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-// ─── Info Card Widget ──────────────────────────────────────────────────────────
-
-class _InfoCard extends StatelessWidget {
-  const _InfoCard({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-  });
-
-  final IconData icon;
-  final String title;
-  final String subtitle;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        borderRadius: AppRadius.card,
-        color: AppTheme.darkSurfaceAlt.withOpacity(0.5),
-        border: Border.all(
-          color: AppColors.outline.withOpacity(0.3),
-          width: 1,
-        ),
-      ),
-      padding: AppSpacing.card,
+    return Padding(
+      padding: EdgeInsets.fromLTRB(hp, 12, hp, 8),
       child: Row(
         children: [
-          Icon(icon, color: AppColors.accentCyan, size: 24),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: AppTextStyles.body()),
-                const SizedBox(height: 2),
-                Text(
-                  subtitle,
-                  style: AppTextStyles.caption(),
+          if (onBack != null)
+            GestureDetector(
+              onTap: onBack,
+              child: Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.surfaceElevated,
+                  border: Border.all(color: AppColors.outlineSubtle),
                 ),
-              ],
+                child: Icon(
+                  Icons.arrow_back_rounded,
+                  size: 18,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            )
+          else
+            const SizedBox(width: 36),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              _title,
+              style: AppTextStyles.title().copyWith(
+                fontSize: context.sp(18, min: 16, max: 22),
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          const SizedBox(width: 10),
+          // History button
+          GestureDetector(
+            onTap: onHistoryTap,
+            child: Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.surfaceElevated,
+                border: Border.all(color: AppColors.outlineSubtle),
+              ),
+              child: Icon(
+                Icons.history_rounded,
+                size: 18,
+                color: AppColors.textSecondary,
+              ),
             ),
           ),
         ],
       ),
+    );
+  }
+}
+
+// ─── Step Indicator ───────────────────────────────────────────────────────────
+
+class _StepIndicator extends StatelessWidget {
+  const _StepIndicator({required this.currentIndex});
+
+  final int currentIndex;
+
+  static const _labels = ['Select', 'Details', 'Review', 'Processing'];
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        children: List.generate(_labels.length * 2 - 1, (i) {
+          if (i.isOdd) {
+            // Connector line
+            final stepIndex = i ~/ 2;
+            final isCompleted = stepIndex < currentIndex;
+            return Expanded(
+              child: Container(
+                height: 2,
+                color: isCompleted
+                    ? AppColors.primaryPurple
+                    : AppColors.outlineSubtle,
+              ),
+            );
+          }
+          final stepIndex = i ~/ 2;
+          final isCompleted = stepIndex < currentIndex;
+          final isCurrent = stepIndex == currentIndex;
+
+          return _StepDot(
+            label: _labels[stepIndex],
+            index: stepIndex + 1,
+            isCompleted: isCompleted,
+            isCurrent: isCurrent,
+          );
+        }),
+      ),
+    );
+  }
+}
+
+class _StepDot extends StatelessWidget {
+  const _StepDot({
+    required this.label,
+    required this.index,
+    required this.isCompleted,
+    required this.isCurrent,
+  });
+
+  final String label;
+  final int index;
+  final bool isCompleted;
+  final bool isCurrent;
+
+  @override
+  Widget build(BuildContext context) {
+    Color dotColor;
+    Color textColor;
+    Widget dotChild;
+
+    if (isCompleted) {
+      dotColor = AppColors.primaryPurple;
+      textColor = AppColors.textSecondary;
+      dotChild = Icon(Icons.check_rounded, size: 12, color: Colors.white);
+    } else if (isCurrent) {
+      dotColor = AppColors.primaryPurple;
+      textColor = AppColors.textPrimary;
+      dotChild = Text(
+        '$index',
+        style: const TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w800,
+          color: Colors.white,
+        ),
+      );
+    } else {
+      dotColor = AppColors.surfaceElevated;
+      textColor = AppColors.textMuted;
+      dotChild = Text(
+        '$index',
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          color: AppColors.textMuted,
+        ),
+      );
+    }
+
+    return Column(
+      children: [
+        Container(
+          width: 26,
+          height: 26,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: dotColor,
+            border: Border.all(
+              color: isCurrent || isCompleted
+                  ? AppColors.primaryPurple
+                  : AppColors.outlineSubtle,
+              width: 1.5,
+            ),
+          ),
+          child: Center(child: dotChild),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: AppTextStyles.caption(color: textColor).copyWith(
+            fontSize: 9,
+            fontWeight: isCurrent ? FontWeight.w700 : FontWeight.w500,
+          ),
+        ),
+      ],
     );
   }
 }

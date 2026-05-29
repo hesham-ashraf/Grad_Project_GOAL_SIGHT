@@ -9,6 +9,7 @@ import '../widgets/manager_bottom_navigation_bar.dart';
 import '../widgets/match_summary_card.dart';
 import '../widgets/player_card.dart';
 import '../widgets/stat_card.dart';
+import '../widgets/manager_dashboard_advanced_widgets.dart';
 
 class ManagerHomeScreen extends StatefulWidget {
   const ManagerHomeScreen({super.key});
@@ -26,7 +27,7 @@ class _ManagerHomeScreenState extends State<ManagerHomeScreen>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1200),
+      duration: const Duration(milliseconds: 1800),
     )..forward();
   }
 
@@ -127,6 +128,51 @@ class _ManagerHomeScreenState extends State<ManagerHomeScreen>
                   _InsightsColumn(
                     controller: _controller,
                     insights: insights,
+                  ),
+                  SizedBox(height: sectionSpacing),
+
+                  // ── NEW: Tactical Recommendations ──
+                  _StaggeredReveal(
+                    controller: _controller,
+                    start: 0.72,
+                    end: 0.86,
+                    child: TacticalRecommendationsSection(),
+                  ),
+                  SizedBox(height: sectionSpacing),
+
+                  // ── NEW: Underperforming Players ──
+                  _StaggeredReveal(
+                    controller: _controller,
+                    start: 0.76,
+                    end: 0.90,
+                    child: UnderperformingPlayersSection(),
+                  ),
+                  SizedBox(height: sectionSpacing),
+
+                  // ── NEW: Tactical Identity Overview ──
+                  _StaggeredReveal(
+                    controller: _controller,
+                    start: 0.80,
+                    end: 0.94,
+                    child: TacticalIdentityOverview(),
+                  ),
+                  SizedBox(height: sectionSpacing),
+
+                  // ── NEW: Club Analytics Dashboard ──
+                  _StaggeredReveal(
+                    controller: _controller,
+                    start: 0.84,
+                    end: 0.97,
+                    child: ClubAnalyticsDashboard(),
+                  ),
+                  SizedBox(height: sectionSpacing),
+
+                  // ── NEW: Performance Trend Charts ──
+                  _StaggeredReveal(
+                    controller: _controller,
+                    start: 0.88,
+                    end: 1.00,
+                    child: PerformanceTrendSection(),
                   ),
                 ],
               ),

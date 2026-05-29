@@ -5,6 +5,7 @@ import '../../core/constants/app_roles.dart';
 import '../../features/auth/auth_state.dart';
 import '../../features/manager/screens/manager_navigation_screen.dart';
 import '../../features/manager/screens/player_profile_screen.dart';
+import '../../features/manager/screens/upload_history_screen.dart';
 import '../../data/models/club_model.dart';
 import '../../data/models/match_analysis_model.dart';
 import '../../data/models/player_profile_model.dart';
@@ -146,6 +147,14 @@ final routerProvider = Provider<GoRouter>((ref) {
         pageBuilder: (context, state) => goalSightTransitionPage(
           state: state,
           child: const ManagerNavigationScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/manager/upload-history',
+        pageBuilder: (context, state) => goalSightTransitionPage(
+          state: state,
+          child: const UploadHistoryScreen(),
+          transition: GoalSightPageTransition.slideLeft,
         ),
       ),
       GoRoute(
