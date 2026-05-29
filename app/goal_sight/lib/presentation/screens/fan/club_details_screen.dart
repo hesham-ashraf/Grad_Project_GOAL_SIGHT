@@ -6,6 +6,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
 import '../../../data/models/club_model.dart';
 import '../../widgets/fan/club_detail_widgets.dart';
+import '../../widgets/fan/club_analytics_widgets.dart';
 
 class ClubDetailsScreen extends StatefulWidget {
   const ClubDetailsScreen({super.key, required this.club});
@@ -22,16 +23,18 @@ class _ClubDetailsScreenState extends State<ClubDetailsScreen>
   late final Animation<double> _headerFade;
   late final Animation<double> _statsFade;
   late final Animation<double> _squadFade;
+  late final Animation<double> _analyticsFade;
   late final Animation<Offset> _headerSlide;
   late final Animation<Offset> _statsSlide;
   late final Animation<Offset> _squadSlide;
+  late final Animation<Offset> _analyticsSlide;
 
   @override
   void initState() {
     super.initState();
     _ctrl = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 900),
+      duration: const Duration(milliseconds: 1400),
     )..forward();
 
     CurvedAnimation _curve(double start, double end) => CurvedAnimation(
@@ -39,16 +42,15 @@ class _ClubDetailsScreenState extends State<ClubDetailsScreen>
           curve: Interval(start, end, curve: Curves.easeOutCubic),
         );
 
-    _headerFade = _curve(0.0, 0.4);
-    _statsFade = _curve(0.2, 0.6);
-    _squadFade = _curve(0.4, 0.9);
+    _headerFade = _curve(0.0, 0.3);
+    _statsFade = _curve(0.15, 0.5);
+    _squadFade = _curve(0.35, 0.7);
+    _analyticsFade = _curve(0.55, 0.9);
 
-    _headerSlide = Tween<Offset>(begin: const Offset(0, 0.06), end: Offset.zero)
-        .animate(_headerFade);
-    _statsSlide = Tween<Offset>(begin: const Offset(0, 0.06), end: Offset.zero)
-        .animate(_statsFade);
-    _squadSlide = Tween<Offset>(begin: const Offset(0, 0.06), end: Offset.zero)
-        .animate(_squadFade);
+    _headerSlide = Tween<Offset>(begin: const Offset(0, 0.06), end: Offset.zero).animate(_headerFade);
+    _statsSlide = Tween<Offset>(begin: const Offset(0, 0.06), end: Offset.zero).animate(_statsFade);
+    _squadSlide = Tween<Offset>(begin: const Offset(0, 0.06), end: Offset.zero).animate(_squadFade);
+    _analyticsSlide = Tween<Offset>(begin: const Offset(0, 0.06), end: Offset.zero).animate(_analyticsFade);
   }
 
   @override
@@ -115,7 +117,7 @@ class _ClubDetailsScreenState extends State<ClubDetailsScreen>
                     ),
                   ),
 
-                  SizedBox(height: context.rs(28, min: 24, max: 36)),
+                  SizedBox(height: context.rs(24, min: 20, max: 32)),
 
                   // ── Season Stats ─────────────────────────────────────────
                   FadeTransition(
@@ -126,7 +128,74 @@ class _ClubDetailsScreenState extends State<ClubDetailsScreen>
                     ),
                   ),
 
-                  SizedBox(height: context.rs(28, min: 24, max: 36)),
+                  SizedBox(height: context.rs(24, min: 20, max: 32)),
+
+                  // ── Tactical Identity ────────────────────────────────────
+                  FadeTransition(
+                    opacity: _analyticsFade,
+                    child: SlideTransition(
+                      position: _analyticsSlide,
+                      child: ClubTacticalIdentityCard(club: club),
+                    ),
+                  ),
+
+                  SizedBox(height: context.rs(24, min: 20, max: 32)),
+
+                  // ── Analytics Dashboard ──────────────────────────────────
+                  FadeTransition(
+                    opacity: _analyticsFade,
+                    child: SlideTransition(
+                      position: _analyticsSlide,
+                      child: ClubAnalyticsDashboard(club: club),
+                    ),
+                  ),
+
+                  SizedBox(height: context.rs(24, min: 20, max: 32)),
+
+                  // ── Performance Trends ───────────────────────────────────
+                  FadeTransition(
+                    opacity: _analyticsFade,
+                    child: SlideTransition(
+                      position: _analyticsSlide,
+                      child: PerformanceTrendCard(club: club),
+                    ),
+                  ),
+
+                  SizedBox(height: context.rs(24, min: 20, max: 32)),
+
+                  // ── AI Tactical Summary ──────────────────────────────────
+                  FadeTransition(
+                    opacity: _analyticsFade,
+                    child: SlideTransition(
+                      position: _analyticsSlide,
+                      child: ClubTacticalSummaryCard(club: club),
+                    ),
+                  ),
+
+                  SizedBox(height: context.rs(24, min: 20, max: 32)),
+
+                  // ── Recent Analyses ──────────────────────────────────────
+                  FadeTransition(
+                    opacity: _analyticsFade,
+                    child: SlideTransition(
+                      position: _analyticsSlide,
+                      child: RecentAnalysesCard(
+                          clubName: club.name, primaryColor: club.primaryColor),
+                    ),
+                  ),
+
+                  SizedBox(height: context.rs(24, min: 20, max: 32)),
+
+                  // ── Top Performers ───────────────────────────────────────
+                  FadeTransition(
+                    opacity: _analyticsFade,
+                    child: SlideTransition(
+                      position: _analyticsSlide,
+                      child: TopPlayersCard(club: club),
+                    ),
+                  ),
+
+                  SizedBox(height: context.rs(24, min: 20, max: 32)),
 
                   // ── Squad ────────────────────────────────────────────────
                   FadeTransition(

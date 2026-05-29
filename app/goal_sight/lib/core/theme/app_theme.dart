@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 /// Core design tokens for the GoalSight fan experience.
 ///
@@ -106,7 +105,7 @@ class AppShadows {
 /// surfaces. The same base font family is reused across the app for consistency.
 class AppTextStyles {
   static TextStyle headline({Color? color}) {
-    return GoogleFonts.plusJakartaSans(
+    return TextStyle(
       fontSize: 34,
       fontWeight: FontWeight.w800,
       color: color ?? AppColors.textPrimary,
@@ -116,7 +115,7 @@ class AppTextStyles {
   }
 
   static TextStyle title({Color? color}) {
-    return GoogleFonts.plusJakartaSans(
+    return TextStyle(
       fontSize: 20,
       fontWeight: FontWeight.w700,
       color: color ?? AppColors.textPrimary,
@@ -126,7 +125,7 @@ class AppTextStyles {
   }
 
   static TextStyle body({Color? color}) {
-    return GoogleFonts.plusJakartaSans(
+    return TextStyle(
       fontSize: 14,
       fontWeight: FontWeight.w500,
       color: color ?? AppColors.textSecondary,
@@ -135,7 +134,7 @@ class AppTextStyles {
   }
 
   static TextStyle caption({Color? color}) {
-    return GoogleFonts.plusJakartaSans(
+    return TextStyle(
       fontSize: 12,
       fontWeight: FontWeight.w500,
       color: color ?? AppColors.textMuted,
@@ -145,7 +144,7 @@ class AppTextStyles {
   }
 
   static TextStyle button({Color? color}) {
-    return GoogleFonts.plusJakartaSans(
+    return TextStyle(
       fontSize: 14,
       fontWeight: FontWeight.w700,
       color: color ?? AppColors.textPrimary,
@@ -279,7 +278,7 @@ class AppTheme {
     required bool appBarCenterTitle,
     required Color appBarForegroundColor,
   }) {
-    final baseText = GoogleFonts.plusJakartaSansTextTheme();
+    final baseText = ThemeData(brightness: brightness).textTheme;
     final textTheme = baseText.copyWith(
       displayLarge: AppTextStyles.headline(color: textPrimary),
       displayMedium: AppTextStyles.headline(color: textPrimary),
