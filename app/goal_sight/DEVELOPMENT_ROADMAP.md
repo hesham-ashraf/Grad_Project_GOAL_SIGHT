@@ -367,25 +367,31 @@ Connect the app to real backend infrastructure after frontend completion.
 
 ### 8. Supabase Setup
 
-- [ ] Create Supabase project | Sign-off: ______ | Date: ______
-- [ ] Configure authentication | Sign-off: ______ | Date: ______
-- [ ] Configure storage buckets | Sign-off: ______ | Date: ______
-- [ ] Configure row-level security | Sign-off: ______ | Date: ______
-- [ ] Configure environment variables | Sign-off: ______ | Date: ______
+- [x] Create Supabase project | Sign-off: ______ | Date: ______
+- [x] Configure authentication | Sign-off: ______ | Date: ______
+- [x] Configure storage buckets | Sign-off: ______ | Date: ______
+- [x] Configure row-level security | Sign-off: ______ | Date: ______
+- [x] Configure environment variables | Sign-off: ______ | Date: ______
 
 ### 9. Database Design
 
-- [ ] Create `users` table | Sign-off: ______ | Date: ______
-- [ ] Create `clubs` table | Sign-off: ______ | Date: ______
-- [ ] Create `players` table | Sign-off: ______ | Date: ______
+- [x] Create `users` table | Sign-off: ______ | Date: ______
+- [x] Create `teams` table | Sign-off: ______ | Date: ______
+- [x] Create `players` table | Sign-off: ______ | Date: ______
 - [ ] Create `managers` table | Sign-off: ______ | Date: ______
-- [ ] Create `matches` table | Sign-off: ______ | Date: ______
+- [x] Create `matches` table | Sign-off: ______ | Date: ______
 - [ ] Create `analyses` table | Sign-off: ______ | Date: ______
-- [ ] Create `upload_jobs` table | Sign-off: ______ | Date: ______
+- [x] Create `match events` table | Sign-off: ______ | Date: ______
+- [x] Create `videos` table | Sign-off: ______ | Date: ______
 - [ ] Create `tactical_reports` table | Sign-off: ______ | Date: ______
-- [ ] Create `player_performance` table | Sign-off: ______ | Date: ______
-- [ ] Create `activities` table | Sign-off: ______ | Date: ______
+- [x] Create `player_match_stats` table | Sign-off: ______ | Date: ______
 - [ ] Create `notifications` table | Sign-off: ______ | Date: ______
+- [x] Create `venues` table | Sign-off: ______ | Date: ______
+- [x] Create `match_players` table | Sign-off: ______ | Date: ______
+- [x] Create `upload_jobs` table | Sign-off: ______ | Date: ______
+- [x] Create `subscription_plans` table | Sign-off: ______ | Date: ______
+- [x] Create `user_subscriptions` table | Sign-off: ______ | Date: ______
+- [x] Create `tracking_snapshots` table | Sign-off: ______ | Date: ______
 
 ### 10. Authentication Integration
 
@@ -407,14 +413,15 @@ Connect the app to real backend infrastructure after frontend completion.
 
 ### 12. Storage System
 
-- [ ] Match video uploads | Sign-off: ______ | Date: ______
-- [ ] Player images | Sign-off: ______ | Date: ______
-- [ ] Club logos | Sign-off: ______ | Date: ______
+- [x] Match video uploads | Sign-off: ______ | Date: ______
+- [x] Player images | Sign-off: ______ | Date: ______
+- [x] Club logos | Sign-off: ______ | Date: ______
 - [ ] Analysis exports | Sign-off: ______ | Date: ______
 - [ ] Report storage | Sign-off: ______ | Date: ______
 
 ### 13. Realtime Features
 
+- [x] Real-time infrastructure configured | Sign-off: ______ | Date: ______
 - [ ] Live upload progress | Sign-off: ______ | Date: ______
 - [ ] Live notifications | Sign-off: ______ | Date: ______
 - [ ] Live activity feeds | Sign-off: ______ | Date: ______
