@@ -375,7 +375,7 @@ Connect the app to real backend infrastructure after frontend completion.
 
 ### 9. Database Design
 
-- [x] Create `users` table | Sign-off: ______ | Date: ______
+- [ ] Create `users` table | Sign-off: ______ | Date: ______
 - [x] Create `teams` table | Sign-off: ______ | Date: ______
 - [x] Create `players` table | Sign-off: ______ | Date: ______
 - [ ] Create `managers` table | Sign-off: ______ | Date: ______

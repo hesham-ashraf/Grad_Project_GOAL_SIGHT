@@ -254,6 +254,12 @@
       "languageVersion": "3.10"
     },
     {
+      "name": "flutter_dotenv",
+      "rootUri": "file:///C:/Users/ahmed/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_dotenv-5.2.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "flutter_launcher_icons",
       "rootUri": "file:///C:/Users/ahmed/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_launcher_icons-0.14.4",
       "packageUri": "lib/",

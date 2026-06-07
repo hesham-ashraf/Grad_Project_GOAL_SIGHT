@@ -13,6 +13,7 @@
         "firebase_core",
         "fl_chart",
         "flutter",
+        "flutter_dotenv",
         "flutter_launcher_icons",
         "flutter_native_splash",
         "flutter_riverpod",
@@ -67,6 +68,13 @@
         "stream_channel",
         "test_api",
         "vector_math"
+      ]
+    },
+    {
+      "name": "flutter_dotenv",
+      "version": "5.2.1",
+      "dependencies": [
+        "flutter"
       ]
     },
     {

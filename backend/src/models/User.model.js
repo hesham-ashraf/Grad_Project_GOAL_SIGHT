@@ -1,154 +1,246 @@
 /**
  * User Model
- * Defines the schema and methods for User collection
+ * PostgreSQL-backed user service (replaces Mongoose model)
  */
 
-import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
+import { query } from '../config/database.js';
 
-const userSchema = new mongoose.Schema(
-  {
-    username: {
-      type: String,
-      required: [true, 'Username is required'],
-      trim: true,
-      minlength: [3, 'Username must be at least 3 characters'],
-      maxlength: [50, 'Username cannot exceed 50 characters'],
-    },
-    email: {
-      type: String,
-      required: [true, 'Email is required'],
-      unique: true,
-      lowercase: true,
-      trim: true,
-      match: [
-        /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
-        'Please provide a valid email address',
-      ],
-    },
-    password: {
-      type: String,
-      required: [true, 'Password is required'],
-      minlength: [6, 'Password must be at least 6 characters'],
-      select: false, // Don't return password by default
-    },
-    role: {
-      type: String,
-      enum: ['fan', 'manager', 'admin'],
-      default: 'fan',
-    },
-    favoriteTeam: {
-      type: String,
-      default: null,
-    },
-    isActive: {
-      type: Boolean,
-      default: true,
-    },
-    lastLogin: {
-      type: Date,
-      default: null,
-    },
-  },
-  {
-    timestamps: true, // Adds createdAt and updatedAt
+// ─── helpers ────────────────────────────────────────────────────────────────
+
+/** Map a raw DB row to a camelCase JS object */
+const toUser = (row) => {
+  if (!row) return null;
+  return {
+    id:           row.id,
+    username:     row.username,
+    email:        row.email,
+    password:     row.password,   // only present when explicitly selected
+    role:         row.role,
+    favoriteTeam: row.favorite_team,
+    isActive:     row.is_active,
+    lastLogin:    row.last_login,
+    createdAt:    row.created_at,
+    updatedAt:    row.updated_at,
+  };
+};
+
+/** Strip the password field from a user object */
+const toSafeObject = (user) => {
+  const safe = { ...user };
+  delete safe.password;
+  return safe;
+};
+
+// ─── static queries ──────────────────────────────────────────────────────────
+
+/**
+ * Create a new user. Hashes the password before inserting.
+ */
+const create = async ({ username, email, password, role = 'fan' }) => {
+  const salt = await bcrypt.genSalt(10);
+  const hashed = await bcrypt.hash(password, salt);
+
+  const { rows } = await query(
+    `INSERT INTO users (username, email, password, role)
+     VALUES ($1, $2, $3, $4)
+     RETURNING *`,
+    [username, email.toLowerCase(), hashed, role]
+  );
+  return toUser(rows[0]);
+};
+
+/**
+ * Find a user by ID (without password).
+ */
+const findById = async (id) => {
+  const { rows } = await query(
+    `SELECT id, username, email, role, favorite_team, is_active, last_login, created_at, updated_at
+     FROM users WHERE id = $1`,
+    [id]
+  );
+  return toUser(rows[0]);
+};
+
+/**
+ * Find a user by ID including the password field.
+ */
+const findByIdWithPassword = async (id) => {
+  const { rows } = await query(`SELECT * FROM users WHERE id = $1`, [id]);
+  return toUser(rows[0]);
+};
+
+/**
+ * Find a user by email (without password).
+ */
+const findByEmail = async (email) => {
+  const { rows } = await query(
+    `SELECT id, username, email, role, favorite_team, is_active, last_login, created_at, updated_at
+     FROM users WHERE email = $1`,
+    [email.toLowerCase()]
+  );
+  return toUser(rows[0]);
+};
+
+/**
+ * Find a user by email including the password field.
+ */
+const findByEmailWithPassword = async (email) => {
+  const { rows } = await query(`SELECT * FROM users WHERE email = $1`, [email.toLowerCase()]);
+  return toUser(rows[0]);
+};
+
+/**
+ * Find all active users with a given role.
+ */
+const findByRole = async (role) => {
+  const { rows } = await query(
+    `SELECT id, username, email, role, favorite_team, is_active, last_login, created_at, updated_at
+     FROM users WHERE role = $1 AND is_active = true`,
+    [role]
+  );
+  return rows.map(toUser);
+};
+
+/**
+ * Paginated list of users with optional role/isActive filters.
+ */
+const find = async ({ role, isActive, skip = 0, limit = 10 } = {}) => {
+  const conditions = [];
+  const params = [];
+
+  if (role !== undefined) {
+    params.push(role);
+    conditions.push(`role = $${params.length}`);
   }
-);
-
-// ===== INDEXES =====
-userSchema.index({ email: 1 });
-userSchema.index({ role: 1 });
-
-// ===== MIDDLEWARE =====
-
-/**
- * Hash password before saving
- */
-userSchema.pre('save', async function (next) {
-  // Only hash if password is modified
-  if (!this.isModified('password')) {
-    return next();
+  if (isActive !== undefined) {
+    params.push(isActive);
+    conditions.push(`is_active = $${params.length}`);
   }
 
-  try {
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
-  } catch (error) {
-    next(error);
+  const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+  params.push(limit, skip);
+
+  const { rows } = await query(
+    `SELECT id, username, email, role, favorite_team, is_active, last_login, created_at, updated_at
+     FROM users ${where}
+     ORDER BY created_at DESC
+     LIMIT $${params.length - 1} OFFSET $${params.length}`,
+    params
+  );
+  return rows.map(toUser);
+};
+
+/**
+ * Count users matching optional role/isActive filters.
+ */
+const countUsers = async ({ role, isActive } = {}) => {
+  const conditions = [];
+  const params = [];
+
+  if (role !== undefined) {
+    params.push(role);
+    conditions.push(`role = $${params.length}`);
   }
-});
+  if (isActive !== undefined) {
+    params.push(isActive);
+    conditions.push(`is_active = $${params.length}`);
+  }
 
-// ===== INSTANCE METHODS =====
-
-/**
- * Compare provided password with hashed password
- * @param {string} candidatePassword - Password to compare
- * @returns {Promise<boolean>} - True if passwords match
- */
-userSchema.methods.comparePassword = async function (candidatePassword) {
-  return await bcrypt.compare(candidatePassword, this.password);
+  const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+  const { rows } = await query(`SELECT COUNT(*) FROM users ${where}`, params);
+  return parseInt(rows[0].count, 10);
 };
 
 /**
- * Get user data without sensitive information
- * @returns {Object} - User object without password
+ * Update a user by ID. Returns the updated user (without password).
  */
-userSchema.methods.toSafeObject = function () {
-  const user = this.toObject();
-  delete user.password;
-  return user;
+const findByIdAndUpdate = async (id, updates) => {
+  const fields = [];
+  const params = [];
+
+  const columnMap = {
+    username:     'username',
+    favoriteTeam: 'favorite_team',
+    role:         'role',
+    isActive:     'is_active',
+    lastLogin:    'last_login',
+  };
+
+  for (const [key, col] of Object.entries(columnMap)) {
+    if (updates[key] !== undefined) {
+      params.push(updates[key]);
+      fields.push(`${col} = $${params.length}`);
+    }
+  }
+
+  if (fields.length === 0) return findById(id);
+
+  params.push(id);
+  const { rows } = await query(
+    `UPDATE users SET ${fields.join(', ')}
+     WHERE id = $${params.length}
+     RETURNING id, username, email, role, favorite_team, is_active, last_login, created_at, updated_at`,
+    params
+  );
+  return toUser(rows[0]);
 };
 
-// ===== STATIC METHODS =====
-
 /**
- * Find user by email
- * @param {string} email - User email
- * @returns {Promise<Object|null>} - User object or null
+ * Update a user's password (hashes first).
  */
-userSchema.statics.findByEmail = function (email) {
-  return this.findOne({ email: email.toLowerCase() });
+const updatePassword = async (id, newPassword) => {
+  const salt = await bcrypt.genSalt(10);
+  const hashed = await bcrypt.hash(newPassword, salt);
+  await query(`UPDATE users SET password = $1 WHERE id = $2`, [hashed, id]);
 };
 
 /**
- * Find active users by role
- * @param {string} role - User role (fan, manager, admin)
- * @returns {Promise<Array>} - Array of users
+ * Return stats grouped by role plus total/active/inactive counts.
  */
-userSchema.statics.findByRole = function (role) {
-  return this.find({ role, isActive: true });
-};
-
-/**
- * Get user statistics
- * @returns {Promise<Object>} - User stats
- */
-userSchema.statics.getStatistics = async function () {
-  const stats = await this.aggregate([
-    {
-      $group: {
-        _id: '$role',
-        count: { $sum: 1 },
-      },
-    },
-  ]);
-
-  const total = await this.countDocuments();
-  const active = await this.countDocuments({ isActive: true });
-  const inactive = total - active;
+const getStatistics = async () => {
+  const { rows: roleRows } = await query(
+    `SELECT role, COUNT(*) AS count FROM users GROUP BY role`
+  );
+  const total  = await countUsers();
+  const active = await countUsers({ isActive: true });
 
   return {
     total,
     active,
-    inactive,
-    byRole: stats.reduce((acc, stat) => {
-      acc[stat._id] = stat.count;
+    inactive: total - active,
+    byRole: roleRows.reduce((acc, r) => {
+      acc[r.role] = parseInt(r.count, 10);
       return acc;
     }, {}),
   };
 };
 
-const User = mongoose.model('User', userSchema);
+// ─── instance-style helpers ───────────────────────────────────────────────────
+
+/**
+ * Compare a candidate password against a stored hash.
+ */
+const comparePassword = async (candidatePassword, hashedPassword) => {
+  return bcrypt.compare(candidatePassword, hashedPassword);
+};
+
+// ─── exports ─────────────────────────────────────────────────────────────────
+
+const User = {
+  create,
+  findById,
+  findByIdWithPassword,
+  findByEmail,
+  findByEmailWithPassword,
+  findByRole,
+  find,
+  countUsers,
+  findByIdAndUpdate,
+  updatePassword,
+  getStatistics,
+  comparePassword,
+  toSafeObject,
+};
 
 export default User;

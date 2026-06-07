@@ -1,60 +1,68 @@
 /**
  * Database Configuration
- * Handles MongoDB connection using Mongoose
+ * PostgreSQL connection pool via the `pg` package (Supabase-compatible)
  */
 
-import mongoose from 'mongoose';
+import pg from 'pg';
+
+const { Pool } = pg;
+
+let pool = null;
 
 /**
- * Connect to MongoDB database
- * @returns {Promise<void>}
+ * Returns the shared connection pool, creating it on first call.
+ * @returns {pg.Pool}
+ */
+export const getPool = () => {
+  if (!pool) {
+    pool = new Pool({
+      connectionString: process.env.DATABASE_URL,
+      ssl: { rejectUnauthorized: false }, // required for Supabase
+      max: 10,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 5000,
+    });
+
+    pool.on('error', (err) => {
+      console.error('❌ Unexpected PostgreSQL pool error:', err);
+    });
+  }
+  return pool;
+};
+
+/**
+ * Convenience wrapper: run a single query on the pool.
+ * @param {string} text   - SQL query string
+ * @param {Array}  params - Query parameters
+ * @returns {Promise<pg.QueryResult>}
+ */
+export const query = (text, params) => getPool().query(text, params);
+
+/**
+ * Test the connection and log the result.
  */
 export const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-
-    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
-    console.log(`📊 Database: ${conn.connection.name}\n`);
+    const result = await query('SELECT current_database(), version()');
+    const { current_database, version } = result.rows[0];
+    console.log(`✅ PostgreSQL Connected`);
+    console.log(`📊 Database: ${current_database}`);
+    console.log(`🔖 ${version.split(' ').slice(0, 2).join(' ')}\n`);
   } catch (error) {
-    console.error('❌ MongoDB Connection Error:', error.message);
+    console.error('❌ PostgreSQL Connection Error:', error.message);
     process.exit(1);
   }
 };
 
 /**
- * Disconnect from MongoDB
- * @returns {Promise<void>}
+ * Gracefully close all pool connections.
  */
 export const disconnectDB = async () => {
-  try {
-    await mongoose.connection.close();
-    console.log('✅ MongoDB Disconnected');
-  } catch (error) {
-    console.error('❌ MongoDB Disconnection Error:', error.message);
+  if (pool) {
+    await pool.end();
+    pool = null;
+    console.log('✅ PostgreSQL pool closed');
   }
 };
 
-// Handle connection events
-mongoose.connection.on('connected', () => {
-  console.log('📡 Mongoose connected to MongoDB');
-});
-
-mongoose.connection.on('error', (err) => {
-  console.error('❌ Mongoose connection error:', err);
-});
-
-mongoose.connection.on('disconnected', () => {
-  console.log('📡 Mongoose disconnected from MongoDB');
-});
-
-// Graceful shutdown
-process.on('SIGINT', async () => {
-  await mongoose.connection.close();
-  console.log('\n✋ MongoDB connection closed through app termination');
-  process.exit(0);
-});
-
-export default { connectDB, disconnectDB };
+export default { connectDB, disconnectDB, query, getPool };

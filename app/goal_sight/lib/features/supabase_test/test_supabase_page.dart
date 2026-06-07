@@ -46,7 +46,7 @@ class _TestSupabasePageState extends State<TestSupabasePage> {
               child: Padding(
                 padding: EdgeInsets.all(24),
                 child: Text(
-                  'Supabase is not configured yet.\nSet the project URL and anon key in lib/core/supabase/supabase_config.dart to load teams.',
+                  'Supabase is not configured yet.\nSet SUPABASE_URL and SUPABASE_ANON_KEY in the .env file to load teams.',
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Colors.white70),
                 ),

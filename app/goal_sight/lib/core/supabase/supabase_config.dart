@@ -1,6 +1,14 @@
-const String supabaseUrl = 'https://hciiygxvwlhasesytrbp.supabase.co';
-const String supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhjaWl5Z3h2d2xoYXNlc3l0cmJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MDkzNzEsImV4cCI6MjA5MzE4NTM3MX0.5yimDuucVsHCwc0P0I7zMXlVgZ22KL_a2-g-iuFrdkA';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-const bool hasSupabaseConfig =
-    supabaseUrl != 'https://hciiygxvwlhasesytrbp.supabase.co' &&
-    supabaseAnonKey != 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhjaWl5Z3h2d2xoYXNlc3l0cmJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MDkzNzEsImV4cCI6MjA5MzE4NTM3MX0.5yimDuucVsHCwc0P0I7zMXlVgZ22KL_a2-g-iuFrdkA';
+/// Supabase project URL, read from the `.env` file (key `SUPABASE_URL`).
+/// Empty when the env file is missing or the key is unset.
+String get supabaseUrl => dotenv.maybeGet('SUPABASE_URL') ?? '';
+
+/// Supabase anon key, read from the `.env` file (key `SUPABASE_ANON_KEY`).
+/// Empty when the env file is missing or the key is unset.
+String get supabaseAnonKey => dotenv.maybeGet('SUPABASE_ANON_KEY') ?? '';
+
+/// True only when both connection values are present, so the app can decide
+/// whether to initialize Supabase or fall back to mock data.
+bool get hasSupabaseConfig =>
+    supabaseUrl.isNotEmpty && supabaseAnonKey.isNotEmpty;

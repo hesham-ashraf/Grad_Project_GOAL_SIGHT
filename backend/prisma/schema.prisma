@@ -1,0 +1,71 @@
+// Prisma schema for GOALSIGHT
+// Run: npx prisma generate   (to generate the client)
+// Run: npx prisma db push    (to push schema to Supabase)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  fan
+  manager
+  admin
+}
+
+enum MatchStatus {
+  scheduled
+  live
+  completed
+  postponed
+  cancelled
+}
+
+model User {
+  id           String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  username     String      @db.VarChar(50)
+  email        String      @unique @db.VarChar(255)
+  password     String      @db.VarChar(255)
+  role         Role        @default(fan)
+  favoriteTeam String?     @map("favorite_team")
+  isActive     Boolean     @default(true) @map("is_active")
+  lastLogin    DateTime?   @map("last_login")
+  createdAt    DateTime    @default(now()) @map("created_at")
+  updatedAt    DateTime    @updatedAt @map("updated_at")
+  matches      Match[]
+
+  @@index([email])
+  @@index([role])
+  @@map("users")
+}
+
+model Match {
+  id             String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  homeTeamName   String      @map("home_team_name") @db.VarChar(255)
+  homeTeamLogo   String      @default("⚽") @map("home_team_logo")
+  homeTeamScore  Int         @default(0) @map("home_team_score")
+  awayTeamName   String      @map("away_team_name") @db.VarChar(255)
+  awayTeamLogo   String      @default("⚽") @map("away_team_logo")
+  awayTeamScore  Int         @default(0) @map("away_team_score")
+  date           DateTime
+  venue          String      @db.VarChar(255)
+  league         String      @db.VarChar(255)
+  season         String      @default("2025/2026") @db.VarChar(50)
+  status         MatchStatus @default(scheduled)
+  statistics     Json        @default("{}")
+  events         Json        @default("[]")
+  createdById    String      @map("created_by") @db.Uuid
+  createdAt      DateTime    @default(now()) @map("created_at")
+  updatedAt      DateTime    @updatedAt @map("updated_at")
+  createdBy      User        @relation(fields: [createdById], references: [id])
+
+  @@index([date])
+  @@index([status])
+  @@index([league])
+  @@map("matches")
+}

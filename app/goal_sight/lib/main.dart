@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -9,6 +10,14 @@ import 'shared/goalsight_ui.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Load connection config from `.env`. Missing file is non-fatal: the app
+  // simply runs without Supabase (mock data flows).
+  try {
+    await dotenv.load(fileName: '.env');
+  } catch (_) {
+    // No .env bundled — leave dotenv empty so hasSupabaseConfig is false.
+  }
 
   if (hasSupabaseConfig) {
     // Initialize Supabase once before the app starts.
