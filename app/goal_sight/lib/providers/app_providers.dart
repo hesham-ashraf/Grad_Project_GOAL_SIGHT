@@ -54,8 +54,7 @@ final adminRemoteDataSourceProvider = Provider<AdminRemoteDataSource>(
 );
 
 final authRepositoryProvider = Provider<IAuthRepository>(
-  (ref) => AuthRepository(
-    ref.watch(authRemoteDataSourceProvider),
+  (ref) => SupabaseAuthRepository(
     ref.watch(secureStorageServiceProvider),
   ),
 );

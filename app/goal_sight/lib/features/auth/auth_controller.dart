@@ -1,8 +1,15 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' show AuthException;
 
 import '../../core/constants/app_roles.dart';
 import '../../data/repositories/auth_repository.dart';
 import 'auth_state.dart';
+
+/// Maps backend errors to a user-friendly message.
+String _authError(Object error) {
+  if (error is AuthException) return error.message;
+  return 'Something went wrong. Please try again.';
+}
 
 class AuthController extends StateNotifier<AuthState> {
   AuthController(this._authRepository) : super(AuthState.initial());
@@ -24,8 +31,8 @@ class AuthController extends StateNotifier<AuthState> {
             );
     } catch (error) {
       state = state.copyWith(
-        status: AuthStatus.error,
-        errorMessage: 'Session restore failed. ${error.toString()}',
+        status: AuthStatus.unauthenticated,
+        errorMessage: _authError(error),
       );
     }
   }
@@ -45,7 +52,7 @@ class AuthController extends StateNotifier<AuthState> {
     } catch (error) {
       state = state.copyWith(
         status: AuthStatus.error,
-        errorMessage: 'Login failed. ${error.toString()}',
+        errorMessage: _authError(error),
       );
     }
   }
@@ -65,8 +72,12 @@ class AuthController extends StateNotifier<AuthState> {
         role: role,
       );
       final token = await _authRepository.getToken();
+      // A token means email confirmation is disabled → straight in.
+      // No token means a confirmation email/OTP was sent.
       state = state.copyWith(
-        status: AuthStatus.emailVerificationRequired,
+        status: token != null
+            ? AuthStatus.authenticated
+            : AuthStatus.emailVerificationRequired,
         user: user,
         token: token,
         clearError: true,
@@ -74,7 +85,7 @@ class AuthController extends StateNotifier<AuthState> {
     } catch (error) {
       state = state.copyWith(
         status: AuthStatus.error,
-        errorMessage: 'Registration failed. ${error.toString()}',
+        errorMessage: _authError(error),
       );
     }
   }
@@ -86,25 +97,43 @@ class AuthController extends StateNotifier<AuthState> {
   }
 
   Future<void> verifyEmail({required String code}) async {
-    state = state.copyWith(status: AuthStatus.loading, clearError: true);
-    await Future<void>.delayed(const Duration(milliseconds: 700));
-
-    if (code.trim().length < 4) {
+    final email = state.user?.email;
+    if (email == null || email.isEmpty) {
       state = state.copyWith(
-        status: AuthStatus.emailVerificationRequired,
-        errorMessage: 'Enter the verification code sent to your email.',
+        status: AuthStatus.error,
+        errorMessage: 'Missing email for verification. Please sign in again.',
       );
       return;
     }
 
-    state = state.copyWith(
-      status: AuthStatus.authenticated,
-      clearError: true,
-    );
+    state = state.copyWith(status: AuthStatus.loading, clearError: true);
+    try {
+      final user =
+          await _authRepository.verifyEmailOtp(email: email, token: code);
+      final token = await _authRepository.getToken();
+      state = state.copyWith(
+        status: AuthStatus.authenticated,
+        user: user,
+        token: token,
+        clearError: true,
+      );
+    } catch (error) {
+      // Keep the user on the verification screen with the error shown.
+      state = state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: _authError(error),
+      );
+    }
   }
 
   Future<void> resendVerificationEmail() async {
+    final email = state.user?.email;
+    if (email == null || email.isEmpty) return;
     state = state.copyWith(clearError: true);
-    await Future<void>.delayed(const Duration(milliseconds: 500));
+    try {
+      await _authRepository.resendVerification(email);
+    } catch (_) {
+      // Non-fatal; the screen shows its own "resent" confirmation.
+    }
   }
 }

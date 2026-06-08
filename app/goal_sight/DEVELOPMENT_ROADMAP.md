@@ -10,7 +10,7 @@ Status rules:
 Recommended sign-off format:
 - `Sign-off: AH | Date: 2026-05-27`
 
-Last reviewed against the codebase: `2026-05-29`
+Last reviewed against the codebase: `2026-06-08`
 
 ---
 
@@ -375,17 +375,17 @@ Connect the app to real backend infrastructure after frontend completion.
 
 ### 9. Database Design
 
-- [ ] Create `users` table | Sign-off: ______ | Date: ______
+- [x] Create `users` table (implemented as `profiles`, 1:1 with auth.users) | Sign-off: AH | Date: 2026-06-08
 - [x] Create `teams` table | Sign-off: ______ | Date: ______
 - [x] Create `players` table | Sign-off: ______ | Date: ______
-- [ ] Create `managers` table | Sign-off: ______ | Date: ______
+- [x] Create `managers` table (managers = `profiles` role + `team_managers` ownership) | Sign-off: AH | Date: 2026-06-08
 - [x] Create `matches` table | Sign-off: ______ | Date: ______
-- [ ] Create `analyses` table | Sign-off: ______ | Date: ______
+- [x] Create `analyses` table (implemented as `match_analyses` + `team_match_analysis` + `match_player_analysis` + `analysis_artifacts`) | Sign-off: AH | Date: 2026-06-08
 - [x] Create `match events` table | Sign-off: ______ | Date: ______
 - [x] Create `videos` table | Sign-off: ______ | Date: ______
-- [ ] Create `tactical_reports` table | Sign-off: ______ | Date: ______
+- [x] Create `tactical_reports` table (implemented as `tactical_insights`) | Sign-off: AH | Date: 2026-06-08
 - [x] Create `player_match_stats` table | Sign-off: ______ | Date: ______
-- [ ] Create `notifications` table | Sign-off: ______ | Date: ______
+- [x] Create `notifications` table (+ `notification_preferences`) | Sign-off: AH | Date: 2026-06-08
 - [x] Create `venues` table | Sign-off: ______ | Date: ______
 - [x] Create `match_players` table | Sign-off: ______ | Date: ______
 - [x] Create `upload_jobs` table | Sign-off: ______ | Date: ______
@@ -395,12 +395,12 @@ Connect the app to real backend infrastructure after frontend completion.
 
 ### 10. Authentication Integration
 
-- [ ] Connect login | Sign-off: ______ | Date: ______
-- [ ] Connect signup | Sign-off: ______ | Date: ______
-- [ ] Connect forgot password | Sign-off: ______ | Date: ______
-- [ ] Connect email verification | Sign-off: ______ | Date: ______
-- [ ] Connect role management | Sign-off: ______ | Date: ______
-- [ ] Connect session persistence | Sign-off: ______ | Date: ______
+- [x] Connect login | Sign-off: AH | Date: 2026-06-08
+- [x] Connect signup | Sign-off: AH | Date: 2026-06-08
+- [x] Connect forgot password | Sign-off: AH | Date: 2026-06-08
+- [x] Connect email verification (OTP; needs `{{ .Token }}` in the Supabase email template) | Sign-off: AH | Date: 2026-06-08
+- [x] Connect role management (role from `profiles`; router guards already enforced) | Sign-off: AH | Date: 2026-06-08
+- [x] Connect session persistence (Supabase session + restore on splash) | Sign-off: AH | Date: 2026-06-08
 
 ### 11. Data Integration
 

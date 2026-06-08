@@ -24,7 +24,7 @@ class _EmailVerificationScreenState
     extends ConsumerState<EmailVerificationScreen>
     with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
-  final _codeController = TextEditingController(text: '2026');
+  final _codeController = TextEditingController();
   bool _resent = false;
 
   late AnimationController _ctrl;
@@ -156,8 +156,8 @@ class _EmailVerificationScreenState
 
                                     Text(
                                       user?.email != null
-                                          ? 'A verification code was sent to ${user!.email}.\nUse code 2026 for the Phase 1 mock flow.'
-                                          : 'Enter the verification code sent to your email.\nUse code 2026 for the Phase 1 mock flow.',
+                                          ? 'Enter the 6-digit code we emailed to ${user!.email}.'
+                                          : 'Enter the verification code sent to your email.',
                                       style: AppTextStyles.body(
                                         color: AppColors.textMuted,
                                       ).copyWith(fontSize: 13),
@@ -171,7 +171,7 @@ class _EmailVerificationScreenState
                                     // Code field
                                     AppTextField(
                                       label: 'Verification Code',
-                                      hintText: '2026',
+                                      hintText: '6-digit code',
                                       controller: _codeController,
                                       keyboardType: TextInputType.number,
                                       suffixIcon: const Padding(

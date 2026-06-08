@@ -1,27 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
 import '../../../core/utils/validators.dart';
+import '../../../providers/app_providers.dart';
 import '../../widgets/app_text_field.dart';
 import '../../widgets/auth_card_widgets.dart';
 import '../../widgets/goalsight_logo.dart';
 import '../../widgets/primary_button.dart';
 
-class ForgotPasswordScreen extends StatefulWidget {
+class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key});
 
   @override
-  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
+  ConsumerState<ForgotPasswordScreen> createState() =>
+      _ForgotPasswordScreenState();
 }
 
-class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
+class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen>
     with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   bool _loading = false;
   bool _sent = false;
+  String? _error;
 
   late AnimationController _ctrl;
   late Animation<double> _fade;
@@ -51,13 +55,27 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
 
   Future<void> _sendResetLink() async {
     if (!_formKey.currentState!.validate()) return;
-    setState(() => _loading = true);
-    await Future<void>.delayed(const Duration(milliseconds: 900));
-    if (!mounted) return;
     setState(() {
-      _loading = false;
-      _sent = true;
+      _loading = true;
+      _error = null;
     });
+    try {
+      await ref
+          .read(authRepositoryProvider)
+          .sendPasswordReset(_emailController.text.trim());
+      if (!mounted) return;
+      setState(() {
+        _loading = false;
+        _sent = true;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _loading = false;
+        _error =
+            'Could not send reset email. Please check the address and try again.';
+      });
+    }
   }
 
   @override
@@ -121,6 +139,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
                                         formKey: _formKey,
                                         emailController: _emailController,
                                         loading: _loading,
+                                        error: _error,
                                         onSubmit: _sendResetLink,
                                       ),
                               ),
@@ -146,6 +165,7 @@ class _FormState extends StatelessWidget {
   final GlobalKey<FormState> formKey;
   final TextEditingController emailController;
   final bool loading;
+  final String? error;
   final VoidCallback onSubmit;
 
   const _FormState({
@@ -153,6 +173,7 @@ class _FormState extends StatelessWidget {
     required this.formKey,
     required this.emailController,
     required this.loading,
+    required this.error,
     required this.onSubmit,
   });
 
@@ -203,6 +224,11 @@ class _FormState extends StatelessWidget {
             keyboardType: TextInputType.emailAddress,
             validator: Validators.email,
           ),
+
+          if (error != null) ...[
+            SizedBox(height: context.rs(14, min: 10, max: 18)),
+            AuthErrorBox(message: error!),
+          ],
 
           SizedBox(height: context.rs(22, min: 16, max: 28)),
 
@@ -272,8 +298,8 @@ class _SuccessState extends StatelessWidget {
 
         Text(
           email.isNotEmpty
-              ? 'Check $email for password reset instructions.\n(Phase 1 mock — no email is actually sent yet.)'
-              : 'Check your inbox for password reset instructions.',
+              ? 'Check $email for a secure password reset link.'
+              : 'Check your inbox for a secure password reset link.',
           style: AppTextStyles.body(
             color: AppColors.textMuted,
           ).copyWith(fontSize: 13),

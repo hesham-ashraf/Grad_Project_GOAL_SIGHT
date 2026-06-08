@@ -1,9 +1,12 @@
+import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../../core/constants/app_roles.dart';
 import '../../core/services/secure_storage_service.dart';
-import '../datasources/auth_remote_datasource.dart';
 import '../models/user_model.dart';
 
-abstract class IAuthRepository {
+/// Auth contract. The Supabase implementation lives below; callers depend only
+/// on this interface so the backend can be swapped without UI changes.
+abstract interface class IAuthRepository {
   Future<UserModel> login({required String email, required String password});
 
   Future<UserModel> register({
@@ -13,27 +16,51 @@ abstract class IAuthRepository {
     required UserRole role,
   });
 
+  /// Restores the persisted Supabase session (if any) on app launch.
   Future<UserModel?> restoreSession();
 
   Future<void> logout();
 
+  /// Current access token, or null when signed out.
   Future<String?> getToken();
+
+  /// Sends a password-reset email.
+  Future<void> sendPasswordReset(String email);
+
+  /// Re-sends the signup confirmation email/OTP.
+  Future<void> resendVerification(String email);
+
+  /// Confirms a signup using the emailed OTP [token].
+  Future<UserModel> verifyEmailOtp({
+    required String email,
+    required String token,
+  });
 }
 
-class AuthRepository implements IAuthRepository {
-  AuthRepository(this._remoteDataSource, this._secureStorageService);
+/// Supabase-backed authentication. Roles are read from the `profiles` table
+/// (the source of truth, written by the `handle_new_user` trigger at signup) —
+/// never trusted from user metadata for routing decisions.
+class SupabaseAuthRepository implements IAuthRepository {
+  SupabaseAuthRepository(this._storage);
 
-  final AuthRemoteDataSource _remoteDataSource;
-  final SecureStorageService _secureStorageService;
+  final SecureStorageService _storage;
+
+  SupabaseClient get _client => Supabase.instance.client;
 
   @override
-  Future<UserModel> login(
-      {required String email, required String password}) async {
-    final response =
-        await _remoteDataSource.login(email: email, password: password);
-    await _secureStorageService.saveToken(response.token);
-    await _secureStorageService.saveRole(response.user.role.value);
-    return response.user;
+  Future<UserModel> login({
+    required String email,
+    required String password,
+  }) async {
+    final res = await _client.auth.signInWithPassword(
+      email: email.trim(),
+      password: password,
+    );
+    final user = res.user;
+    if (user == null) {
+      throw const AuthException('Invalid email or password.');
+    }
+    return _hydrate(user, res.session);
   }
 
   @override
@@ -43,41 +70,112 @@ class AuthRepository implements IAuthRepository {
     required String password,
     required UserRole role,
   }) async {
-    final response = await _remoteDataSource.register(
-      name: name,
-      email: email,
+    final res = await _client.auth.signUp(
+      email: email.trim(),
       password: password,
+      data: {'full_name': name.trim(), 'role': role.value},
+    );
+    final user = res.user;
+    if (user == null) {
+      throw const AuthException('Registration failed. Please try again.');
+    }
+
+    // When email confirmation is disabled, Supabase returns a live session and
+    // the user is authenticated immediately. Otherwise the profile already
+    // exists (created by the signup trigger) but no session is issued yet.
+    if (res.session != null) {
+      return _hydrate(user, res.session);
+    }
+
+    await _storage.saveRole(role.value);
+    return UserModel(
+      id: user.id,
+      name: name.trim(),
+      email: email.trim(),
       role: role,
     );
-    await _secureStorageService.saveToken(response.token);
-    await _secureStorageService.saveRole(response.user.role.value);
-    return response.user;
+  }
+
+  @override
+  Future<UserModel> verifyEmailOtp({
+    required String email,
+    required String token,
+  }) async {
+    final res = await _client.auth.verifyOTP(
+      email: email.trim(),
+      token: token.trim(),
+      type: OtpType.signup,
+    );
+    final user = res.user;
+    if (user == null) {
+      throw const AuthException('Invalid or expired verification code.');
+    }
+    return _hydrate(user, res.session);
+  }
+
+  @override
+  Future<void> resendVerification(String email) {
+    return _client.auth.resend(type: OtpType.signup, email: email.trim());
+  }
+
+  @override
+  Future<void> sendPasswordReset(String email) {
+    return _client.auth.resetPasswordForEmail(email.trim());
   }
 
   @override
   Future<UserModel?> restoreSession() async {
-    final token = await _secureStorageService.readToken();
-    final storedRole = await _secureStorageService.readRole();
+    final session = _client.auth.currentSession;
+    final user = _client.auth.currentUser;
+    if (session == null || user == null) return null;
+    return _hydrate(user, session);
+  }
 
-    if (token == null || token.isEmpty || storedRole == null) {
-      return null;
+  @override
+  Future<void> logout() async {
+    await _client.auth.signOut();
+    await _storage.clearSession();
+  }
+
+  @override
+  Future<String?> getToken() async {
+    return _client.auth.currentSession?.accessToken;
+  }
+
+  /// Builds a [UserModel] from the auth user + the `profiles` row (role/name),
+  /// and mirrors the token/role into secure storage for non-Supabase consumers
+  /// (e.g. the live-match WebSocket).
+  Future<UserModel> _hydrate(User user, Session? session) async {
+    var role = UserRole.fan;
+    var name = user.userMetadata?['full_name']?.toString() ??
+        user.email ??
+        'User';
+
+    try {
+      final profile = await _client
+          .from('profiles')
+          .select('full_name, role')
+          .eq('id', user.id)
+          .maybeSingle();
+      if (profile != null) {
+        role = parseUserRole((profile['role'] ?? 'fan').toString());
+        final fullName = profile['full_name']?.toString();
+        if (fullName != null && fullName.isNotEmpty) name = fullName;
+      }
+    } catch (_) {
+      // Profile not readable yet (transient/RLS) — fall back to metadata role.
+      final metaRole = user.userMetadata?['role']?.toString();
+      if (metaRole != null) role = parseUserRole(metaRole);
     }
 
+    if (session != null) await _storage.saveToken(session.accessToken);
+    await _storage.saveRole(role.value);
+
     return UserModel(
-      id: 'session-user',
-      name: 'Authenticated User',
-      email: 'session@goalsight.ai',
-      role: parseUserRole(storedRole),
+      id: user.id,
+      name: name,
+      email: user.email ?? '',
+      role: role,
     );
-  }
-
-  @override
-  Future<void> logout() {
-    return _secureStorageService.clearSession();
-  }
-
-  @override
-  Future<String?> getToken() {
-    return _secureStorageService.readToken();
   }
 }

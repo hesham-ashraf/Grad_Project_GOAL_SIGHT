@@ -45,6 +45,26 @@ class FakeAuthRepository implements IAuthRepository {
   Future<UserModel?> restoreSession() async {
     return sessionUser;
   }
+
+  @override
+  Future<void> sendPasswordReset(String email) async {}
+
+  @override
+  Future<void> resendVerification(String email) async {}
+
+  @override
+  Future<UserModel> verifyEmailOtp({
+    required String email,
+    required String token,
+  }) async {
+    this.token = 'token';
+    return UserModel(
+      id: '3',
+      name: 'Test User',
+      email: email,
+      role: UserRole.manager,
+    );
+  }
 }
 
 void main() {
