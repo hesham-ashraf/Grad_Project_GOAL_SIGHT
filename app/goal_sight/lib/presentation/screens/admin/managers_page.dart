@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
-import '../../../features/admin/data/admin_mock_data.dart';
 import '../../../data/models/manager_model.dart';
+import '../../../providers/repository_providers.dart';
 import '../../widgets/admin/admin_manager_widgets.dart';
 
-class ManagersPage extends StatefulWidget {
+class ManagersPage extends ConsumerStatefulWidget {
   const ManagersPage({super.key});
 
   @override
-  State<ManagersPage> createState() => _ManagersPageState();
+  ConsumerState<ManagersPage> createState() => _ManagersPageState();
 }
 
-class _ManagersPageState extends State<ManagersPage>
+class _ManagersPageState extends ConsumerState<ManagersPage>
     with SingleTickerProviderStateMixin {
   late AnimationController _ctrl;
   late List<Animation<double>> _fades;
@@ -51,7 +52,7 @@ class _ManagersPageState extends State<ManagersPage>
   }
 
   List<ManagerModel> get _filtered {
-    return AdminMockData.managers.where((m) {
+    return ref.watch(adminManagersProvider).where((m) {
       final matchesSearch = _searchQuery.isEmpty ||
           m.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
           m.email.toLowerCase().contains(_searchQuery.toLowerCase());

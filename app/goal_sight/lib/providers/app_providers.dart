@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' show Supabase;
 
 import '../core/services/api_service.dart';
 import '../core/services/secure_storage_service.dart';
@@ -23,6 +24,7 @@ import '../features/match/live_match_state.dart';
 import '../features/match/match_controller.dart';
 import '../features/match/match_state.dart';
 import '../features/user/team_member_model.dart';
+import 'clubs_provider.dart';
 
 final secureStorageServiceProvider = Provider<SecureStorageService>(
   (ref) => const SecureStorageService(),
@@ -60,7 +62,7 @@ final authRepositoryProvider = Provider<IAuthRepository>(
 );
 
 final matchRepositoryProvider = Provider<MatchRepository>(
-  (ref) => MatchRepository(ref.watch(matchRemoteDataSourceProvider)),
+  (ref) => const MatchRepository(),
 );
 
 final adminRepositoryProvider = Provider<AdminRepository>(
@@ -194,54 +196,32 @@ final teamMembersProvider = Provider<List<TeamMemberModel>>(
 
 final coachTeamNameProvider = Provider<String>((ref) => 'GoalSight FC');
 
-final leagueStandingsProvider = Provider<List<StandingEntryModel>>(
-  (ref) => const [
-    StandingEntryModel(
-      rank: 1,
-      team: 'GoalSight FC',
-      played: 24,
-      wins: 16,
-      draws: 5,
-      losses: 3,
-      goalsFor: 48,
-      goalsAgainst: 20,
-      points: 53,
-    ),
-    StandingEntryModel(
-      rank: 2,
-      team: 'Falcons United',
-      played: 24,
-      wins: 15,
-      draws: 5,
-      losses: 4,
-      goalsFor: 44,
-      goalsAgainst: 22,
-      points: 50,
-    ),
-    StandingEntryModel(
-      rank: 3,
-      team: 'Sharks FC',
-      played: 24,
-      wins: 13,
-      draws: 7,
-      losses: 4,
-      goalsFor: 41,
-      goalsAgainst: 26,
-      points: 46,
-    ),
-    StandingEntryModel(
-      rank: 4,
-      team: 'Eagles Club',
-      played: 24,
-      wins: 12,
-      draws: 7,
-      losses: 5,
-      goalsFor: 35,
-      goalsAgainst: 25,
-      points: 43,
-    ),
-  ],
-);
+// League standings derived from Supabase-backed club season stats.
+final leagueStandingsProvider = Provider<List<StandingEntryModel>>((ref) {
+  final clubs = ref.watch(mockClubsProvider);
+  final ranked = clubs.toList()
+    ..sort((a, b) {
+      if (b.stats.points != a.stats.points) {
+        return b.stats.points.compareTo(a.stats.points);
+      }
+      return b.stats.goalDifference.compareTo(a.stats.goalDifference);
+    });
+
+  return [
+    for (var i = 0; i < ranked.length; i++)
+      StandingEntryModel(
+        rank: i + 1,
+        team: ranked[i].name,
+        played: ranked[i].stats.matchesPlayed,
+        wins: ranked[i].stats.wins,
+        draws: ranked[i].stats.draws,
+        losses: ranked[i].stats.losses,
+        goalsFor: ranked[i].stats.goalsScored,
+        goalsAgainst: ranked[i].stats.goalsConceded,
+        points: ranked[i].stats.points,
+      ),
+  ];
+});
 
 final adminSystemAlertsProvider = Provider<List<String>>(
   (ref) => const [
@@ -284,47 +264,33 @@ final fanRecentResultsProvider = Provider<List<MatchModel>>((ref) {
 
 final fanHighlightsProvider = FutureProvider<List<FanHighlightModel>>(
   (ref) async {
-    await Future<void>.delayed(const Duration(milliseconds: 1100));
-    return const [
-      FanHighlightModel(
-        id: 'h1',
-        title: 'Manchester United vs Liverpool - All Goals & Highlights',
-        thumbnailUrl:
-            'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&w=1100&q=80',
-        duration: '5:23',
-        league: 'Premier League',
-        views: '1.2M views',
-      ),
-      FanHighlightModel(
-        id: 'h2',
-        title: 'Real Madrid vs Barcelona - El Clasico Extended Highlights',
-        thumbnailUrl:
-            'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?auto=format&fit=crop&w=1100&q=80',
-        duration: '8:45',
-        league: 'La Liga',
-        views: '2.5M views',
-      ),
-      FanHighlightModel(
-        id: 'h3',
-        title: 'Bayern Munich - Amazing Team Goals Compilation',
-        thumbnailUrl:
-            'https://images.unsplash.com/photo-1486286701208-1d58e9338013?auto=format&fit=crop&w=1100&q=80',
-        duration: '6:12',
-        league: 'Bundesliga',
-        views: '892K views',
-      ),
-      FanHighlightModel(
-        id: 'h4',
-        title: 'PSG vs Marseille - Best Moments',
-        thumbnailUrl:
-            'https://images.unsplash.com/photo-1459865264687-595d652de67e?auto=format&fit=crop&w=1100&q=80',
-        duration: '4:58',
-        league: 'Ligue 1',
-        views: '654K views',
-      ),
-    ];
+    final rows = await Supabase.instance.client
+        .from('highlights')
+        .select('id, title, thumbnail_url, duration_seconds, league, views')
+        .order('views', ascending: false);
+    return (rows as List).map((r) {
+      final map = r as Map<String, dynamic>;
+      return FanHighlightModel(
+        id: map['id'].toString(),
+        title: (map['title'] ?? '').toString(),
+        thumbnailUrl: (map['thumbnail_url'] ?? '').toString(),
+        duration:
+            _formatDuration((map['duration_seconds'] as num? ?? 0).toInt()),
+        league: (map['league'] ?? '').toString(),
+        views: _formatViews((map['views'] as num? ?? 0).toInt()),
+      );
+    }).toList();
   },
 );
+
+String _formatDuration(int seconds) =>
+    '${seconds ~/ 60}:${(seconds % 60).toString().padLeft(2, '0')}';
+
+String _formatViews(int v) {
+  if (v >= 1000000) return '${(v / 1000000).toStringAsFixed(1)}M views';
+  if (v >= 1000) return '${(v / 1000).toStringAsFixed(0)}K views';
+  return '$v views';
+}
 
 final liveMatchControllerProvider = StateNotifierProvider.autoDispose
     .family<LiveMatchController, LiveMatchState, String>((ref, matchId) {

@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/services/haptic_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
-import '../../../providers/clubs_provider.dart';
+import '../../../providers/repository_providers.dart';
 import '../../widgets/fan/club_card.dart';
 
 class ClubsScreen extends ConsumerStatefulWidget {
@@ -50,13 +50,10 @@ class _ClubsScreenState extends ConsumerState<ClubsScreen>
     });
   }
 
-  bool _refreshing = false;
   Future<void> _handleRefresh() async {
-    if (_refreshing) return;
-    setState(() => _refreshing = true);
     await HapticService.refresh();
-    await Future.delayed(const Duration(milliseconds: 800));
-    if (mounted) setState(() => _refreshing = false);
+    ref.invalidate(clubListProvider(null));
+    await ref.read(clubListProvider(null).future);
   }
 
   @override
@@ -68,10 +65,7 @@ class _ClubsScreenState extends ConsumerState<ClubsScreen>
 
   @override
   Widget build(BuildContext context) {
-    final allClubs = ref.watch(mockClubsProvider);
-    final filteredClubs = allClubs.where((club) {
-      return club.name.toLowerCase().contains(_searchQuery);
-    }).toList();
+    final clubsAsync = ref.watch(clubListProvider(null));
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -195,28 +189,40 @@ class _ClubsScreenState extends ConsumerState<ClubsScreen>
 
             // Grid View
             Expanded(
-              child: filteredClubs.isEmpty
-                  ? _EmptyClubsState(query: _searchQuery)
-                  : RefreshIndicator(
-                      onRefresh: _handleRefresh,
-                      color: AppColors.accentCyan,
-                      backgroundColor: AppColors.surface,
-                      strokeWidth: 2.5,
-                      child: FadeTransition(
-                        opacity: _fadeAnimation,
-                        child: SlideTransition(
-                          position: _slideAnimation,
-                          child: GridView.builder(
-                            padding: EdgeInsets.fromLTRB(
-                              context.rs(20, min: 16, max: 24),
-                              context.rs(8, min: 4, max: 12),
-                              context.rs(20, min: 16, max: 24),
-                              context.rs(100, min: 80, max: 120),
-                            ),
-                            physics: const BouncingScrollPhysics(
-                              parent: AlwaysScrollableScrollPhysics(),
-                            ),
-                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              child: clubsAsync.when(
+                loading: () => const _ClubsLoading(),
+                error: (_, __) => _ClubsError(
+                  onRetry: () => ref.invalidate(clubListProvider(null)),
+                ),
+                data: (allClubs) {
+                  final filteredClubs = allClubs
+                      .where((club) =>
+                          club.name.toLowerCase().contains(_searchQuery))
+                      .toList();
+                  if (filteredClubs.isEmpty) {
+                    return _EmptyClubsState(query: _searchQuery);
+                  }
+                  return RefreshIndicator(
+                    onRefresh: _handleRefresh,
+                    color: AppColors.accentCyan,
+                    backgroundColor: AppColors.surface,
+                    strokeWidth: 2.5,
+                    child: FadeTransition(
+                      opacity: _fadeAnimation,
+                      child: SlideTransition(
+                        position: _slideAnimation,
+                        child: GridView.builder(
+                          padding: EdgeInsets.fromLTRB(
+                            context.rs(20, min: 16, max: 24),
+                            context.rs(8, min: 4, max: 12),
+                            context.rs(20, min: 16, max: 24),
+                            context.rs(100, min: 80, max: 120),
+                          ),
+                          physics: const BouncingScrollPhysics(
+                            parent: AlwaysScrollableScrollPhysics(),
+                          ),
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount:
                                 MediaQuery.of(context).size.width > 600 ? 3 : 2,
                             childAspectRatio: 0.85,
@@ -233,10 +239,12 @@ class _ClubsScreenState extends ConsumerState<ClubsScreen>
                               },
                             );
                           },
-                          ),
                         ),
                       ),
                     ),
+                  );
+                },
+              ),
             ),
           ],
         ),
@@ -291,6 +299,83 @@ class _EmptyClubsState extends StatelessWidget {
                 fontSize: context.rs(13, min: 12, max: 14),
               ),
               textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Loading State ───────────────────────────────────────────────────────────
+
+class _ClubsLoading extends StatelessWidget {
+  const _ClubsLoading();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: CircularProgressIndicator(
+        color: AppColors.accentCyan,
+        strokeWidth: 2.5,
+      ),
+    );
+  }
+}
+
+// ─── Error State ─────────────────────────────────────────────────────────────
+
+class _ClubsError extends StatelessWidget {
+  const _ClubsError({required this.onRetry});
+
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.all(context.rs(32, min: 24, max: 48)),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: context.rs(72, min: 60, max: 80),
+              height: context.rs(72, min: 60, max: 80),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.surfaceElevated,
+                border: Border.all(color: AppColors.outlineSubtle),
+              ),
+              child: Icon(
+                Icons.cloud_off_rounded,
+                size: context.rs(32, min: 26, max: 36),
+                color: AppColors.danger,
+              ),
+            ),
+            SizedBox(height: context.rs(16, min: 12, max: 20)),
+            Text(
+              'Could not load clubs',
+              style: AppTextStyles.title(color: AppColors.textPrimary).copyWith(
+                fontSize: context.rs(16, min: 14, max: 18),
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: context.rs(6, min: 4, max: 8)),
+            Text(
+              'Check your connection and try again.',
+              style: AppTextStyles.body(color: AppColors.textMuted).copyWith(
+                fontSize: context.rs(13, min: 12, max: 14),
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: context.rs(16, min: 12, max: 20)),
+            TextButton.icon(
+              onPressed: onRetry,
+              icon: const Icon(Icons.refresh_rounded, size: 18),
+              label: const Text('Retry'),
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors.accentCyan,
+              ),
             ),
           ],
         ),

@@ -8,25 +8,30 @@
 // ---------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../data/models/manager_model.dart';
 import '../../../features/admin/data/admin_mock_data.dart';
+import '../../../providers/repository_providers.dart';
 
 // ============================================================================
 // MANAGER STATS HEADER
 // ============================================================================
 
-class ManagerStatsHeader extends StatelessWidget {
+class ManagerStatsHeader extends ConsumerWidget {
   const ManagerStatsHeader({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final managers = AdminMockData.managers;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final managers = ref.watch(adminManagersProvider);
     final active = managers.where((m) => m.isActive).length;
     final totalUploads = managers.fold<int>(0, (sum, m) => sum + m.uploadCount);
-    final avgRating = managers.map((m) => m.tacticalRating).reduce((a, b) => a + b) / managers.length;
+    final avgRating = managers.isEmpty
+        ? 0.0
+        : managers.map((m) => m.tacticalRating).reduce((a, b) => a + b) /
+            managers.length;
 
     return Row(
       children: [

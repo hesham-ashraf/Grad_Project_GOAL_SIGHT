@@ -10,7 +10,7 @@ Status rules:
 Recommended sign-off format:
 - `Sign-off: AH | Date: 2026-05-27`
 
-Last reviewed against the codebase: `2026-06-08`
+Last reviewed against the codebase: `2026-06-09`
 
 ---
 
@@ -378,7 +378,7 @@ Connect the app to real backend infrastructure after frontend completion.
 - [x] Create `users` table (implemented as `profiles`, 1:1 with auth.users) | Sign-off: AH | Date: 2026-06-08
 - [x] Create `teams` table | Sign-off: ______ | Date: ______
 - [x] Create `players` table | Sign-off: ______ | Date: ______
-- [x] Create `managers` table (managers = `profiles` role + `team_managers` ownership) | Sign-off: AH | Date: 2026-06-08
+- [x] Create `managers` table (admin directory table + `team_managers` ownership; login managers = `profiles` role) | Sign-off: AH | Date: 2026-06-09
 - [x] Create `matches` table | Sign-off: ______ | Date: ______
 - [x] Create `analyses` table (implemented as `match_analyses` + `team_match_analysis` + `match_player_analysis` + `analysis_artifacts`) | Sign-off: AH | Date: 2026-06-08
 - [x] Create `match events` table | Sign-off: ______ | Date: ______
@@ -404,12 +404,32 @@ Connect the app to real backend infrastructure after frontend completion.
 
 ### 11. Data Integration
 
-- [ ] Replace mock repositories | Sign-off: ______ | Date: ______
-- [ ] Create Supabase services | Sign-off: ______ | Date: ______
-- [ ] Create async state management | Sign-off: ______ | Date: ______
-- [ ] Add pagination | Sign-off: ______ | Date: ______
+- [x] Replace mock repositories (clubs, analyses, matches, uploads, managers, standings, highlights → Supabase; remaining items in §11b) | Sign-off: AH | Date: 2026-06-09
+- [x] Create Supabase services (`SupabaseClub/Analysis/Upload/Manager` repositories + Supabase-backed `MatchRepository`, under `lib/data/repositories/supabase/`) | Sign-off: AH | Date: 2026-06-09
+- [x] Create async state management (Riverpod `AsyncValue` + sync-bridge providers; `clubs_screen` & `upload_history_screen` converted) | Sign-off: AH | Date: 2026-06-09
+- [ ] Add pagination (repos expose `*Paged` methods; not yet wired to infinite-scroll UI) | Sign-off: ______ | Date: ______
 - [ ] Add caching | Sign-off: ______ | Date: ______
-- [ ] Add proper error handling | Sign-off: ______ | Date: ______
+- [ ] Add proper error handling (auth + clubs have error/retry; unified error model pending) | Sign-off: ______ | Date: ______
+
+### 11b. Data Integration — Remaining
+
+> Added 2026-06-09. Factual/entity data is now Supabase-backed across 8 verticals
+> (clubs, squads, league standings, match analyses, fan matches/home, fan
+> highlights, manager upload history, admin managers). DB migrations `021`–`029`
+> applied + filed. Verified at `flutter analyze` + DB/RLS/seed level; not yet
+> runtime-tested on a device. The items below remain.
+
+- [ ] Connect Admin Squad players (`AdminMockData.squad` → `player_intelligence`; refactor `admin_squad_widgets`, `squad_overview_page`, `player_intelligence_page`) | Sign-off: ______ | Date: ______
+- [ ] Connect admin system overview counts (`admin_repository`/`adminControllerProvider` → Supabase `count` queries) | Sign-off: ______ | Date: ______
+- [ ] Replace remaining inline mock providers (`teamMembersProvider`, `coachTeamNameProvider`, `adminSystemAlertsProvider`, `fan_mock_providers.dart`) | Sign-off: ______ | Date: ______
+- [ ] Retire dead mock code (`mock_player_repository`, unused mock data files, Dio auth/match/admin datasources) | Sign-off: ______ | Date: ______
+- [ ] Seed real data for still-empty tables (`matches`, `match_events`, `player_match_stats`, `venues`, `subscription_plans`, `user_subscriptions`) | Sign-off: ______ | Date: ______
+- [ ] Runtime/visual QA of all Supabase-backed screens on a device/emulator | Sign-off: ______ | Date: ______
+
+> Deferred to Phase 3 (AI-narrative — no real source until the AI engine exists):
+> admin tactical insights / activity feed / alerts / performance trends /
+> manager performance records; manager dashboard AI content; manager matches
+> mock; and the upload AI-processing simulation.
 
 ### 12. Storage System
 

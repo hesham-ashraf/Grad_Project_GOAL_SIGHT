@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/services/haptic_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
-import '../upload_history_mock_data.dart';
 import '../../../data/models/upload_job_model.dart';
+import '../../../providers/repository_providers.dart';
 import '../widgets/upload_history_widgets.dart';
 
-class UploadHistoryScreen extends StatefulWidget {
+class UploadHistoryScreen extends ConsumerStatefulWidget {
   const UploadHistoryScreen({super.key});
 
   @override
-  State<UploadHistoryScreen> createState() => _UploadHistoryScreenState();
+  ConsumerState<UploadHistoryScreen> createState() =>
+      _UploadHistoryScreenState();
 }
 
-class _UploadHistoryScreenState extends State<UploadHistoryScreen>
+class _UploadHistoryScreenState extends ConsumerState<UploadHistoryScreen>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   final _searchController = TextEditingController();
@@ -31,13 +33,10 @@ class _UploadHistoryScreenState extends State<UploadHistoryScreen>
     )..forward();
   }
 
-  bool _refreshing = false;
   Future<void> _handleRefresh() async {
-    if (_refreshing) return;
-    setState(() => _refreshing = true);
     await HapticService.refresh();
-    await Future.delayed(const Duration(milliseconds: 800));
-    if (mounted) setState(() => _refreshing = false);
+    ref.invalidate(uploadHistoryProvider(null));
+    await ref.read(uploadHistoryProvider(null).future);
   }
 
   @override
@@ -49,8 +48,8 @@ class _UploadHistoryScreenState extends State<UploadHistoryScreen>
 
   // ── Filtering ────────────────────────────────────────────────────────────────
 
-  List<UploadJobModel> get _filteredJobs {
-    var jobs = List<UploadJobModel>.from(kMockUploadHistory);
+  List<UploadJobModel> _filtered(List<UploadJobModel> source) {
+    var jobs = List<UploadJobModel>.from(source);
 
     // Sort: processing first, then by uploadedAt descending
     jobs.sort((a, b) {
@@ -107,7 +106,11 @@ class _UploadHistoryScreenState extends State<UploadHistoryScreen>
   @override
   Widget build(BuildContext context) {
     final hp = context.rs(20, min: 14, max: 28);
-    final filtered = _filteredJobs;
+    final jobs = ref.watch(uploadHistoryProvider(null)).maybeWhen(
+          data: (d) => d,
+          orElse: () => const <UploadJobModel>[],
+        );
+    final filtered = _filtered(jobs);
     final isSearching =
         _searchQuery.isNotEmpty || _filterStatus != null;
 
@@ -123,7 +126,8 @@ class _UploadHistoryScreenState extends State<UploadHistoryScreen>
               0.25,
               Padding(
                 padding: EdgeInsets.fromLTRB(hp, 12, hp, 0),
-                child: _HistoryTopBar(onBack: () => context.pop()),
+                child: _HistoryTopBar(
+                    onBack: () => context.pop(), count: jobs.length),
               ),
             ),
 
@@ -152,8 +156,7 @@ class _UploadHistoryScreenState extends State<UploadHistoryScreen>
                             0.05,
                             0.28,
                             _HistoryHeader(
-                              totalCount:
-                                  kMockUploadHistory.length,
+                              totalCount: jobs.length,
                             ),
                           ),
                           const SizedBox(height: 16),
@@ -163,7 +166,7 @@ class _UploadHistoryScreenState extends State<UploadHistoryScreen>
                             0.12,
                             0.36,
                             HistoryStatsSummary(
-                              jobs: kMockUploadHistory,
+                              jobs: jobs,
                             ),
                           ),
                           const SizedBox(height: 14),
@@ -198,7 +201,7 @@ class _UploadHistoryScreenState extends State<UploadHistoryScreen>
                             0.56,
                             _ResultsCount(
                               count: filtered.length,
-                              total: kMockUploadHistory.length,
+                              total: jobs.length,
                               isFiltered: isSearching,
                             ),
                           ),
@@ -277,8 +280,9 @@ class _UploadHistoryScreenState extends State<UploadHistoryScreen>
 // ─── History Top Bar ──────────────────────────────────────────────────────────
 
 class _HistoryTopBar extends StatelessWidget {
-  const _HistoryTopBar({required this.onBack});
+  const _HistoryTopBar({required this.onBack, required this.count});
   final VoidCallback onBack;
+  final int count;
 
   @override
   Widget build(BuildContext context) {
@@ -326,7 +330,7 @@ class _HistoryTopBar extends StatelessWidget {
                   size: 13, color: AppColors.primaryPurple),
               const SizedBox(width: 5),
               Text(
-                '${kMockUploadHistory.length} Records',
+                '$count Records',
                 style: AppTextStyles.caption(
                         color: AppColors.primaryPurple)
                     .copyWith(fontWeight: FontWeight.w700),

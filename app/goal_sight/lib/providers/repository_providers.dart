@@ -18,18 +18,18 @@ import '../data/repositories/interfaces/i_club_repository.dart';
 import '../data/repositories/interfaces/i_manager_repository.dart';
 import '../data/repositories/interfaces/i_player_repository.dart';
 import '../data/repositories/interfaces/i_upload_repository.dart';
-import '../data/repositories/mock/mock_analysis_repository.dart';
-import '../data/repositories/mock/mock_club_repository.dart';
-import '../data/repositories/mock/mock_manager_repository.dart';
 import '../data/repositories/mock/mock_player_repository.dart';
-import '../data/repositories/mock/mock_upload_repository.dart';
+import '../data/repositories/supabase/supabase_analysis_repository.dart';
+import '../data/repositories/supabase/supabase_club_repository.dart';
+import '../data/repositories/supabase/supabase_manager_repository.dart';
+import '../data/repositories/supabase/supabase_upload_repository.dart';
 import '../data/models/upload_job_model.dart';
 
 // ── Repository singletons ─────────────────────────────────────────────────
 
-/// Club repository — swap MockClubRepository → SupabaseClubRepository
+/// Club repository — Supabase-backed (teams + season stats + squads).
 final clubRepositoryProvider = Provider<IClubRepository>(
-  (_) => const MockClubRepository(),
+  (_) => const SupabaseClubRepository(),
 );
 
 /// Player repository — swap MockPlayerRepository → SupabasePlayerRepository
@@ -37,19 +37,19 @@ final playerRepositoryProvider = Provider<IPlayerRepository>(
   (_) => const MockPlayerRepository(),
 );
 
-/// Analysis repository — swap MockAnalysisRepository → SupabaseAnalysisRepository
+/// Analysis repository — Supabase-backed (match_analyses + nested).
 final analysisRepositoryProvider = Provider<IAnalysisRepository>(
-  (_) => const MockAnalysisRepository(),
+  (_) => const SupabaseAnalysisRepository(),
 );
 
-/// Upload repository — swap MockUploadRepository → SupabaseUploadRepository
+/// Upload repository — Supabase-backed (upload_jobs).
 final uploadRepositoryProvider = Provider<IUploadRepository>(
-  (_) => const MockUploadRepository(),
+  (_) => const SupabaseUploadRepository(),
 );
 
-/// Manager repository — swap MockManagerRepository → SupabaseManagerRepository
+/// Manager repository — Supabase-backed (managers directory table).
 final managerRepositoryProvider = Provider<IManagerRepository>(
-  (_) => const MockManagerRepository(),
+  (_) => const SupabaseManagerRepository(),
 );
 
 // ── Club providers ────────────────────────────────────────────────────────
@@ -146,3 +146,11 @@ final managerDetailProvider = FutureProvider.family<ManagerModel, String>(
   (ref, managerId) =>
       ref.watch(managerRepositoryProvider).fetchManagerById(managerId),
 );
+
+/// Synchronous managers list for admin screens (empty while loading / on error).
+final adminManagersProvider = Provider<List<ManagerModel>>((ref) {
+  return ref.watch(managerListProvider('')).maybeWhen(
+        data: (managers) => managers,
+        orElse: () => const <ManagerModel>[],
+      );
+});

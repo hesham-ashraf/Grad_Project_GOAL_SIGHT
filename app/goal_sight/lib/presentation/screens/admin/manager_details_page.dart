@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../features/admin/data/admin_mock_data.dart';
 import '../../../data/models/manager_model.dart';
+import '../../../providers/repository_providers.dart';
 
-class ManagerDetailsPage extends StatefulWidget {
+class ManagerDetailsPage extends ConsumerStatefulWidget {
   const ManagerDetailsPage({super.key, required this.managerId});
   final String managerId;
 
   @override
-  State<ManagerDetailsPage> createState() => _ManagerDetailsPageState();
+  ConsumerState<ManagerDetailsPage> createState() => _ManagerDetailsPageState();
 }
 
-class _ManagerDetailsPageState extends State<ManagerDetailsPage>
+class _ManagerDetailsPageState extends ConsumerState<ManagerDetailsPage>
     with SingleTickerProviderStateMixin {
   late AnimationController _ctrl;
   late List<Animation<double>> _fades;
@@ -46,9 +48,18 @@ class _ManagerDetailsPageState extends State<ManagerDetailsPage>
 
   @override
   Widget build(BuildContext context) {
-    final manager = AdminMockData.managers.firstWhere(
+    final managers = ref.watch(adminManagersProvider);
+    if (managers.isEmpty) {
+      return const Scaffold(
+        backgroundColor: AppColors.background,
+        body: Center(
+          child: CircularProgressIndicator(color: AppColors.accentCyan),
+        ),
+      );
+    }
+    final manager = managers.firstWhere(
       (m) => m.id == widget.managerId,
-      orElse: () => AdminMockData.managers.first,
+      orElse: () => managers.first,
     );
     final perf = AdminMockData.managerPerformance[manager.id];
 

@@ -11,16 +11,18 @@ import '../data/models/player_profile_model.dart';
 import '../data/models/club_model.dart';
 import 'clubs_provider.dart';
 
-//Manager's club ID - currently manages GoalSight FC
-const String _managerClubId = 'club_001';
+//Manager's club - currently manages GoalSight FC (matched by name since
+//Supabase assigns UUID ids). TODO: resolve via team_managers ownership.
+const String _managerClubName = 'GoalSight FC';
 
 //Fetch the manager's club
 final managerClubProvider = Provider<ClubModel?>((ref) {
   final clubs = ref.watch(mockClubsProvider);
+  if (clubs.isEmpty) return null;
   try {
-    return clubs.firstWhere((c) => c.id == _managerClubId);
+    return clubs.firstWhere((c) => c.name == _managerClubName);
   } catch (_) {
-    return null;
+    return clubs.first;
   }
 });
 
