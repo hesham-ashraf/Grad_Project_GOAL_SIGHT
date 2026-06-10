@@ -1,0 +1,50 @@
+{
+  "generatedAt": "2026-06-09T23:42:41.801Z",
+  "baseUrl": "https://hciiygxvwlhasesytrbp.supabase.co",
+  "verdict": "failed",
+  "missingEnv": [],
+  "roles": [
+    {
+      "role": "admin",
+      "authMode": "password",
+      "userId": "b830875d-9fdc-4ad8-a4ed-ba1b2e99498c",
+      "status": "ready",
+      "notes": []
+    },
+    {
+      "role": "manager",
+      "authMode": "password",
+      "userId": "1c34db13-cc1f-46bc-a1e0-dffc73342689",
+      "status": "ready",
+      "notes": []
+    },
+    {
+      "role": "player",
+      "authMode": "password",
+      "userId": "05cc12a7-ffc8-4532-885e-daa345c1954d",
+      "status": "ready",
+      "notes": []
+    },
+    {
+      "role": "fan",
+      "authMode": "password",
+      "userId": "3cee463a-f9cf-4847-a3a2-ec39d661968a",
+      "status": "ready",
+      "notes": []
+    }
+  ],
+  "failures": [
+    {
+      "test": "Player linked stats preflight",
+      "message": "No linked player row exists for the authenticated player profile 05cc12a7-ffc8-4532-885e-daa345c1954d.",
+      "rootCause": "Authenticated reads against public.profiles and public.players are still hitting stack depth recursion through public.has_role().",
+      "databaseError": {
+        "code": "54001",
+        "message": "stack depth limit exceeded"
+      }
+    }
+  ],
+  "notes": [
+    "No linked player row exists for the authenticated player profile 05cc12a7-ffc8-4532-885e-daa345c1954d."
+  ]
+}

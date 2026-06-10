@@ -11,6 +11,19 @@
 -- ============================================================
 
 -- ---- 1. Harden function search_path (security advisor) ----
+create or replace function public.has_role(role_name text)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public, auth
+as $$
+	select exists (
+		select 1 from public.profiles p
+		where p.id = auth.uid() and p.role = role_name
+	);
+$$;
+
 alter function public.has_role(text)   set search_path = '';
 alter function public.set_updated_at() set search_path = '';
 
