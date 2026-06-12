@@ -3,6 +3,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const crypto = require('node:crypto');
 
 if (typeof fetch !== 'function') {
   throw new Error('Node 18+ is required because this harness uses the built-in fetch API.');
@@ -12,12 +13,14 @@ const baseUrl = requiredEnv('SUPABASE_URL');
 const anonKey = requiredEnv('SUPABASE_ANON_KEY');
 
 const reportPath = path.join(__dirname, '..', 'supabase', 'validation', 'phase15_runtime_results.json');
+const summaryPath = path.join(__dirname, '..', 'supabase', 'validation', 'phase15_runtime_summary.md');
+const matrixPath = path.join(__dirname, '..', 'supabase', 'validation', 'phase15_coverage_matrix.md');
 const allowDemoFallback = env('PHASE15_ALLOW_DEMO_SEEDS') === 'true';
 
 const roleSpecs = [
   {
     role: 'admin',
-    expectedUserId: '26357f17-0004-426f-83c3-1a127e8ff83e',
+    expectedUserId: 'b830875d-9fdc-4ad8-a4ed-ba1b2e99498c',
     emailEnv: 'PHASE15_ADMIN_EMAIL',
     passwordEnv: 'PHASE15_ADMIN_PASSWORD',
     tokenEnv: 'PHASE15_ADMIN_ACCESS_TOKEN',
@@ -27,7 +30,7 @@ const roleSpecs = [
   },
   {
     role: 'manager',
-    expectedUserId: 'baf4f830-9142-46da-8ebc-adf80919ac8e',
+    expectedUserId: '1c34db13-cc1f-46bc-a1e0-dffc73342689',
     emailEnv: 'PHASE15_MANAGER_EMAIL',
     passwordEnv: 'PHASE15_MANAGER_PASSWORD',
     tokenEnv: 'PHASE15_MANAGER_ACCESS_TOKEN',
@@ -37,7 +40,7 @@ const roleSpecs = [
   },
   {
     role: 'player',
-    expectedUserId: '35783d1b-90f3-4f79-8cf4-ffb2b03bd530',
+    expectedUserId: '05cc12a7-ffc8-4532-885e-daa345c1954d',
     emailEnv: 'PHASE15_PLAYER_EMAIL',
     passwordEnv: 'PHASE15_PLAYER_PASSWORD',
     tokenEnv: 'PHASE15_PLAYER_ACCESS_TOKEN',
@@ -47,7 +50,7 @@ const roleSpecs = [
   },
   {
     role: 'fan',
-    expectedUserId: 'a14fa62f-b619-4821-b256-d2da35d0a7ca',
+    expectedUserId: '3cee463a-f9cf-4847-a3a2-ec39d661968a',
     emailEnv: 'PHASE15_FAN_EMAIL',
     passwordEnv: 'PHASE15_FAN_PASSWORD',
     tokenEnv: 'PHASE15_FAN_ACCESS_TOKEN',
@@ -63,6 +66,8 @@ const state = {
   verdict: 'not_run',
   missingEnv: [],
   roles: [],
+  tests: [],
+  coverageVerdict: 'not_run',
   notes: []
 };
 
@@ -118,32 +123,28 @@ async function main() {
     return;
   }
 
-  const allResults = [];
-  for (const context of contexts) {
-    const result = await validateRole(context);
-    allResults.push(result);
-    state.roles = state.roles.map((roleResult) => {
-      if (roleResult.role !== context.role) {
-        return roleResult;
-      }
+  const contextMap = Object.fromEntries(contexts.map((context) => [context.role, context]));
+  const fixtures = await preparePhase15Fixtures(contextMap);
 
-      return {
-        ...roleResult,
-        userId: result.user.id,
-        status: result.status,
-        notes: result.notes
-      };
+  try {
+    state.tests = await runPhase15CoverageSuite(contextMap, fixtures);
+    state.coverageMatrix = buildCoverageMatrix(state.tests);
+    state.coverageVerdict = state.tests.every((testResult) => testResult.coverageStatus === 'PASS') ? 'PASS' : 'PARTIAL';
+    state.verdict = state.tests.every((testResult) => testResult.executionStatus === 'pass') ? 'pass' : 'failed';
+    state.notes.push(...state.tests.flatMap((testResult) => testResult.notes || []));
+    persistReport();
+    writePhase15Artifacts(state);
+
+    console.log(JSON.stringify(state, null, 2));
+
+    if (state.verdict !== 'pass') {
+      process.exitCode = 1;
+    }
+  } finally {
+    await cleanupPhase15Fixtures(fixtures).catch((error) => {
+      state.notes.push(`Cleanup warning: ${error.message}`);
+      persistReport();
     });
-  }
-
-  state.verdict = allResults.every((result) => result.status === 'pass') ? 'pass' : 'partial';
-  state.notes.push(...allResults.flatMap((result) => result.notes));
-  persistReport();
-
-  console.log(JSON.stringify(state, null, 2));
-
-  if (state.verdict !== 'pass') {
-    process.exitCode = 1;
   }
 }
 
@@ -176,20 +177,6 @@ function createHeaders(accessToken, extraHeaders = {}) {
 }
 
 async function resolveRoleContext(spec) {
-  const accessToken = env(spec.tokenEnv);
-  if (accessToken) {
-    const user = await fetchCurrentUser(accessToken);
-    return {
-      role: spec.role,
-      authMode: 'access_token',
-      accessToken,
-      userId: user.id,
-      user,
-      status: 'ready',
-      notes: []
-    };
-  }
-
   const email = env(spec.emailEnv);
   const password = env(spec.passwordEnv);
 
@@ -201,6 +188,20 @@ async function resolveRoleContext(spec) {
       accessToken: session.access_token,
       userId: session.user.id,
       user: session.user,
+      status: 'ready',
+      notes: []
+    };
+  }
+
+  const accessToken = env(spec.tokenEnv);
+  if (accessToken) {
+    const user = await fetchCurrentUser(accessToken);
+    return {
+      role: spec.role,
+      authMode: 'access_token',
+      accessToken,
+      userId: user.id,
+      user,
       status: 'ready',
       notes: []
     };
@@ -302,7 +303,13 @@ async function validateRole(context) {
     player: [
       { name: 'teams', table: 'teams', select: 'id,name', expectAllow: true },
       { name: 'matches', table: 'matches', select: 'id,status', expectAllow: true },
-      { name: 'player_match_stats', table: 'player_match_stats', select: 'id,player_id', expectAllow: true, filter: await buildPlayerStatsFilter(context.accessToken) },
+      {
+        name: 'player_match_stats',
+        table: 'player_match_stats',
+        select: 'id,player_id',
+        expectAllow: true,
+        filter: context.role === 'player' ? await buildPlayerStatsFilter(context.accessToken, user.id) : undefined
+      },
       { name: 'match_videos_storage', storageBucket: 'match-videos', expectAllow: true },
       { name: 'upload_jobs', table: 'upload_jobs', select: 'id', expectAllow: false }
     ],
@@ -343,12 +350,11 @@ async function validateRole(context) {
   };
 }
 
-async function buildPlayerStatsFilter(accessToken) {
-  const currentUser = await fetchCurrentUser(accessToken);
-  const playerRows = await selectRows(accessToken, 'players', 'id,profile_id', `profile_id=eq.${currentUser.id}`);
+async function buildPlayerStatsFilter(accessToken, playerUserId) {
+  const playerRows = await selectRows(accessToken, 'players', 'id,profile_id', `profile_id=eq.${playerUserId}`);
   const ids = playerRows.map((row) => row.id).filter(Boolean);
   if (ids.length === 0) {
-    throw new Error(`No linked player row exists for the authenticated player profile ${currentUser.id}.`);
+    throw new Error(`No linked player row exists for the authenticated player profile ${playerUserId}.`);
   }
 
   return `player_id=in.(${ids.join(',')})`;

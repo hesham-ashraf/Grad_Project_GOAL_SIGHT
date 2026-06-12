@@ -9,7 +9,7 @@ Catalog validation can prove that policies exist. It cannot prove runtime author
 | --- | --- |
 | Admin | `26357f17-0004-426f-83c3-1a127e8ff83e` |
 | Manager | `baf4f830-9142-46da-8ebc-adf80919ac8e` |
-| Player | `35783d1b-90f3-4f79-8cf4-ffb2b03bd530` |
+| Player | `05cc12a7-ffc8-4532-885e-daa345c1954d` |
 | Fan | `a14fa62f-b619-4821-b256-d2da35d0a7ca` |
 
 Player mapping:
