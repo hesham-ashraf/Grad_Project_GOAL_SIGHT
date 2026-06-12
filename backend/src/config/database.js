@@ -9,6 +9,30 @@ const { Pool } = pg;
 
 let pool = null;
 
+const isLocalPostgresHost = (hostname) =>
+  hostname === 'localhost' ||
+  hostname === '127.0.0.1' ||
+  hostname === '::1' ||
+  hostname === '[::1]';
+
+const buildSslConfig = () => {
+  const connectionString = process.env.DATABASE_URL;
+  if (!connectionString) {
+    return false;
+  }
+
+  try {
+    const url = new URL(connectionString);
+    if (isLocalPostgresHost(url.hostname)) {
+      return false;
+    }
+  } catch (error) {
+    void error;
+  }
+
+  return { rejectUnauthorized: false };
+};
+
 /**
  * Returns the shared connection pool, creating it on first call.
  * @returns {pg.Pool}
@@ -17,7 +41,7 @@ export const getPool = () => {
   if (!pool) {
     pool = new Pool({
       connectionString: process.env.DATABASE_URL,
-      ssl: { rejectUnauthorized: false }, // required for Supabase
+      ssl: buildSslConfig(),
       max: 10,
       idleTimeoutMillis: 30000,
       connectionTimeoutMillis: 5000,
@@ -49,8 +73,8 @@ export const connectDB = async () => {
     console.log(`📊 Database: ${current_database}`);
     console.log(`🔖 ${version.split(' ').slice(0, 2).join(' ')}\n`);
   } catch (error) {
-    console.error('❌ PostgreSQL Connection Error:', error.message);
-    process.exit(1);
+    console.warn('⚠️ PostgreSQL Connection Warning:', error.message);
+    console.warn('⚠️ Starting backend in degraded mode without database access.');
   }
 };
 
