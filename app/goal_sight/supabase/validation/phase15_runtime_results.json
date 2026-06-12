@@ -1,58 +1,711 @@
 {
-  "generatedAt": "2026-06-12T15:30:51.549Z",
+  "generatedAt": "2026-06-12T16:55:43.768Z",
   "baseUrl": "https://hciiygxvwlhasesytrbp.supabase.co",
-  "verdict": "pass",
+  "verdict": "failed",
   "missingEnv": [],
   "roles": [
     {
       "role": "admin",
       "authMode": "password",
       "userId": "b830875d-9fdc-4ad8-a4ed-ba1b2e99498c",
-      "status": "pass",
-      "notes": [
-        "Profile role verified for admin.",
-        "Realtime subscription joined for admin on matches."
-      ]
+      "status": "ready",
+      "notes": []
     },
     {
       "role": "manager",
       "authMode": "password",
       "userId": "1c34db13-cc1f-46bc-a1e0-dffc73342689",
-      "status": "pass",
-      "notes": [
-        "Profile role verified for manager.",
-        "Realtime subscription joined for manager on matches."
-      ]
+      "status": "ready",
+      "notes": []
     },
     {
       "role": "player",
       "authMode": "password",
       "userId": "05cc12a7-ffc8-4532-885e-daa345c1954d",
-      "status": "pass",
-      "notes": [
-        "Profile role verified for player.",
-        "Realtime subscription joined for player on matches."
-      ]
+      "status": "ready",
+      "notes": []
     },
     {
       "role": "fan",
       "authMode": "password",
       "userId": "3cee463a-f9cf-4847-a3a2-ec39d661968a",
-      "status": "pass",
+      "status": "ready",
+      "notes": []
+    }
+  ],
+  "tests": [
+    {
+      "id": "A1",
+      "title": "Admin can read all target tables",
+      "coverageStatus": "PASS",
+      "executionStatus": "pass",
       "notes": [
-        "Profile role verified for fan.",
-        "Realtime subscription joined for fan on matches."
+        "Admin read 10 tables successfully."
+      ]
+    },
+    {
+      "id": "A2",
+      "title": "Admin can manage upload jobs",
+      "coverageStatus": "PASS",
+      "executionStatus": "pass",
+      "notes": [
+        "Admin insert, update, and delete succeeded."
+      ]
+    },
+    {
+      "id": "A3",
+      "title": "Admin notification access",
+      "coverageStatus": "PASS",
+      "executionStatus": "pass",
+      "notes": [
+        "Admin read 8 notification rows."
+      ]
+    },
+    {
+      "id": "A4",
+      "title": "Admin activity log access",
+      "coverageStatus": "PASS",
+      "executionStatus": "pass",
+      "notes": [
+        "Admin read 41 activity rows."
+      ]
+    },
+    {
+      "id": "M1",
+      "title": "Manager can create own upload job",
+      "coverageStatus": "PASS",
+      "executionStatus": "pass",
+      "notes": [
+        "Manager-owned upload job created: 1ae6c2a6-aabb-4382-b7d0-ae2f1318c4c2"
+      ]
+    },
+    {
+      "id": "M2",
+      "title": "Manager can read own upload job",
+      "coverageStatus": "PASS",
+      "executionStatus": "pass",
+      "notes": [
+        "Manager read own upload job 1ae6c2a6-aabb-4382-b7d0-ae2f1318c4c2."
+      ]
+    },
+    {
+      "id": "M3",
+      "title": "Manager can update own upload job",
+      "coverageStatus": "PASS",
+      "executionStatus": "pass",
+      "notes": [
+        "Manager own upload job updated to 35%."
+      ]
+    },
+    {
+      "id": "M4",
+      "title": "Manager cannot create upload job for another user",
+      "coverageStatus": "PASS",
+      "executionStatus": "pass",
+      "notes": [
+        "Insert into upload_jobs denied as expected: 403 new row violates row-level security policy for table \"upload_jobs\""
+      ]
+    },
+    {
+      "id": "M5",
+      "title": "Manager cannot update another user's upload job",
+      "coverageStatus": "PASS",
+      "executionStatus": "pass",
+      "notes": [
+        "Update on upload_jobs returned an empty success response."
+      ]
+    },
+    {
+      "id": "P1",
+      "title": "Player can read own profile",
+      "coverageStatus": "PASS",
+      "executionStatus": "pass",
+      "notes": [
+        "Player profile read succeeded."
+      ]
+    },
+    {
+      "id": "P2",
+      "title": "Player cannot read another user's profile",
+      "coverageStatus": "PASS",
+      "executionStatus": "pass",
+      "notes": [
+        "Player could not read manager profile."
+      ]
+    },
+    {
+      "id": "P3",
+      "title": "Player mapping is correct",
+      "coverageStatus": "PASS",
+      "executionStatus": "pass",
+      "notes": [
+        "Ahmed Striker mapped to 05cc12a7-ffc8-4532-885e-daa345c1954d."
+      ]
+    },
+    {
+      "id": "P4",
+      "title": "Player can read own linked stats",
+      "coverageStatus": "FAIL",
+      "executionStatus": "fail",
+      "notes": [
+        "Player could not read own linked stats."
+      ]
+    },
+    {
+      "id": "P5",
+      "title": "Player cannot read another player's stats",
+      "coverageStatus": "PASS",
+      "executionStatus": "pass",
+      "notes": [
+        "Other player stats stayed hidden."
+      ]
+    },
+    {
+      "id": "P6",
+      "title": "Player cannot read upload jobs",
+      "coverageStatus": "PASS",
+      "executionStatus": "pass",
+      "notes": [
+        "Upload jobs denied to player."
+      ]
+    },
+    {
+      "id": "F1",
+      "title": "Fan can read own profile",
+      "coverageStatus": "PASS",
+      "executionStatus": "pass",
+      "notes": [
+        "Fan profile read succeeded."
+      ]
+    },
+    {
+      "id": "F2",
+      "title": "Fan cannot read other profiles",
+      "coverageStatus": "PASS",
+      "executionStatus": "pass",
+      "notes": [
+        "Manager profile hidden from fan."
+      ]
+    },
+    {
+      "id": "F3",
+      "title": "Fan can read public football data",
+      "coverageStatus": "PASS",
+      "executionStatus": "pass",
+      "notes": [
+        "Fan read teams, players, matches, and match events."
+      ]
+    },
+    {
+      "id": "F4",
+      "title": "Fan cannot read player stats",
+      "coverageStatus": "PASS",
+      "executionStatus": "pass",
+      "notes": [
+        "Fan player stats request remained empty or denied."
+      ]
+    },
+    {
+      "id": "F5",
+      "title": "Fan cannot read videos",
+      "coverageStatus": "PASS",
+      "executionStatus": "pass",
+      "notes": [
+        "Fan videos request remained empty or denied."
+      ]
+    },
+    {
+      "id": "F6",
+      "title": "Fan cannot read upload jobs",
+      "coverageStatus": "PASS",
+      "executionStatus": "pass",
+      "notes": [
+        "Fan upload_jobs request remained empty or denied."
+      ]
+    },
+    {
+      "id": "F7",
+      "title": "Fan notification ownership",
+      "coverageStatus": "PASS",
+      "executionStatus": "pass",
+      "notes": [
+        "Fan saw own notification and not manager notification."
+      ]
+    },
+    {
+      "id": "F8",
+      "title": "Fan activity ownership",
+      "coverageStatus": "PASS",
+      "executionStatus": "pass",
+      "notes": [
+        "Insert into activity_logs denied as expected: 403 new row violates row-level security policy for table \"activity_logs\"",
+        "Fan inserted own activity 50928643-36a0-4f59-944c-cbc96640ae5a."
+      ]
+    },
+    {
+      "id": "S1",
+      "title": "Public buckets are readable",
+      "coverageStatus": "FAIL",
+      "executionStatus": "fail",
+      "notes": [
+        "No existing public objects were found in team-logos or player-images."
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Manager can upload match video",
+      "coverageStatus": "PASS",
+      "executionStatus": "pass",
+      "notes": [
+        "Manager uploaded phase15/match-videos/manager-upload-337bc1c8-47f5-4f80-8645-aa446fe954cd.mp4."
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Manager can read match video",
+      "coverageStatus": "PASS",
+      "executionStatus": "pass",
+      "notes": [
+        "Manager downloaded match video."
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Player can read match video",
+      "coverageStatus": "PASS",
+      "executionStatus": "pass",
+      "notes": [
+        "Player downloaded match video."
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Fan cannot read match video",
+      "coverageStatus": "PASS",
+      "executionStatus": "pass",
+      "notes": [
+        "Fan was denied match video download."
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "Fan cannot upload match video",
+      "coverageStatus": "PASS",
+      "executionStatus": "pass",
+      "notes": [
+        "Upload to match-videos/phase15-match-video-denied-1bde1c90-5297-4ffa-b997-7ab2aa671885.txt denied as expected: 400 new row violates row-level security policy"
+      ]
+    },
+    {
+      "id": "R1",
+      "title": "Manager receives own upload job updates",
+      "coverageStatus": "FAIL",
+      "executionStatus": "fail",
+      "notes": [
+        "Timed out waiting for realtime payload."
+      ]
+    },
+    {
+      "id": "R2",
+      "title": "Manager does not receive other user's upload job updates",
+      "coverageStatus": "FAIL",
+      "executionStatus": "fail",
+      "notes": [
+        "Timed out waiting for realtime payload."
+      ]
+    },
+    {
+      "id": "R3",
+      "title": "Player receives own stats updates only",
+      "coverageStatus": "FAIL",
+      "executionStatus": "fail",
+      "notes": [
+        "Timed out waiting for realtime payload."
+      ]
+    },
+    {
+      "id": "R4",
+      "title": "Player does not receive another player's stats",
+      "coverageStatus": "FAIL",
+      "executionStatus": "fail",
+      "notes": [
+        "Timed out waiting for realtime payload."
+      ]
+    },
+    {
+      "id": "R5",
+      "title": "User receives own notification updates only",
+      "coverageStatus": "FAIL",
+      "executionStatus": "fail",
+      "notes": [
+        "Timed out waiting for realtime payload."
+      ]
+    },
+    {
+      "id": "R6",
+      "title": "Admin receives activity feed updates",
+      "coverageStatus": "FAIL",
+      "executionStatus": "fail",
+      "notes": [
+        "Timed out waiting for realtime payload."
       ]
     }
   ],
+  "coverageVerdict": "PARTIAL",
   "notes": [
-    "Profile role verified for admin.",
-    "Realtime subscription joined for admin on matches.",
-    "Profile role verified for manager.",
-    "Realtime subscription joined for manager on matches.",
-    "Profile role verified for player.",
-    "Realtime subscription joined for player on matches.",
-    "Profile role verified for fan.",
-    "Realtime subscription joined for fan on matches."
+    "Admin read 10 tables successfully.",
+    "Admin insert, update, and delete succeeded.",
+    "Admin read 8 notification rows.",
+    "Admin read 41 activity rows.",
+    "Manager-owned upload job created: 1ae6c2a6-aabb-4382-b7d0-ae2f1318c4c2",
+    "Manager read own upload job 1ae6c2a6-aabb-4382-b7d0-ae2f1318c4c2.",
+    "Manager own upload job updated to 35%.",
+    "Insert into upload_jobs denied as expected: 403 new row violates row-level security policy for table \"upload_jobs\"",
+    "Update on upload_jobs returned an empty success response.",
+    "Player profile read succeeded.",
+    "Player could not read manager profile.",
+    "Ahmed Striker mapped to 05cc12a7-ffc8-4532-885e-daa345c1954d.",
+    "Player could not read own linked stats.",
+    "Other player stats stayed hidden.",
+    "Upload jobs denied to player.",
+    "Fan profile read succeeded.",
+    "Manager profile hidden from fan.",
+    "Fan read teams, players, matches, and match events.",
+    "Fan player stats request remained empty or denied.",
+    "Fan videos request remained empty or denied.",
+    "Fan upload_jobs request remained empty or denied.",
+    "Fan saw own notification and not manager notification.",
+    "Insert into activity_logs denied as expected: 403 new row violates row-level security policy for table \"activity_logs\"",
+    "Fan inserted own activity 50928643-36a0-4f59-944c-cbc96640ae5a.",
+    "No existing public objects were found in team-logos or player-images.",
+    "Manager uploaded phase15/match-videos/manager-upload-337bc1c8-47f5-4f80-8645-aa446fe954cd.mp4.",
+    "Manager downloaded match video.",
+    "Player downloaded match video.",
+    "Fan was denied match video download.",
+    "Upload to match-videos/phase15-match-video-denied-1bde1c90-5297-4ffa-b997-7ab2aa671885.txt denied as expected: 400 new row violates row-level security policy",
+    "Timed out waiting for realtime payload.",
+    "Timed out waiting for realtime payload.",
+    "Timed out waiting for realtime payload.",
+    "Timed out waiting for realtime payload.",
+    "Timed out waiting for realtime payload.",
+    "Timed out waiting for realtime payload."
+  ],
+  "coverageMatrix": [
+    {
+      "id": "A1",
+      "title": "Admin can read all target tables",
+      "status": "PASS",
+      "executed": "pass",
+      "notes": [
+        "Admin read 10 tables successfully."
+      ]
+    },
+    {
+      "id": "A2",
+      "title": "Admin can manage upload jobs",
+      "status": "PASS",
+      "executed": "pass",
+      "notes": [
+        "Admin insert, update, and delete succeeded."
+      ]
+    },
+    {
+      "id": "A3",
+      "title": "Admin notification access",
+      "status": "PASS",
+      "executed": "pass",
+      "notes": [
+        "Admin read 8 notification rows."
+      ]
+    },
+    {
+      "id": "A4",
+      "title": "Admin activity log access",
+      "status": "PASS",
+      "executed": "pass",
+      "notes": [
+        "Admin read 41 activity rows."
+      ]
+    },
+    {
+      "id": "M1",
+      "title": "Manager can create own upload job",
+      "status": "PASS",
+      "executed": "pass",
+      "notes": [
+        "Manager-owned upload job created: 1ae6c2a6-aabb-4382-b7d0-ae2f1318c4c2"
+      ]
+    },
+    {
+      "id": "M2",
+      "title": "Manager can read own upload job",
+      "status": "PASS",
+      "executed": "pass",
+      "notes": [
+        "Manager read own upload job 1ae6c2a6-aabb-4382-b7d0-ae2f1318c4c2."
+      ]
+    },
+    {
+      "id": "M3",
+      "title": "Manager can update own upload job",
+      "status": "PASS",
+      "executed": "pass",
+      "notes": [
+        "Manager own upload job updated to 35%."
+      ]
+    },
+    {
+      "id": "M4",
+      "title": "Manager cannot create upload job for another user",
+      "status": "PASS",
+      "executed": "pass",
+      "notes": [
+        "Insert into upload_jobs denied as expected: 403 new row violates row-level security policy for table \"upload_jobs\""
+      ]
+    },
+    {
+      "id": "M5",
+      "title": "Manager cannot update another user's upload job",
+      "status": "PASS",
+      "executed": "pass",
+      "notes": [
+        "Update on upload_jobs returned an empty success response."
+      ]
+    },
+    {
+      "id": "P1",
+      "title": "Player can read own profile",
+      "status": "PASS",
+      "executed": "pass",
+      "notes": [
+        "Player profile read succeeded."
+      ]
+    },
+    {
+      "id": "P2",
+      "title": "Player cannot read another user's profile",
+      "status": "PASS",
+      "executed": "pass",
+      "notes": [
+        "Player could not read manager profile."
+      ]
+    },
+    {
+      "id": "P3",
+      "title": "Player mapping is correct",
+      "status": "PASS",
+      "executed": "pass",
+      "notes": [
+        "Ahmed Striker mapped to 05cc12a7-ffc8-4532-885e-daa345c1954d."
+      ]
+    },
+    {
+      "id": "P4",
+      "title": "Player can read own linked stats",
+      "status": "FAIL",
+      "executed": "fail",
+      "notes": [
+        "Player could not read own linked stats."
+      ]
+    },
+    {
+      "id": "P5",
+      "title": "Player cannot read another player's stats",
+      "status": "PASS",
+      "executed": "pass",
+      "notes": [
+        "Other player stats stayed hidden."
+      ]
+    },
+    {
+      "id": "P6",
+      "title": "Player cannot read upload jobs",
+      "status": "PASS",
+      "executed": "pass",
+      "notes": [
+        "Upload jobs denied to player."
+      ]
+    },
+    {
+      "id": "F1",
+      "title": "Fan can read own profile",
+      "status": "PASS",
+      "executed": "pass",
+      "notes": [
+        "Fan profile read succeeded."
+      ]
+    },
+    {
+      "id": "F2",
+      "title": "Fan cannot read other profiles",
+      "status": "PASS",
+      "executed": "pass",
+      "notes": [
+        "Manager profile hidden from fan."
+      ]
+    },
+    {
+      "id": "F3",
+      "title": "Fan can read public football data",
+      "status": "PASS",
+      "executed": "pass",
+      "notes": [
+        "Fan read teams, players, matches, and match events."
+      ]
+    },
+    {
+      "id": "F4",
+      "title": "Fan cannot read player stats",
+      "status": "PASS",
+      "executed": "pass",
+      "notes": [
+        "Fan player stats request remained empty or denied."
+      ]
+    },
+    {
+      "id": "F5",
+      "title": "Fan cannot read videos",
+      "status": "PASS",
+      "executed": "pass",
+      "notes": [
+        "Fan videos request remained empty or denied."
+      ]
+    },
+    {
+      "id": "F6",
+      "title": "Fan cannot read upload jobs",
+      "status": "PASS",
+      "executed": "pass",
+      "notes": [
+        "Fan upload_jobs request remained empty or denied."
+      ]
+    },
+    {
+      "id": "F7",
+      "title": "Fan notification ownership",
+      "status": "PASS",
+      "executed": "pass",
+      "notes": [
+        "Fan saw own notification and not manager notification."
+      ]
+    },
+    {
+      "id": "F8",
+      "title": "Fan activity ownership",
+      "status": "PASS",
+      "executed": "pass",
+      "notes": [
+        "Insert into activity_logs denied as expected: 403 new row violates row-level security policy for table \"activity_logs\"",
+        "Fan inserted own activity 50928643-36a0-4f59-944c-cbc96640ae5a."
+      ]
+    },
+    {
+      "id": "S1",
+      "title": "Public buckets are readable",
+      "status": "FAIL",
+      "executed": "fail",
+      "notes": [
+        "No existing public objects were found in team-logos or player-images."
+      ]
+    },
+    {
+      "id": "S2",
+      "title": "Manager can upload match video",
+      "status": "PASS",
+      "executed": "pass",
+      "notes": [
+        "Manager uploaded phase15/match-videos/manager-upload-337bc1c8-47f5-4f80-8645-aa446fe954cd.mp4."
+      ]
+    },
+    {
+      "id": "S3",
+      "title": "Manager can read match video",
+      "status": "PASS",
+      "executed": "pass",
+      "notes": [
+        "Manager downloaded match video."
+      ]
+    },
+    {
+      "id": "S4",
+      "title": "Player can read match video",
+      "status": "PASS",
+      "executed": "pass",
+      "notes": [
+        "Player downloaded match video."
+      ]
+    },
+    {
+      "id": "S5",
+      "title": "Fan cannot read match video",
+      "status": "PASS",
+      "executed": "pass",
+      "notes": [
+        "Fan was denied match video download."
+      ]
+    },
+    {
+      "id": "S6",
+      "title": "Fan cannot upload match video",
+      "status": "PASS",
+      "executed": "pass",
+      "notes": [
+        "Upload to match-videos/phase15-match-video-denied-1bde1c90-5297-4ffa-b997-7ab2aa671885.txt denied as expected: 400 new row violates row-level security policy"
+      ]
+    },
+    {
+      "id": "R1",
+      "title": "Manager receives own upload job updates",
+      "status": "FAIL",
+      "executed": "fail",
+      "notes": [
+        "Timed out waiting for realtime payload."
+      ]
+    },
+    {
+      "id": "R2",
+      "title": "Manager does not receive other user's upload job updates",
+      "status": "FAIL",
+      "executed": "fail",
+      "notes": [
+        "Timed out waiting for realtime payload."
+      ]
+    },
+    {
+      "id": "R3",
+      "title": "Player receives own stats updates only",
+      "status": "FAIL",
+      "executed": "fail",
+      "notes": [
+        "Timed out waiting for realtime payload."
+      ]
+    },
+    {
+      "id": "R4",
+      "title": "Player does not receive another player's stats",
+      "status": "FAIL",
+      "executed": "fail",
+      "notes": [
+        "Timed out waiting for realtime payload."
+      ]
+    },
+    {
+      "id": "R5",
+      "title": "User receives own notification updates only",
+      "status": "FAIL",
+      "executed": "fail",
+      "notes": [
+        "Timed out waiting for realtime payload."
+      ]
+    },
+    {
+      "id": "R6",
+      "title": "Admin receives activity feed updates",
+      "status": "FAIL",
+      "executed": "fail",
+      "notes": [
+        "Timed out waiting for realtime payload."
+      ]
+    }
   ]
 }
