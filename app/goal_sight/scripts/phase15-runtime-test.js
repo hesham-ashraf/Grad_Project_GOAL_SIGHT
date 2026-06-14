@@ -268,8 +268,8 @@ async function fetchCurrentUser(accessToken) {
 async function preparePhase15Fixtures(contextMap) {
   const fixtures = {
     adminAccessToken: contextMap.admin.accessToken,
-    teamLogoObjectPath: `phase15/team-logos/${uniqueSuffix('logo')}.txt`,
-    playerImageObjectPath: `phase15/player-images/${uniqueSuffix('player')}.txt`,
+    teamLogoObjectPath: 'phase15/phase15-team-logo.txt',
+    playerImageObjectPath: 'phase15/phase15-player-image.txt',
     matchVideoObjectPath: `phase15/match-videos/${uniqueSuffix('match')}.mp4`,
     uploadedDeniedObjectPath: `phase15/match-videos/${uniqueSuffix('fan-denied')}.mp4`,
     videoTableRowId: null,
@@ -548,7 +548,7 @@ async function runPhase15CoverageSuite(contextMap, fixtures) {
   }));
 
   results.push(await runCoverageTest('P4', 'Player can read own linked stats', 'PASS', async () => {
-    const rows = await selectRows(player.accessToken, 'player_match_stats', 'id,player_id', `player_id=eq.${fixtures.playerStatRowId ? player.user.id : player.user.id}`);
+    const rows = await selectRows(player.accessToken, 'player_match_stats', 'id,player_id', `player_id=eq.${fixtures.playerId}`);
     if (!rows.some((row) => row.id === fixtures.playerStatRowId)) {
       throw new Error('Player could not read own linked stats.');
     }
@@ -652,44 +652,15 @@ async function runPhase15CoverageSuite(contextMap, fixtures) {
     if (!fixtures.teamLogoObjectPath || !fixtures.playerImageObjectPath) {
       throw new Error('No existing public objects were found in team-logos or player-images.');
     }
-    // Try to discover a readable public object path by checking listed objects and a few fallbacks
-    const tryCandidates = async (bucket, knownPath) => {
-      const candidates = new Set();
-      if (knownPath) candidates.add(knownPath);
-      // try common prefixes
-      candidates.add(`phase15/${knownPath}`);
-      candidates.add(knownPath.replace(/^.*\//, ''));
-
-      // include listed object names from the bucket (admin listing)
-      const listed = await listStorageObjects(admin.accessToken, bucket).catch(() => []);
-      const listedArr = Array.isArray(listed) ? listed : (Array.isArray(listed?.value) ? listed.value : []);
-      for (const item of listedArr) {
-        if (item && item.name) candidates.add(item.name);
-      }
-
-      for (const c of candidates) {
-        if (!c) continue;
-        const res = await readPublicStorageObject(bucket, c);
-        if (res && res.ok) {
-          return { ok: true, path: c, res };
-        }
-      }
-
-      return { ok: false, tried: Array.from(candidates).slice(0,20) };
-    };
-
-    const teamResult = await tryCandidates('team-logos', fixtures.teamLogoObjectPath);
-    const playerResult = await tryCandidates('player-images', fixtures.playerImageObjectPath);
+    const teamResult = await readPublicStorageObject('team-logos', fixtures.teamLogoObjectPath);
+    const playerResult = await readPublicStorageObject('player-images', fixtures.playerImageObjectPath);
 
     if (!teamResult.ok || !playerResult.ok) {
-      const details = `team_ok=${teamResult.ok} tried=${(teamResult.tried||[]).slice(0,5).join(',')}; player_ok=${playerResult.ok} tried=${(playerResult.tried||[]).slice(0,5).join(',')}`;
+      const details = `team_ok=${teamResult.ok} path=${fixtures.teamLogoObjectPath}; player_ok=${playerResult.ok} path=${fixtures.playerImageObjectPath}`;
       if (state && Array.isArray(state.notes)) state.notes.push(`S1 debug: ${details}`);
       throw new Error(`Public bucket reads failed: ${details}`);
     }
 
-    // prefer the discovered public paths for subsequent tests
-    fixtures.teamLogoObjectPath = teamResult.path;
-    fixtures.playerImageObjectPath = playerResult.path;
     return ['Anonymous read succeeded for team-logos and player-images.'];
   }));
 
@@ -1071,15 +1042,16 @@ async function deleteStorageObject(accessToken, bucket, objectPath) {
 
 async function subscribeToRealtimeChanges(accessToken, table, filter) {
   const realtime = await openRealtimeSubscription({ accessToken, table, filter });
+  await realtime.ready;
 
   function normalizeRealtimeMessage(message) {
     const payload = message?.payload || {};
     const data = payload.data || payload.payload || payload;
     return {
       ...message,
-      type: payload.type || payload.eventType || message?.event,
+      type: data.type || data.eventType || payload.type || payload.eventType || message?.event,
       table: payload.table || data.table || table,
-      record: payload.record || data.record || data.new || data.new_record || null,
+      record: payload.record || data.record || payload.new || data.new || data.new_record || null,
       old_record: payload.old_record || data.old || data.old_record || null,
       rawPayload: payload
     };
@@ -1091,7 +1063,13 @@ async function subscribeToRealtimeChanges(accessToken, table, filter) {
       const deadline = Date.now() + timeoutMs;
       while (Date.now() < deadline) {
         const remainingMs = Math.max(0, deadline - Date.now());
-        const message = normalizeRealtimeMessage(await realtime.waitForChange(remainingMs || 1000));
+        let rawMessage;
+        try {
+          rawMessage = await realtime.waitForChange(remainingMs || 1000);
+        } catch (error) {
+          return null;
+        }
+        const message = normalizeRealtimeMessage(rawMessage);
         if (predicate(message)) {
           return message;
         }
@@ -1103,7 +1081,13 @@ async function subscribeToRealtimeChanges(accessToken, table, filter) {
       const matches = [];
       while (Date.now() < deadline && matches.length < expectedCount) {
         const remainingMs = Math.max(0, deadline - Date.now());
-        const message = normalizeRealtimeMessage(await realtime.waitForChange(remainingMs || 1000));
+        let rawMessage;
+        try {
+          rawMessage = await realtime.waitForChange(remainingMs || 1000);
+        } catch (error) {
+          break;
+        }
+        const message = normalizeRealtimeMessage(rawMessage);
         if (predicate(message)) {
           matches.push(message);
         }
@@ -1250,24 +1234,10 @@ async function preparePhase15Fixtures(contextMap) {
   fixtures.storageObjects.push({ bucket: 'match-videos', path: matchVideoPath });
   fixtures.storageObjects.push({ bucket: 'match-videos', path: unauthorizedMatchVideoPath });
 
-  // Ensure there is at least one public object in the public image buckets
-  // (some projects ship public assets; create placeholders if none exist so S1 can validate)
-  const teamPlaceholder = 'phase15-team-logo-placeholder.txt';
-  const playerPlaceholder = 'phase15-player-image-placeholder.txt';
-  try {
-    await uploadStorageObject(admin.accessToken, 'team-logos', teamPlaceholder, 'phase15 public team logo', 'text/plain');
-  } catch (e) {
-    // ignore upload errors here; we'll still attempt to read later
-  }
-  try {
-    await uploadStorageObject(admin.accessToken, 'player-images', playerPlaceholder, 'phase15 public player image', 'text/plain');
-  } catch (e) {
-    // ignore upload errors here; we'll still attempt to read later
-  }
-
-  // Use the exact placeholder names we uploaded above. These are stable and public.
-  fixtures.teamLogoObjectPath = teamPlaceholder;
-  fixtures.playerImageObjectPath = playerPlaceholder;
+  // Use the exact live public object paths that exist in Supabase storage.
+  // These are the actual files the S1 runtime check should read.
+  fixtures.teamLogoObjectPath = 'phase15/phase15-team-logo.txt';
+  fixtures.playerImageObjectPath = 'phase15/phase15-player-image.txt';
   fixtures.matchVideoObjectPath = matchVideoPath;
   fixtures.uploadedDeniedObjectPath = unauthorizedMatchVideoPath;
   fixtures.matchVideoPath = matchVideoPath;
