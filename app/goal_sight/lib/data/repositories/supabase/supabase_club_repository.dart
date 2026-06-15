@@ -64,7 +64,27 @@ final class SupabaseClubRepository implements IClubRepository {
     String? query,
     String sortBy = 'name',
   }) async {
-    final clubs = await fetchClubs(query: query);
+    final start = page * pageSize;
+    final end = start + pageSize - 1;
+
+    final rows = query != null && query.isNotEmpty
+        ? await _client
+            .from('teams')
+            .select(_columns)
+            .ilike('name', '%$query%')
+            .order('name')
+            .range(start, end)
+        : await _client
+            .from('teams')
+            .select(_columns)
+            .order('name')
+            .range(start, end);
+
+    final clubs = (rows as List)
+        .map((r) => _mapClub(r as Map<String, dynamic>))
+        .whereType<ClubModel>()
+        .toList();
+
     switch (sortBy) {
       case 'ranking':
         clubs.sort((a, b) => a.stats.ranking.compareTo(b.stats.ranking));
@@ -74,10 +94,7 @@ final class SupabaseClubRepository implements IClubRepository {
       default:
         clubs.sort((a, b) => a.name.compareTo(b.name));
     }
-    final start = page * pageSize;
-    if (start >= clubs.length) return [];
-    final end = (start + pageSize).clamp(0, clubs.length);
-    return clubs.sublist(start, end);
+    return clubs;
   }
 
   // ── Mappers ───────────────────────────────────────────────────────────────
