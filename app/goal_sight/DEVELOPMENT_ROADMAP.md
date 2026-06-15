@@ -10,7 +10,7 @@ Status rules:
 Recommended sign-off format:
 - `Sign-off: AH | Date: 2026-05-27`
 
-Last reviewed against the codebase: `2026-06-09`
+Last reviewed against the codebase: `2026-06-15`
 
 ---
 
@@ -442,10 +442,10 @@ Connect the app to real backend infrastructure after frontend completion.
 ### 13. Realtime Features
 
 - [x] Real-time infrastructure configured | Sign-off: ______ | Date: ______
-- [ ] Live upload progress | Sign-off: ______ | Date: ______
-- [ ] Live notifications | Sign-off: ______ | Date: ______
-- [ ] Live activity feeds | Sign-off: ______ | Date: ______
-- [ ] Real-time analysis updates | Sign-off: ______ | Date: ______
+- [x] Live upload progress (Supabase Realtime publication + runtime R1/R2 validation for `upload_jobs`) | Sign-off: Codex | Date: 2026-06-15
+- [x] Live notifications (runtime R5 validation for user-scoped `notifications`) | Sign-off: Codex | Date: 2026-06-15
+- [x] Live activity feeds (runtime R6 validation for admin `activity_logs` feed updates) | Sign-off: Codex | Date: 2026-06-15
+- [x] Real-time analysis updates (Realtime publication for `player_match_stats`, `tracking_snapshots`, and `videos`; runtime R3/R4 validation for player stats) | Sign-off: Codex | Date: 2026-06-15
 
 ---
 ### 14 Runtime Validation
@@ -509,10 +509,10 @@ Connect the AI pipeline to the mobile app.
 
 ### 19. Security
 
-- [ ] Add role validation | Sign-off: ______ | Date: ______
-- [ ] Secure uploads | Sign-off: ______ | Date: ______
-- [ ] Secure storage access | Sign-off: ______ | Date: ______
-- [ ] Validate permissions | Sign-off: ______ | Date: ______
+- [x] Add role validation (JWT role claim hardening via migration `032_role_claim_hardening.sql`) | Sign-off: Codex | Date: 2026-06-15
+- [x] Secure uploads (manager-owned upload/job and storage authorization validated in Phase 15 runtime tests) | Sign-off: Codex | Date: 2026-06-15
+- [x] Secure storage access (role-scoped `match-videos` access + public image buckets validated in S1-S6) | Sign-off: Codex | Date: 2026-06-15
+- [x] Validate permissions (Phase 15 authenticated runtime suite passed 35/35 authorization checks) | Sign-off: Codex | Date: 2026-06-15
 
 ### 20. Testing
 
@@ -524,8 +524,8 @@ Connect the AI pipeline to the mobile app.
 
 ### 21. Deployment
 
-- [ ] App icons | Sign-off: ______ | Date: ______
-- [ ] Splash screen | Sign-off: ______ | Date: ______
+- [x] App icons | Sign-off: Codex | Date: 2026-06-15
+- [x] Splash screen | Sign-off: Codex | Date: 2026-06-15
 - [ ] Store screenshots | Sign-off: ______ | Date: ______
 - [ ] Android production build | Sign-off: ______ | Date: ______
 - [ ] iOS production build | Sign-off: ______ | Date: ______
