@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
-import '../../../features/admin/data/admin_mock_data.dart';
 import '../../../data/models/player_analysis_model.dart';
+import '../../../providers/app_providers.dart';
+import '../../../shared/widgets/app_error_view.dart';
 import '../../widgets/admin/admin_squad_widgets.dart';
 
-class SquadOverviewPage extends StatefulWidget {
+class SquadOverviewPage extends ConsumerStatefulWidget {
   const SquadOverviewPage({super.key});
 
   @override
-  State<SquadOverviewPage> createState() => _SquadOverviewPageState();
+  ConsumerState<SquadOverviewPage> createState() => _SquadOverviewPageState();
 }
 
-class _SquadOverviewPageState extends State<SquadOverviewPage>
+class _SquadOverviewPageState extends ConsumerState<SquadOverviewPage>
     with SingleTickerProviderStateMixin {
   late AnimationController _ctrl;
   late List<Animation<double>> _fades;
@@ -43,8 +45,8 @@ class _SquadOverviewPageState extends State<SquadOverviewPage>
     super.dispose();
   }
 
-  List<PlayerAnalysisModel> get _filteredSquad {
-    var list = AdminMockData.squad.where((p) {
+  List<PlayerAnalysisModel> _filteredSquad(List<PlayerAnalysisModel> all) {
+    var list = all.where((p) {
       final matchSearch = _searchQuery.isEmpty ||
           p.name.toLowerCase().contains(_searchQuery.toLowerCase());
       final matchPos = _posFilter == 'All' || p.position.contains(_posFilter);
@@ -70,7 +72,7 @@ class _SquadOverviewPageState extends State<SquadOverviewPage>
 
   @override
   Widget build(BuildContext context) {
-    final players = _filteredSquad;
+    final squadAsync = ref.watch(adminSquadProvider);
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -115,97 +117,109 @@ class _SquadOverviewPageState extends State<SquadOverviewPage>
           const SizedBox(width: 8),
         ],
       ),
-      body: ListView(
-        padding: EdgeInsets.fromLTRB(
-          context.rs(20, min: 16, max: 28),
-          context.rs(4, min: 2, max: 8),
-          context.rs(20, min: 16, max: 28),
-          context.rs(100, min: 80, max: 120),
+      body: squadAsync.when(
+        loading: () => const Center(
+          child: CircularProgressIndicator(color: AppColors.accentCyan),
         ),
-        physics: const BouncingScrollPhysics(),
-        children: [
-          // 0 — Condition header
-          _reveal(0, const SquadConditionHeader()),
-          const SizedBox(height: 16),
-
-          // 1 — Search + position filters
-          _reveal(1, Column(
+        error: (err, _) => AppErrorView(
+          error: err,
+          onRetry: () => ref.invalidate(adminSquadProvider),
+        ),
+        data: (allPlayers) {
+          final players = _filteredSquad(allPlayers);
+          return ListView(
+            padding: EdgeInsets.fromLTRB(
+              context.rs(20, min: 16, max: 28),
+              context.rs(4, min: 2, max: 8),
+              context.rs(20, min: 16, max: 28),
+              context.rs(100, min: 80, max: 120),
+            ),
+            physics: const BouncingScrollPhysics(),
             children: [
-              Container(
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceElevated,
-                  borderRadius: BorderRadius.circular(AppRadius.md),
-                  border: Border.all(color: AppColors.outline),
-                ),
-                child: TextField(
-                  controller: _searchCtrl,
-                  onChanged: (v) => setState(() => _searchQuery = v),
-                  style: AppTextStyles.body(color: Colors.white),
-                  decoration: InputDecoration(
-                    hintText: 'Search player...',
-                    hintStyle: AppTextStyles.body(color: AppColors.textMuted),
-                    prefixIcon: const Icon(Icons.search, color: AppColors.textMuted, size: 18),
-                    suffixIcon: _searchQuery.isNotEmpty
-                        ? IconButton(
-                            icon: const Icon(Icons.clear, color: AppColors.textMuted, size: 16),
-                            onPressed: () { _searchCtrl.clear(); setState(() => _searchQuery = ''); },
-                          )
-                        : null,
-                    border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                physics: const BouncingScrollPhysics(),
-                child: Row(
-                  children: ['All', 'GK', 'CB', 'RB', 'LB', 'CDM', 'CM', 'CAM', 'RW', 'LW', 'ST'].map((pos) {
-                    final sel = _posFilter == pos;
-                    return GestureDetector(
-                      onTap: () => setState(() => _posFilter = pos),
-                      child: Container(
-                        margin: const EdgeInsets.only(right: 8),
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-                        decoration: BoxDecoration(
-                          color: sel ? AppColors.accentCyan.withValues(alpha: 0.15) : AppColors.surfaceElevated,
-                          borderRadius: BorderRadius.circular(AppRadius.pill),
-                          border: Border.all(color: sel ? AppColors.accentCyan.withValues(alpha: 0.5) : AppColors.outline),
-                        ),
-                        child: Text(
-                          pos,
-                          style: AppTextStyles.caption(color: sel ? AppColors.accentCyan : AppColors.textSecondary)
-                              .copyWith(fontWeight: sel ? FontWeight.bold : FontWeight.normal),
-                        ),
+              // 0 — Condition header
+              _reveal(0, const SquadConditionHeader()),
+              const SizedBox(height: 16),
+
+              // 1 — Search + position filters
+              _reveal(1, Column(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceElevated,
+                      borderRadius: BorderRadius.circular(AppRadius.md),
+                      border: Border.all(color: AppColors.outline),
+                    ),
+                    child: TextField(
+                      controller: _searchCtrl,
+                      onChanged: (v) => setState(() => _searchQuery = v),
+                      style: AppTextStyles.body(color: Colors.white),
+                      decoration: InputDecoration(
+                        hintText: 'Search player...',
+                        hintStyle: AppTextStyles.body(color: AppColors.textMuted),
+                        prefixIcon: const Icon(Icons.search, color: AppColors.textMuted, size: 18),
+                        suffixIcon: _searchQuery.isNotEmpty
+                            ? IconButton(
+                                icon: const Icon(Icons.clear, color: AppColors.textMuted, size: 16),
+                                onPressed: () { _searchCtrl.clear(); setState(() => _searchQuery = ''); },
+                              )
+                            : null,
+                        border: InputBorder.none,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                       ),
-                    );
-                  }).toList(),
-                ),
-              ),
-            ],
-          )),
-          const SizedBox(height: 16),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    physics: const BouncingScrollPhysics(),
+                    child: Row(
+                      children: ['All', 'GK', 'CB', 'RB', 'LB', 'CDM', 'CM', 'CAM', 'RW', 'LW', 'ST'].map((pos) {
+                        final sel = _posFilter == pos;
+                        return GestureDetector(
+                          onTap: () => setState(() => _posFilter = pos),
+                          child: Container(
+                            margin: const EdgeInsets.only(right: 8),
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                            decoration: BoxDecoration(
+                              color: sel ? AppColors.accentCyan.withValues(alpha: 0.15) : AppColors.surfaceElevated,
+                              borderRadius: BorderRadius.circular(AppRadius.pill),
+                              border: Border.all(color: sel ? AppColors.accentCyan.withValues(alpha: 0.5) : AppColors.outline),
+                            ),
+                            child: Text(
+                              pos,
+                              style: AppTextStyles.caption(color: sel ? AppColors.accentCyan : AppColors.textSecondary)
+                                  .copyWith(fontWeight: sel ? FontWeight.bold : FontWeight.normal),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
+              )),
+              const SizedBox(height: 16),
 
-          // 2 — Player list
-          _reveal(2, players.isEmpty
-              ? _EmptyState(query: _searchQuery)
-              : Column(
-                  children: players.map((p) => EnhancedPlayerAnalyticsCard(player: p)).toList(),
-                )),
-          const SizedBox(height: 16),
+              // 2 — Player list
+              _reveal(2, players.isEmpty
+                  ? _EmptyState(query: _searchQuery)
+                  : Column(
+                      children: players.map((p) => EnhancedPlayerAnalyticsCard(player: p)).toList(),
+                    )),
+              const SizedBox(height: 16),
 
-          // 3 — Tactical contribution + strengths
-          _reveal(3, const Column(
-            children: [
-              SquadTacticalContributionSection(),
-              SizedBox(height: 20),
-              SquadRiskRankingSection(),
-              SizedBox(height: 20),
-              SquadStrengthsGrid(),
+              // 3 — Tactical contribution + strengths
+              _reveal(3, const Column(
+                children: [
+                  SquadTacticalContributionSection(),
+                  SizedBox(height: 20),
+                  SquadRiskRankingSection(),
+                  SizedBox(height: 20),
+                  SquadStrengthsGrid(),
+                ],
+              )),
             ],
-          )),
-        ],
+          );
+        },
       ),
     );
   }

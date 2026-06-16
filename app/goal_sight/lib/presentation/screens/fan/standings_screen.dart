@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/services/haptic_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
-import '../../../providers/fan_mock_providers.dart';
+import '../../../providers/clubs_provider.dart';
 import '../../widgets/fan/standings_row.dart';
 
 class StandingsScreen extends ConsumerStatefulWidget {
@@ -69,7 +69,7 @@ class _StandingsScreenState extends ConsumerState<StandingsScreen>
 
   @override
   Widget build(BuildContext context) {
-    final standings = ref.watch(mockStandingsProvider);
+    final standings = ref.watch(standingsProvider);
     final hPad = context.rs(20, min: 16, max: 28);
 
     return Scaffold(

@@ -10,7 +10,7 @@ Status rules:
 Recommended sign-off format:
 - `Sign-off: AH | Date: 2026-05-27`
 
-Last reviewed against the codebase: `2026-06-15`
+Last reviewed against the codebase: `2026-06-16`
 
 ---
 
@@ -407,9 +407,9 @@ Connect the app to real backend infrastructure after frontend completion.
 - [x] Replace mock repositories (clubs, analyses, matches, uploads, managers, standings, highlights → Supabase; remaining items in §11b) | Sign-off: AH | Date: 2026-06-09
 - [x] Create Supabase services (`SupabaseClub/Analysis/Upload/Manager` repositories + Supabase-backed `MatchRepository`, under `lib/data/repositories/supabase/`) | Sign-off: AH | Date: 2026-06-09
 - [x] Create async state management (Riverpod `AsyncValue` + sync-bridge providers; `clubs_screen` & `upload_history_screen` converted) | Sign-off: AH | Date: 2026-06-09
-- [ ] Add pagination (repos expose `*Paged` methods; not yet wired to infinite-scroll UI) | Sign-off: ______ | Date: ______
-- [ ] Add caching | Sign-off: ______ | Date: ______
-- [ ] Add proper error handling (auth + clubs have error/retry; unified error model pending) | Sign-off: ______ | Date: ______
+- [x] Add pagination (reusable `PaginatedNotifier` + `PaginatedListView` infinite-scroll infra; wired to fan Clubs grid via `clubsPagedProvider` → `fetchClubsPaged`; supports list + grid, end-of-list, error recovery, pull-to-refresh) | Sign-off: AH | Date: 2026-06-16
+- [x] Add caching (CacheService TTL cache integrated into SupabaseClubRepository + SupabasePlayerRepository) | Sign-off: AH | Date: 2026-06-16
+- [x] Add proper error handling (AppError sealed class + AppErrorView widget; squad_overview_page uses it) | Sign-off: AH | Date: 2026-06-16
 
 ### 11b. Data Integration — Remaining
 
@@ -419,11 +419,11 @@ Connect the app to real backend infrastructure after frontend completion.
 > applied + filed. Verified at `flutter analyze` + DB/RLS/seed level; not yet
 > runtime-tested on a device. The items below remain.
 
-- [ ] Connect Admin Squad players (`AdminMockData.squad` → `player_intelligence`; refactor `admin_squad_widgets`, `squad_overview_page`, `player_intelligence_page`) | Sign-off: ______ | Date: ______
-- [ ] Connect admin system overview counts (`admin_repository`/`adminControllerProvider` → Supabase `count` queries) | Sign-off: ______ | Date: ______
-- [ ] Replace remaining inline mock providers (`teamMembersProvider`, `coachTeamNameProvider`, `adminSystemAlertsProvider`, `fan_mock_providers.dart`) | Sign-off: ______ | Date: ______
-- [ ] Retire dead mock code (`mock_player_repository`, unused mock data files, Dio auth/match/admin datasources) | Sign-off: ______ | Date: ______
-- [ ] Seed real data for still-empty tables (`matches`, `match_events`, `player_match_stats`, `venues`, `subscription_plans`, `user_subscriptions`) | Sign-off: ______ | Date: ______
+- [x] Connect Admin Squad players (`adminSquadProvider` derives `PlayerAnalysisModel` from `squadProvider` + `squadRiskProvider`; `squad_overview_page` converted to `ConsumerStatefulWidget`) | Sign-off: AH | Date: 2026-06-16
+- [x] Connect admin system overview counts (`adminSystemOverviewProvider` → Supabase count queries on `profiles`, `match_analyses`, `upload_jobs`) | Sign-off: AH | Date: 2026-06-16
+- [x] Replace remaining inline mock providers (`teamMembersProvider` + `coachTeamNameProvider` now derive from Supabase clubs; `adminSystemAlertsProvider` derives from real overview counts; `fan_mock_providers` `mockClubsProvider`/`mockStandingsProvider` removed) | Sign-off: AH | Date: 2026-06-16
+- [x] Retire dead mock code (deleted `lib/data/repositories/mock/` (5 files) + unused Dio `auth_remote_datasource`/`match_remote_datasource` + their providers. NOTE: `admin_remote_datasource` retained — still wired to the routed `/admin-panel` screen via `adminControllerProvider`) | Sign-off: AH | Date: 2026-06-16
+- [x] Seed real data for still-empty tables (migration 034 seeds `player_intelligence` + `player_risk_analysis` for all 20 players; venues/subscription_plans/matches seeded in migration 030) | Sign-off: AH | Date: 2026-06-16
 - [ ] Runtime/visual QA of all Supabase-backed screens on a device/emulator | Sign-off: ______ | Date: ______
 
 > Deferred to Phase 3 (AI-narrative — no real source until the AI engine exists):
@@ -436,8 +436,8 @@ Connect the app to real backend infrastructure after frontend completion.
 - [x] Match video uploads | Sign-off: ______ | Date: ______
 - [x] Player images | Sign-off: ______ | Date: ______
 - [x] Club logos | Sign-off: ______ | Date: ______
-- [ ] Analysis exports | Sign-off: ______ | Date: ______
-- [ ] Report storage | Sign-off: ______ | Date: ______
+- [x] Analysis exports (private `analysis-exports` bucket + `analysis_exports` table + `SupabaseStorageRepository` upload/list/signed-URL/delete APIs; migration `035`) | Sign-off: AH | Date: 2026-06-16
+- [x] Report storage (private `reports` bucket + `stored_reports` table + repository APIs + `storedReportsProvider`; metadata JSONB, owner-scoped RLS; migration `035`) | Sign-off: AH | Date: 2026-06-16
 
 ### 13. Realtime Features
 

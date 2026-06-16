@@ -8,6 +8,7 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../data/models/analysis_export_model.dart';
 import '../data/models/club_model.dart';
 import '../data/models/manager_model.dart';
 import '../data/models/match_analysis_model.dart';
@@ -18,8 +19,10 @@ import '../data/repositories/interfaces/i_club_repository.dart';
 import '../data/repositories/interfaces/i_manager_repository.dart';
 import '../data/repositories/interfaces/i_player_repository.dart';
 import '../data/repositories/interfaces/i_upload_repository.dart';
-import '../data/repositories/mock/mock_player_repository.dart';
+import 'paginated_notifier.dart';
 import '../data/repositories/supabase/supabase_analysis_repository.dart';
+import '../data/repositories/supabase/supabase_player_repository.dart';
+import '../data/repositories/supabase/supabase_storage_repository.dart';
 import '../data/repositories/supabase/supabase_club_repository.dart';
 import '../data/repositories/supabase/supabase_manager_repository.dart';
 import '../data/repositories/supabase/supabase_upload_repository.dart';
@@ -32,9 +35,9 @@ final clubRepositoryProvider = Provider<IClubRepository>(
   (_) => const SupabaseClubRepository(),
 );
 
-/// Player repository — swap MockPlayerRepository → SupabasePlayerRepository
+/// Player repository — Supabase-backed (players + player_intelligence).
 final playerRepositoryProvider = Provider<IPlayerRepository>(
-  (_) => const MockPlayerRepository(),
+  (_) => const SupabasePlayerRepository(),
 );
 
 /// Analysis repository — Supabase-backed (match_analyses + nested).
@@ -52,6 +55,11 @@ final managerRepositoryProvider = Provider<IManagerRepository>(
   (_) => const SupabaseManagerRepository(),
 );
 
+/// Storage repository — analysis exports + report persistence.
+final storageRepositoryProvider = Provider<SupabaseStorageRepository>(
+  (_) => const SupabaseStorageRepository(),
+);
+
 // ── Club providers ────────────────────────────────────────────────────────
 
 /// All clubs, optionally filtered by [query]
@@ -62,6 +70,24 @@ final clubListProvider = FutureProvider.family<List<ClubModel>, String?>(
 /// Single club by id
 final clubDetailProvider = FutureProvider.family<ClubModel, String>(
   (ref, clubId) => ref.watch(clubRepositoryProvider).fetchClubById(clubId),
+);
+
+/// Infinite-scroll clubs directory, keyed by search query ('' = all).
+/// Server-paginated via [IClubRepository.fetchClubsPaged].
+final clubsPagedProvider = StateNotifierProvider.autoDispose
+    .family<PaginatedNotifier<ClubModel>, PaginatedState<ClubModel>, String>(
+  (ref, query) {
+    final repo = ref.watch(clubRepositoryProvider);
+    return PaginatedNotifier<ClubModel>(
+      (page, size) => repo.fetchClubsPaged(
+        page: page,
+        pageSize: size,
+        query: query.isEmpty ? null : query,
+        sortBy: 'ranking',
+      ),
+      pageSize: 12,
+    );
+  },
 );
 
 // ── Player providers ──────────────────────────────────────────────────────
@@ -154,3 +180,20 @@ final adminManagersProvider = Provider<List<ManagerModel>>((ref) {
         orElse: () => const <ManagerModel>[],
       );
 });
+
+// ── Storage providers ─────────────────────────────────────────────────────
+
+/// Analysis exports, optionally filtered by analysis id (null = all).
+final analysisExportsProvider =
+    FutureProvider.family<List<AnalysisExportModel>, String?>(
+  (ref, analysisId) => ref
+      .watch(storageRepositoryProvider)
+      .fetchAnalysisExports(analysisId: analysisId),
+);
+
+/// Stored reports, optionally filtered by report type (null = all).
+final storedReportsProvider =
+    FutureProvider.family<List<StoredReportModel>, StoredReportType?>(
+  (ref, type) =>
+      ref.watch(storageRepositoryProvider).fetchReports(type: type),
+);

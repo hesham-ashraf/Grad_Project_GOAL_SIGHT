@@ -6,6 +6,7 @@ import '../../../core/services/haptic_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
 import '../../../providers/repository_providers.dart';
+import '../../../shared/widgets/paginated_list_view.dart';
 import '../../widgets/fan/club_card.dart';
 
 class ClubsScreen extends ConsumerStatefulWidget {
@@ -52,8 +53,7 @@ class _ClubsScreenState extends ConsumerState<ClubsScreen>
 
   Future<void> _handleRefresh() async {
     await HapticService.refresh();
-    ref.invalidate(clubListProvider(null));
-    await ref.read(clubListProvider(null).future);
+    await ref.read(clubsPagedProvider(_searchQuery).notifier).refresh();
   }
 
   @override
@@ -65,7 +65,7 @@ class _ClubsScreenState extends ConsumerState<ClubsScreen>
 
   @override
   Widget build(BuildContext context) {
-    final clubsAsync = ref.watch(clubListProvider(null));
+    final pagedState = ref.watch(clubsPagedProvider(_searchQuery));
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -187,63 +187,37 @@ class _ClubsScreenState extends ConsumerState<ClubsScreen>
               ),
             ),
 
-            // Grid View
+            // Grid View — server-paginated with infinite scroll.
             Expanded(
-              child: clubsAsync.when(
-                loading: () => const _ClubsLoading(),
-                error: (_, __) => _ClubsError(
-                  onRetry: () => ref.invalidate(clubListProvider(null)),
-                ),
-                data: (allClubs) {
-                  final filteredClubs = allClubs
-                      .where((club) =>
-                          club.name.toLowerCase().contains(_searchQuery))
-                      .toList();
-                  if (filteredClubs.isEmpty) {
-                    return _EmptyClubsState(query: _searchQuery);
-                  }
-                  return RefreshIndicator(
+              child: FadeTransition(
+                opacity: _fadeAnimation,
+                child: SlideTransition(
+                  position: _slideAnimation,
+                  child: PaginatedListView(
+                    state: pagedState,
+                    onLoadMore: () =>
+                        ref.read(clubsPagedProvider(_searchQuery).notifier).loadMore(),
                     onRefresh: _handleRefresh,
-                    color: AppColors.accentCyan,
-                    backgroundColor: AppColors.surface,
-                    strokeWidth: 2.5,
-                    child: FadeTransition(
-                      opacity: _fadeAnimation,
-                      child: SlideTransition(
-                        position: _slideAnimation,
-                        child: GridView.builder(
-                          padding: EdgeInsets.fromLTRB(
-                            context.rs(20, min: 16, max: 24),
-                            context.rs(8, min: 4, max: 12),
-                            context.rs(20, min: 16, max: 24),
-                            context.rs(100, min: 80, max: 120),
-                          ),
-                          physics: const BouncingScrollPhysics(
-                            parent: AlwaysScrollableScrollPhysics(),
-                          ),
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount:
-                                MediaQuery.of(context).size.width > 600 ? 3 : 2,
-                            childAspectRatio: 0.85,
-                            crossAxisSpacing: context.rs(16, min: 12, max: 20),
-                            mainAxisSpacing: context.rs(16, min: 12, max: 20),
-                          ),
-                          itemCount: filteredClubs.length,
-                          itemBuilder: (context, index) {
-                            final club = filteredClubs[index];
-                            return ClubCard(
-                              club: club,
-                              onTap: () {
-                                context.push('/fan-club-details', extra: club);
-                              },
-                            );
-                          },
-                        ),
-                      ),
+                    padding: EdgeInsets.fromLTRB(
+                      context.rs(20, min: 16, max: 24),
+                      context.rs(8, min: 4, max: 12),
+                      context.rs(20, min: 16, max: 24),
+                      context.rs(100, min: 80, max: 120),
                     ),
-                  );
-                },
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount:
+                          MediaQuery.of(context).size.width > 600 ? 3 : 2,
+                      childAspectRatio: 0.85,
+                      crossAxisSpacing: context.rs(16, min: 12, max: 20),
+                      mainAxisSpacing: context.rs(16, min: 12, max: 20),
+                    ),
+                    emptyBuilder: (_) => _EmptyClubsState(query: _searchQuery),
+                    itemBuilder: (context, club, index) => ClubCard(
+                      club: club,
+                      onTap: () => context.push('/fan-club-details', extra: club),
+                    ),
+                  ),
+                ),
               ),
             ),
           ],
@@ -307,80 +281,4 @@ class _EmptyClubsState extends StatelessWidget {
   }
 }
 
-// ─── Loading State ───────────────────────────────────────────────────────────
-
-class _ClubsLoading extends StatelessWidget {
-  const _ClubsLoading();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: CircularProgressIndicator(
-        color: AppColors.accentCyan,
-        strokeWidth: 2.5,
-      ),
-    );
-  }
-}
-
-// ─── Error State ─────────────────────────────────────────────────────────────
-
-class _ClubsError extends StatelessWidget {
-  const _ClubsError({required this.onRetry});
-
-  final VoidCallback onRetry;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: EdgeInsets.all(context.rs(32, min: 24, max: 48)),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: context.rs(72, min: 60, max: 80),
-              height: context.rs(72, min: 60, max: 80),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.surfaceElevated,
-                border: Border.all(color: AppColors.outlineSubtle),
-              ),
-              child: Icon(
-                Icons.cloud_off_rounded,
-                size: context.rs(32, min: 26, max: 36),
-                color: AppColors.danger,
-              ),
-            ),
-            SizedBox(height: context.rs(16, min: 12, max: 20)),
-            Text(
-              'Could not load clubs',
-              style: AppTextStyles.title(color: AppColors.textPrimary).copyWith(
-                fontSize: context.rs(16, min: 14, max: 18),
-              ),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: context.rs(6, min: 4, max: 8)),
-            Text(
-              'Check your connection and try again.',
-              style: AppTextStyles.body(color: AppColors.textMuted).copyWith(
-                fontSize: context.rs(13, min: 12, max: 14),
-              ),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: context.rs(16, min: 12, max: 20)),
-            TextButton.icon(
-              onPressed: onRetry,
-              icon: const Icon(Icons.refresh_rounded, size: 18),
-              label: const Text('Retry'),
-              style: TextButton.styleFrom(
-                foregroundColor: AppColors.accentCyan,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 

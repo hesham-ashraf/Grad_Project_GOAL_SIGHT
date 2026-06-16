@@ -9,6 +9,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../core/services/cache_service.dart';
 import '../../models/club_model.dart';
 import '../interfaces/i_club_repository.dart';
 
@@ -22,8 +23,17 @@ final class SupabaseClubRepository implements IClubRepository {
       'playing_style, primary_color, description, '
       'team_season_stats(*), players(*)';
 
+  static const _allClubsCacheKey = 'clubs:all';
+  static const _clubCacheTtl = Duration(minutes: 10);
+
   @override
   Future<List<ClubModel>> fetchClubs({String? query}) async {
+    // Serve from cache when no filter is applied.
+    if (query == null || query.isEmpty) {
+      final cached = CacheService.get<List<ClubModel>>(_allClubsCacheKey);
+      if (cached != null) return cached;
+    }
+
     final rows = await _client.from('teams').select(_columns);
     var clubs = (rows as List)
         .map((r) => _mapClub(r as Map<String, dynamic>))
@@ -31,7 +41,11 @@ final class SupabaseClubRepository implements IClubRepository {
         .whereType<ClubModel>()
         .toList();
 
-    if (query != null && query.isNotEmpty) {
+    clubs.sort((a, b) => a.stats.ranking.compareTo(b.stats.ranking));
+
+    if (query == null || query.isEmpty) {
+      CacheService.set(_allClubsCacheKey, clubs, ttl: _clubCacheTtl);
+    } else {
       final lower = query.toLowerCase();
       clubs = clubs
           .where((c) =>
@@ -39,21 +53,23 @@ final class SupabaseClubRepository implements IClubRepository {
               c.league.toLowerCase().contains(lower))
           .toList();
     }
-    clubs.sort((a, b) => a.stats.ranking.compareTo(b.stats.ranking));
     return clubs;
   }
 
   @override
   Future<ClubModel> fetchClubById(String id) async {
+    final cacheKey = 'clubs:$id';
+    final cached = CacheService.get<ClubModel>(cacheKey);
+    if (cached != null) return cached;
+
     final row = await _client
         .from('teams')
         .select(_columns)
         .eq('id', id)
         .maybeSingle();
     final club = row == null ? null : _mapClub(row);
-    if (club == null) {
-      throw Exception('Club not found: $id');
-    }
+    if (club == null) throw Exception('Club not found: $id');
+    CacheService.set(cacheKey, club, ttl: _clubCacheTtl);
     return club;
   }
 

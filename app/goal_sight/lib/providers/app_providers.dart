@@ -6,12 +6,12 @@ import '../core/services/api_service.dart';
 import '../core/services/secure_storage_service.dart';
 import '../core/services/websocket_service.dart';
 import '../data/datasources/admin_remote_datasource.dart';
-import '../data/datasources/auth_remote_datasource.dart';
-import '../data/datasources/match_remote_datasource.dart';
 import '../data/models/match_model.dart';
+import '../data/models/player_analysis_model.dart';
 import '../data/repositories/admin_repository.dart';
 import '../data/repositories/auth_repository.dart';
 import '../data/repositories/match_repository.dart';
+import '../data/models/system_overview_model.dart';
 import '../features/admin/admin_controller.dart';
 import '../features/admin/admin_state.dart';
 import '../data/models/analytics_summary.dart';
@@ -25,6 +25,7 @@ import '../features/match/match_controller.dart';
 import '../features/match/match_state.dart';
 import '../features/user/team_member_model.dart';
 import 'clubs_provider.dart';
+import 'repository_providers.dart';
 
 final secureStorageServiceProvider = Provider<SecureStorageService>(
   (ref) => const SecureStorageService(),
@@ -41,14 +42,6 @@ final webSocketServiceProvider = Provider<WebSocketService>(
     ref.onDispose(service.dispose);
     return service;
   },
-);
-
-final authRemoteDataSourceProvider = Provider<AuthRemoteDataSource>(
-  (ref) => AuthRemoteDataSource(ref.watch(dioProvider)),
-);
-
-final matchRemoteDataSourceProvider = Provider<MatchRemoteDataSource>(
-  (ref) => MatchRemoteDataSource(ref.watch(dioProvider)),
 );
 
 final adminRemoteDataSourceProvider = Provider<AdminRemoteDataSource>(
@@ -105,96 +98,35 @@ final analyticsSummaryProvider = Provider<AnalyticsSummary>((ref) {
   );
 });
 
-final teamMembersProvider = Provider<List<TeamMemberModel>>(
-  (ref) => const [
-    TeamMemberModel(
-      id: 'p1',
-      name: 'Ahmed Nasser',
-      position: 'Goalkeeper',
-      shirtNumber: 1,
-      age: 26,
-      rating: 7.5,
-      stamina: 88,
-      goals: 0,
-      assists: 0,
-      isStarting: true,
-    ),
-    TeamMemberModel(
-      id: 'p2',
-      name: 'Karim Adel',
-      position: 'Defender',
-      shirtNumber: 4,
-      age: 24,
-      rating: 7.9,
-      stamina: 91,
-      goals: 1,
-      assists: 1,
-      isStarting: true,
-    ),
-    TeamMemberModel(
-      id: 'p3',
-      name: 'Omar Fathy',
-      position: 'Defender',
-      shirtNumber: 5,
-      age: 27,
-      rating: 7.7,
-      stamina: 89,
-      goals: 0,
-      assists: 1,
-      isStarting: true,
-    ),
-    TeamMemberModel(
-      id: 'p4',
-      name: 'Ziad Hamdy',
-      position: 'Midfielder',
-      shirtNumber: 8,
-      age: 23,
-      rating: 8.1,
-      stamina: 93,
-      goals: 3,
-      assists: 6,
-      isStarting: true,
-    ),
-    TeamMemberModel(
-      id: 'p5',
-      name: 'Hassan Ali',
-      position: 'Midfielder',
-      shirtNumber: 10,
-      age: 25,
-      rating: 8.4,
-      stamina: 86,
-      goals: 8,
-      assists: 7,
-      isStarting: true,
-    ),
-    TeamMemberModel(
-      id: 'p6',
-      name: 'Mostafa Samir',
-      position: 'Forward',
-      shirtNumber: 9,
-      age: 22,
-      rating: 8.0,
-      stamina: 84,
-      goals: 11,
-      assists: 4,
-      isStarting: true,
-    ),
-    TeamMemberModel(
-      id: 'p7',
-      name: 'Youssef Tarek',
-      position: 'Forward',
-      shirtNumber: 11,
-      age: 21,
-      rating: 7.4,
-      stamina: 82,
-      goals: 5,
-      assists: 2,
-      isStarting: false,
-    ),
-  ],
-);
+/// Team members for the coach's club, derived from the Supabase-backed club
+/// squad (first/top-ranked club). Empty while clubs are loading.
+final teamMembersProvider = Provider<List<TeamMemberModel>>((ref) {
+  final clubs = ref.watch(mockClubsProvider);
+  if (clubs.isEmpty) return const [];
+  final squad = clubs.first.players;
+  return [
+    for (var i = 0; i < squad.length; i++)
+      TeamMemberModel(
+        id: squad[i].id,
+        name: squad[i].name,
+        position: squad[i].position,
+        shirtNumber: i + 1,
+        age: squad[i].age,
+        rating: squad[i].rating,
+        // Stamina is not tracked on ClubPlayer; approximate from season rating.
+        stamina: (squad[i].rating * 11).round().clamp(40, 100),
+        goals: squad[i].goals,
+        assists: squad[i].assists,
+        isStarting: i < 11,
+      ),
+  ];
+});
 
-final coachTeamNameProvider = Provider<String>((ref) => 'GoalSight FC');
+/// The coach's club name, sourced from the Supabase-backed club list.
+final coachTeamNameProvider = Provider<String>((ref) {
+  final clubs = ref.watch(mockClubsProvider);
+  return clubs.isEmpty ? 'GoalSight FC' : clubs.first.name;
+});
 
 // League standings derived from Supabase-backed club season stats.
 final leagueStandingsProvider = Provider<List<StandingEntryModel>>((ref) {
@@ -223,13 +155,25 @@ final leagueStandingsProvider = Provider<List<StandingEntryModel>>((ref) {
   ];
 });
 
-final adminSystemAlertsProvider = Provider<List<String>>(
-  (ref) => const [
-    '2 pending user verification requests.',
-    'Weekly match import completed successfully.',
-    'No critical incidents in the last 24 hours.',
-  ],
-);
+/// System alerts derived from real Supabase operational counts (managers,
+/// analyses, active processing jobs). Empty while the overview is loading.
+final adminSystemAlertsProvider = Provider<List<String>>((ref) {
+  return ref.watch(adminSystemOverviewProvider).maybeWhen(
+    data: (overview) {
+      final alerts = <String>[];
+      if (overview.activeMatches > 0) {
+        alerts.add(
+            '${overview.activeMatches} upload(s) currently processing.');
+      } else {
+        alerts.add('No uploads processing — pipeline idle.');
+      }
+      alerts.add('${overview.totalUsers} manager account(s) active.');
+      alerts.add('${overview.totalMatches} match analyses available.');
+      return alerts;
+    },
+    orElse: () => const <String>[],
+  );
+});
 
 final fanLiveMatchesProvider = FutureProvider<List<MatchModel>>((ref) async {
   await Future<void>.delayed(const Duration(milliseconds: 950));
@@ -300,4 +244,68 @@ final liveMatchControllerProvider = StateNotifierProvider.autoDispose
     matchId: matchId,
     token: token,
   );
+});
+
+// ── Admin: Supabase-backed system overview counts ─────────────────────────
+
+final adminSystemOverviewProvider = FutureProvider<SystemOverviewModel>((ref) async {
+  final client = Supabase.instance.client;
+
+  final managersRaw = await client
+      .from('profiles')
+      .select('id')
+      .eq('role', 'manager');
+  final totalManagers = (managersRaw as List).length;
+
+  final analysesRaw = await client
+      .from('match_analyses')
+      .select('id');
+  final totalAnalyses = (analysesRaw as List).length;
+
+  final activeRaw = await client
+      .from('upload_jobs')
+      .select('id')
+      .eq('status', 'processing');
+  final activeJobs = (activeRaw as List).length;
+
+  return SystemOverviewModel(
+    totalUsers: totalManagers,
+    totalMatches: totalAnalyses,
+    activeMatches: activeJobs,
+  );
+});
+
+// ── Admin: Squad derived from real player + risk data ────────────────────
+
+final adminSquadProvider = FutureProvider<List<PlayerAnalysisModel>>((ref) async {
+  final players = await ref.watch(squadProvider(null).future);
+  final risks = await ref.watch(squadRiskProvider(null).future);
+
+  final riskMap = {for (final r in risks) r.playerId: r};
+
+  return players.map((p) {
+    final risk = riskMap[p.id];
+    final posShort = p.position.contains('/') ? p.position.split('/').last.trim() : p.position;
+    final avatarUrl =
+        'https://ui-avatars.com/api/?name=${Uri.encodeComponent(p.name)}'
+        '&background=705AF5&color=fff&length=2&bold=true&size=96';
+
+    return PlayerAnalysisModel(
+      id: p.id,
+      name: p.name,
+      position: posShort,
+      imageUrl: avatarUrl,
+      overallRating: p.currentRating,
+      fatigueLevel: p.fatigue.toDouble(),
+      injuryRisk: risk?.injuryRisk ?? 20.0,
+      workRate: p.activityLevel.toDouble(),
+      tacticalImpact: risk != null ? (100.0 - risk.tacticalRisk).clamp(0, 100) : 75.0,
+      keyStrengths: p.insights.take(2).toList(),
+      weaknesses: const [],
+      recentRatings: {
+        for (var i = 0; i < p.ratingsHistory.length; i++)
+          'Match ${i + 1}': p.ratingsHistory[i],
+      },
+    );
+  }).toList();
 });
