@@ -222,16 +222,19 @@ class SupabaseAuthRepository implements IAuthRepository {
         user.email ??
         'User';
 
+    String? clubId;
+
     try {
       final profile = await _client
           .from('profiles')
-          .select('full_name, role')
+          .select('full_name, role, club_id')
           .eq('id', user.id)
           .maybeSingle();
       if (profile != null) {
         role = parseUserRole((profile['role'] ?? 'fan').toString());
         final fullName = profile['full_name']?.toString();
         if (fullName != null && fullName.isNotEmpty) name = fullName;
+        clubId = profile['club_id']?.toString();
       }
     } catch (_) {
       // Profile not readable yet (transient/RLS) — fall back to metadata role.
@@ -247,6 +250,7 @@ class SupabaseAuthRepository implements IAuthRepository {
       name: name,
       email: user.email ?? '',
       role: role,
+      clubId: clubId,
     );
   }
 }

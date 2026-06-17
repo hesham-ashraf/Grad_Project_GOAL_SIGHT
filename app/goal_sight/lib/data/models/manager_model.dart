@@ -8,6 +8,7 @@ class ManagerModel {
   final bool isActive;
   final int matchesAnalyzed;
   final double tacticalRating;
+  final String? clubId;
 
   const ManagerModel({
     required this.id,
@@ -19,6 +20,7 @@ class ManagerModel {
     required this.isActive,
     required this.matchesAnalyzed,
     required this.tacticalRating,
+    this.clubId,
   });
 
   factory ManagerModel.fromJson(Map<String, dynamic> json) {

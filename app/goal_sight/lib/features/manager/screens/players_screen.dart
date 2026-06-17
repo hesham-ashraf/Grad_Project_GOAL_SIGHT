@@ -130,7 +130,8 @@ class _PlayersScreenState extends ConsumerState<PlayersScreen>
 
   @override
   Widget build(BuildContext context) {
-    final allPlayers = ref.watch(managerPlayersProvider);
+    final playersAsync = ref.watch(managerPlayersProvider);
+    final allPlayers = playersAsync.valueOrNull ?? const [];
     final filteredPlayers = _buildFilteredList(allPlayers);
 
     final avgRating = allPlayers.isEmpty
@@ -363,7 +364,9 @@ class _PlayersScreenState extends ConsumerState<PlayersScreen>
 
             // ── Player list ───────────────────────────────────────────────
             Expanded(
-              child: _reveal(2, filteredPlayers.isEmpty
+              child: _reveal(2, playersAsync.isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : filteredPlayers.isEmpty
                   ? _EmptyState(
                       query: _searchQuery,
                       position: _selectedPosition,

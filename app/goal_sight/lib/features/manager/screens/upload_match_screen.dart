@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
@@ -8,6 +9,7 @@ import '../../../core/utils/responsive.dart';
 import '../../../data/models/match_analysis_model.dart';
 import '../manager_upload_mock_data.dart';
 import '../../../data/models/upload_job_model.dart';
+import '../../../providers/repository_providers.dart';
 import '../widgets/ai_processing_widgets.dart';
 import '../widgets/upload_widgets.dart';
 
@@ -24,14 +26,14 @@ enum _UploadStep {
 
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
-class UploadMatchScreen extends StatefulWidget {
+class UploadMatchScreen extends ConsumerStatefulWidget {
   const UploadMatchScreen({super.key});
 
   @override
-  State<UploadMatchScreen> createState() => _UploadMatchScreenState();
+  ConsumerState<UploadMatchScreen> createState() => _UploadMatchScreenState();
 }
 
-class _UploadMatchScreenState extends State<UploadMatchScreen>
+class _UploadMatchScreenState extends ConsumerState<UploadMatchScreen>
     with TickerProviderStateMixin {
   _UploadStep _step = _UploadStep.fileSelection;
   UploadFormData _formData = UploadFormData();
@@ -42,6 +44,7 @@ class _UploadMatchScreenState extends State<UploadMatchScreen>
   double _overallProgress = 0.0;
   Timer? _processingTimer;
   int _stageIndex = -1;
+  String? _jobId; // DB job ID once created
 
   // Failure state
   String _failureReason = '';
@@ -152,7 +155,7 @@ class _UploadMatchScreenState extends State<UploadMatchScreen>
     );
   }
 
-  // ── Processing simulation ───────────────────────────────────────────────────
+  // ── Processing ─────────────────────────────────────────────────────────────
 
   void _startProcessing() {
     _goTo(_UploadStep.processing);
@@ -161,9 +164,32 @@ class _UploadMatchScreenState extends State<UploadMatchScreen>
       _overallProgress = 0.0;
       _stageIndex = -1;
     });
+    _createJobThenProcess();
+  }
 
-    // Simulate initial upload delay then begin stages
-    Future.delayed(const Duration(milliseconds: 800), _advanceStage);
+  Future<void> _createJobThenProcess() async {
+    // Create a real DB record so upload history reflects this job.
+    try {
+      final repo = ref.read(uploadRepositoryProvider);
+      final job = await repo.createUploadJob(UploadJobModel(
+        id: '',
+        homeTeam: _formData.homeTeam,
+        awayTeam: _formData.awayTeam,
+        competition: _formData.competition,
+        venue: _formData.venue,
+        matchDate: _formData.matchDate,
+        fileName: _formData.fileName ?? 'match.mp4',
+        uploadedAt: DateTime.now(),
+        status: UploadStatus.processing,
+        notes: _formData.notes,
+      ));
+      _jobId = job.id;
+    } catch (_) {
+      // Non-fatal: job creation failed (e.g. offline). Continue simulation.
+    }
+    if (mounted) {
+      Future.delayed(const Duration(milliseconds: 800), _advanceStage);
+    }
   }
 
   void _advanceStage() {
@@ -180,6 +206,16 @@ class _UploadMatchScreenState extends State<UploadMatchScreen>
         _currentStage = stages.last;
         _generatedAnalysis = analysis;
       });
+      // Mark job completed in DB (best-effort).
+      if (_jobId != null) {
+        final repo = ref.read(uploadRepositoryProvider);
+        repo.updateJobStatus(
+          _jobId!,
+          status: UploadStatus.completed,
+          progress: 1.0,
+          stage: ProcessingStage.finalizingReport,
+        ).catchError((_) {});
+      }
       // Short pause then go to success
       Future.delayed(const Duration(milliseconds: 600), () {
         if (mounted) _goTo(_UploadStep.success);
@@ -257,6 +293,7 @@ class _UploadMatchScreenState extends State<UploadMatchScreen>
       _overallProgress = 0.0;
       _stageIndex = -1;
       _failureReason = '';
+      _jobId = null;
     });
     _stepCtrl.forward(from: 0);
   }

@@ -181,9 +181,42 @@ final adminSystemAlertsProvider = Provider<List<String>>((ref) {
   );
 });
 
+/// Fan match feed — backed by match_analyses from Supabase (completed results).
+/// Mapped to MatchModel so existing fan home UI needs no changes.
 final fanLiveMatchesProvider = FutureProvider<List<MatchModel>>((ref) async {
-  await Future<void>.delayed(const Duration(milliseconds: 950));
-  return ref.watch(matchRepositoryProvider).fetchMatches();
+  final analyses = await ref.watch(matchAnalysisListProvider(null).future);
+  return analyses.map((a) => MatchModel(
+    id: a.matchId,
+    homeTeam: a.homeTeam,
+    awayTeam: a.awayTeam,
+    status: a.status.isNotEmpty ? a.status : 'FT',
+    score: a.score,
+    date: a.date,
+    intensity: a.intensity,
+    highlightText: a.highlightText,
+    isTopMatch: a.intensity >= 80,
+    summary: a.summary.overallNarrative,
+    dominantTeam: a.summary.dominantTeam,
+    recommendations: a.recommendations,
+    tactics: TacticalAnalysis(
+      homePossession: a.homeAnalysis.possession,
+      homeStyle: a.homeAnalysis.style,
+      homePressure: a.homeAnalysis.pressureStyle,
+      awayPossession: a.awayAnalysis.possession,
+      awayStyle: a.awayAnalysis.style,
+      awayPressure: a.awayAnalysis.pressureStyle,
+    ),
+    players: a.players
+        .map((p) => MatchPlayer(
+              id: p.id,
+              name: p.name,
+              rating: p.rating,
+              insight: p.insight,
+              isBest: p.isMOTM,
+              isWorst: p.isWorst,
+            ))
+        .toList(),
+  )).toList();
 });
 
 final fanFeaturedMatchProvider = Provider<MatchModel?>((ref) {
@@ -197,9 +230,7 @@ final fanFeaturedMatchProvider = Provider<MatchModel?>((ref) {
 final fanTodayMatchesProvider = Provider<List<MatchModel>>((ref) {
   final asyncMatches = ref.watch(fanLiveMatchesProvider);
   return asyncMatches.maybeWhen(
-    data: (matches) => matches
-        .where((match) => match.status.toLowerCase() != 'finished')
-        .toList(),
+    data: (matches) => matches.take(5).toList(),
     orElse: () => const [],
   );
 });
@@ -441,10 +472,18 @@ final managerDashboardProvider = FutureProvider<ManagerDashboardData>((ref) asyn
   );
 });
 
+// ── Admin: club_id from the signed-in user (cached in UserModel after P0-1) ─
+
+final adminClubIdProvider = Provider<String?>((ref) {
+  final auth = ref.watch(authControllerProvider);
+  return auth.user?.clubId;
+});
+
 // ── Admin: Tactical insights derived from match analyses ──────────────────
 
 final adminTacticalInsightsProvider = FutureProvider<List<TacticalInsightModel>>((ref) async {
-  final analyses = await ref.watch(matchAnalysisListProvider(null).future);
+  final clubId = ref.watch(adminClubIdProvider);
+  final analyses = await ref.watch(matchAnalysisListProvider(clubId).future);
 
   final insights = <TacticalInsightModel>[];
   for (var i = 0; i < analyses.length && insights.length < 5; i++) {
@@ -469,7 +508,8 @@ final adminTacticalInsightsProvider = FutureProvider<List<TacticalInsightModel>>
 // ── Admin: Activity feed derived from recent uploads ──────────────────────
 
 final adminActivityProvider = FutureProvider<List<ActivityModel>>((ref) async {
-  final uploads = await ref.watch(uploadHistoryProvider(null).future);
+  final uid = Supabase.instance.client.auth.currentUser?.id;
+  final uploads = await ref.watch(uploadHistoryProvider(uid).future);
 
   return uploads.take(8).indexed.map((entry) {
     final idx = entry.$1;
@@ -495,8 +535,9 @@ final adminActivityProvider = FutureProvider<List<ActivityModel>>((ref) async {
 // ── Admin: Squad derived from real player + risk data ────────────────────
 
 final adminSquadProvider = FutureProvider<List<PlayerAnalysisModel>>((ref) async {
-  final players = await ref.watch(squadProvider(null).future);
-  final risks = await ref.watch(squadRiskProvider(null).future);
+  final clubId = ref.watch(adminClubIdProvider);
+  final players = await ref.watch(squadProvider(clubId).future);
+  final risks = await ref.watch(squadRiskProvider(clubId).future);
 
   final riskMap = {for (final r in risks) r.playerId: r};
 

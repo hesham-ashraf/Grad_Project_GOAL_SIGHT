@@ -21,6 +21,9 @@ final class SupabaseManagerRepository implements IManagerRepository {
     bool? activeOnly,
   }) async {
     var query = _client.from('managers').select();
+    if (clubId != null) {
+      query = query.eq('club_id', clubId);
+    }
     if (activeOnly != null) {
       query = query.eq('is_active', activeOnly);
     }
@@ -51,6 +54,7 @@ final class SupabaseManagerRepository implements IManagerRepository {
           'tactical_rating': manager.tacticalRating,
           'last_active': manager.lastActive.toIso8601String(),
           'is_active': manager.isActive,
+          if (manager.clubId != null) 'club_id': manager.clubId,
         })
         .select()
         .single();
@@ -92,6 +96,7 @@ final class SupabaseManagerRepository implements IManagerRepository {
         isActive: r['is_active'] == true,
         matchesAnalyzed: (r['matches_analyzed'] as num? ?? 0).toInt(),
         tacticalRating: _toDouble(r['tactical_rating']),
+        clubId: r['club_id']?.toString(),
       );
 
   double _toDouble(dynamic v) {
