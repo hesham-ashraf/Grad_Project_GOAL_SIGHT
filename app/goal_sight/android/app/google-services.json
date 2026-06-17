@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1027783536420",
+    "project_id": "goalsight-12d49",
+    "storage_bucket": "goalsight-12d49.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1027783536420:android:52cb0e53d5d5012bfccdb1",
+        "android_client_info": {
+          "package_name": "com.example.goal_sight"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1027783536420-lrf7bv3ddn05bvv4jhut4q177e2bvb36.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.goal_sight",
+            "certificate_hash": "3289728cff075746e01ca45d0d90c2ecd7905f7d"
+          }
+        },
+        {
+          "client_id": "1027783536420-dcbglh3k7vsn05dd7k8fessmk4l96qfl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDL5JlrwFSDGrgYMWtOO23mML5i1No6yZ8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1027783536420-dcbglh3k7vsn05dd7k8fessmk4l96qfl.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

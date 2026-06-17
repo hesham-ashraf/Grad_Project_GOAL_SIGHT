@@ -82,7 +82,11 @@ final class SupabaseManagerRepository implements IManagerRepository {
     required bool canEditPlayers,
     required bool canManageStaff,
   }) async {
-    // Manager permissions are not yet modelled in the DB — acknowledged no-op.
+    await _client.from('managers').update({
+      'can_upload': canUpload,
+      'can_edit_players': canEditPlayers,
+      'can_manage_staff': canManageStaff,
+    }).eq('id', id);
   }
 
   ManagerModel _mapManager(Map<String, dynamic> r) => ManagerModel(

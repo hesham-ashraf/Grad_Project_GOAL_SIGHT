@@ -131,6 +131,32 @@ final class SupabasePlayerRepository implements IPlayerRepository {
   }
 
   @override
+  Future<PlayerProfileModel> createPlayer({
+    required String fullName,
+    required String position,
+    required String clubId,
+    int? jerseyNumber,
+  }) async {
+    final inserted = await _client
+        .from('players')
+        .insert({
+          'full_name': fullName,
+          'position': position,
+          'team_id': clubId,
+          if (jerseyNumber != null) 'jersey_number': jerseyNumber,
+          'season_rating': 6.0,
+          'season_goals': 0,
+          'season_assists': 0,
+          'season_tackles': 0,
+          'appearances': 0,
+        })
+        .select(_playerCols)
+        .single();
+    CacheService.invalidatePrefix('squad:');
+    return _mapPlayer(inserted);
+  }
+
+  @override
   Future<List<PlayerProfileModel>> fetchPlayersPaged({
     required int page,
     int pageSize = 20,

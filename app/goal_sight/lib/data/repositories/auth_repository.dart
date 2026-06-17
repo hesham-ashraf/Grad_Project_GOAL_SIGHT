@@ -148,10 +148,8 @@ class SupabaseAuthRepository implements IAuthRepository {
 
   @override
   Future<UserModel> signInWithGoogle() async {
-    // TODO: Set the webClientId from your Google Cloud Console OAuth credential.
-    // Enable Google provider in Supabase Dashboard → Auth → Providers → Google.
     const webClientId =
-        'YOUR_GOOGLE_WEB_CLIENT_ID.apps.googleusercontent.com';
+        '1027783536420-dcbglh3k7vsn05dd7k8fessmk4l96qfl.apps.googleusercontent.com';
     final googleSignIn = GoogleSignIn(serverClientId: webClientId);
     final googleUser = await googleSignIn.signIn();
     if (googleUser == null) {

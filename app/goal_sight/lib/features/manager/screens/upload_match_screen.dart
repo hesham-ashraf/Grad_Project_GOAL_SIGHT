@@ -209,12 +209,12 @@ class _UploadMatchScreenState extends ConsumerState<UploadMatchScreen>
       // Mark job completed in DB (best-effort).
       if (_jobId != null) {
         final repo = ref.read(uploadRepositoryProvider);
-        repo.updateJobStatus(
+        unawaited(repo.updateJobStatus(
           _jobId!,
           status: UploadStatus.completed,
           progress: 1.0,
           stage: ProcessingStage.finalizingReport,
-        ).catchError((_) {});
+        ).then((_) {}, onError: (_) {}));
       }
       // Short pause then go to success
       Future.delayed(const Duration(milliseconds: 600), () {

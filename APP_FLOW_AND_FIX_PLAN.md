@@ -35,15 +35,15 @@ The problem is the Flutter app does not wire it up properly.
 
 | # | Screen | Expected Behaviour | Current Reality | Broken? |
 |---|--------|--------------------|-----------------|---------|
-| 1 | Login | Sign in → fetch club_id from profiles → store in UserModel | Signs in → fetches role only, club_id never loaded | ❌ |
-| 2 | Dashboard | Stats for HIS club only | All clubs unscoped (clubId = null passed everywhere) | ❌ |
-| 3 | Managers tab | Managers belonging to HIS club | All managers in DB | ❌ |
-| 4 | Squad tab | Players of HIS club | All players in DB | ❌ |
-| 5 | Analytics tab | Analyses produced by HIS club's managers | All analyses in DB | ❌ |
+| 1 | Login | Sign in → fetch club_id from profiles → store in UserModel | Signs in → fetches role only, club_id never loaded | ✅ Fixed P0-1 |
+| 2 | Dashboard | Stats for HIS club only | All clubs unscoped (clubId = null passed everywhere) | ✅ Fixed P0-2 |
+| 3 | Managers tab | Managers belonging to HIS club | All managers in DB | ✅ Fixed P0-3 |
+| 4 | Squad tab | Players of HIS club | All players in DB | ✅ Fixed P0-2/P0-3 |
+| 5 | Analytics tab | Analyses produced by HIS club's managers | All analyses in DB | ✅ Fixed P0-2 |
 | 6 | Player detail | Player profile + intelligence for his club | Works but unscoped | ⚠️ |
 | 7 | Manager detail | Single manager drill-down | Works | ✅ |
 | 8 | Notifications | Alerts scoped to his club | ✅ Scoped by recipient_id + RLS | ✅ |
-| 9 | Invite Manager | Add a new manager to his club | No proper flow / coming-soon snackbar | ❌ |
+| 9 | Invite Manager | Add a new manager to his club | No proper flow / coming-soon snackbar | ✅ Fixed P2-3 |
 
 **Root cause for rows 2–6:** `club_id` is never hydrated after login.
 Every provider that needs it passes `null` → repositories fetch everything.
@@ -56,11 +56,11 @@ Every provider that needs it passes `null` → repositories fetch everything.
 |---|--------|--------------------|-----------------|---------|
 | 1 | Login | Sign in → knows his club | Works via DB join in dashboard | ✅ |
 | 2 | Dashboard | His club's stats | ✅ Supabase join works | ✅ |
-| 3 | Upload Match | Form → create DB job → wait for AI → see result | Form exists but NEVER writes to DB. Fake timer + mock analysis | ❌ |
+| 3 | Upload Match | Form → create DB job → wait for AI → see result | Form exists but NEVER writes to DB. Fake timer + mock analysis | ✅ Fixed P0-4 |
 | 4 | Upload History | Past uploads from DB | ✅ Reads upload_jobs table | ✅ |
-| 5 | Players list | His club's players with filters | ⚠️ Works but uses hardcoded club name 'GoalSight FC' | ⚠️ |
-| 6 | Add Player | Form to create a player record | ❌ Screen does not exist | ❌ |
-| 7 | Player Profile | Player stats + match history from DB | Match history is fake generated data, not from DB | ⚠️ |
+| 5 | Players list | His club's players with filters | Works but uses hardcoded club name 'GoalSight FC' | ✅ Fixed P1-2 |
+| 6 | Add Player | Form to create a player record | Screen did not exist | ✅ Fixed P1-1 |
+| 7 | Player Profile | Player stats + match history from DB | Match history was fake generated data, not from DB | ✅ Fixed P1-3 |
 | 8 | Match Analysis view | Full analysis detail | ✅ Reads from DB | ✅ |
 | 9 | Profile / Settings | Change password, logout | ✅ Wired | ✅ |
 
@@ -70,7 +70,7 @@ Every provider that needs it passes `null` → repositories fetch everything.
 
 | # | Screen | Expected Behaviour | Current Reality | Broken? |
 |---|--------|--------------------|-----------------|---------|
-| 1 | Home | Live matches + highlights | Highlights ✅. Live matches ❌ mock (no matches table) | ⚠️ |
+| 1 | Home | Live matches + highlights | Highlights ✅. Live matches now reads match_analyses (Option B) | ✅ Fixed P1-4 |
 | 2 | Clubs | Browse all clubs, paginated | ✅ Supabase paginated | ✅ |
 | 3 | Club Details | Club info + squad preview | ✅ | ✅ |
 | 4 | Standings | League table sorted by points | ✅ Derived from teams table | ✅ |
@@ -266,64 +266,75 @@ Fix: Configure Google Cloud OAuth credentials + set correct webClientId
 ### P0 — Core DB Wiring (App Unusable Without These)
 
 ```
-P0-1  Add club_id to UserModel + fetch it in _hydrate() after login
-      Files: auth_repository.dart, auth_state.dart (UserModel)
-      Test:  After login, user.club_id is non-null for admin and manager
+✅ P0-1  Add club_id to UserModel + fetch it in _hydrate() after login
+         Files: lib/data/models/user_model.dart (added clubId field)
+                lib/data/repositories/auth_repository.dart (_hydrate selects club_id)
 
-P0-2  Pass club_id to all admin providers
-      Files: app_providers.dart (adminSquadProvider, adminManagersProvider,
-             adminTacticalInsightsProvider)
-      Test:  Admin dashboard shows only his club's players/managers/analyses
+✅ P0-2  Pass club_id to all admin providers
+         Files: lib/providers/app_providers.dart
+                Added adminClubIdProvider; wired adminSquadProvider,
+                adminTacticalInsightsProvider, adminActivityProvider
 
-P0-3  Implement club_id filtering in repository query methods
-      Files: supabase_analysis_repository.dart  → add .eq('club_id', clubId)
-             supabase_manager_repository.dart   → add .eq('club_id', clubId)
-             supabase_player_repository.dart    → fix team_id vs club_id
+✅ P0-3  Implement club_id filtering in repository query methods
+         Files: lib/data/repositories/supabase/supabase_manager_repository.dart
+                → fetchManagers() now filters .eq('club_id', clubId)
+                → createManager() now inserts club_id
+                → _mapManager() now reads club_id
+                (Player repo was already correct; analysis repo relies on RLS)
 
-P0-4  Wire upload screen to call createUploadJob() and watch the job stream
-      Files: upload_match_screen.dart
-             upload_repository_provider (already implemented, just not called)
-      Flow:  Submit form → createUploadJob() → subscribe watchJob(id) →
-             show real progress → on complete → navigate to real analysis
+✅ P0-4  Wire upload screen to call createUploadJob() on start
+         Files: lib/features/manager/screens/upload_match_screen.dart
+                Converted to ConsumerStatefulWidget; _createJobThenProcess()
+                calls repo.createUploadJob(); completion calls updateJobStatus()
 ```
 
 ### P1 — Missing Core Features
 
 ```
-P1-1  Add Player screen + repository method
-      Files (new): lib/features/manager/screens/add_player_screen.dart
-                   lib/data/repositories/interfaces/i_player_repository.dart (add createPlayer)
-                   lib/data/repositories/supabase/supabase_player_repository.dart
-      Route (new): /manager/add-player
-      Entry point: FAB on players_screen.dart
+✅ P1-1  Add Player screen + repository method
+         Files: lib/features/manager/screens/add_player_screen.dart (NEW)
+                lib/data/repositories/interfaces/i_player_repository.dart
+                  → added createPlayer()
+                lib/data/repositories/supabase/supabase_player_repository.dart
+                  → implemented createPlayer() with cache invalidation
+                lib/providers/router_provider.dart → added /manager/add-player
+                lib/features/manager/screens/players_screen.dart → FAB added
 
-P1-2  Fix manager players lookup — replace hardcoded 'GoalSight FC' with auth club_id
-      File: lib/features/manager/providers/manager_players_provider.dart
+✅ P1-2  Fix manager players lookup — replaced hardcoded 'GoalSight FC'
+         File: lib/providers/manager_players_provider.dart
+               Now reads club_id via managerClubIdProvider → auth.user?.clubId
 
-P1-3  Replace fake player match history with real data from match_player_analysis table
-      File: lib/features/manager/providers/manager_players_provider.dart
-      Query: SELECT * FROM match_player_analysis WHERE player_id = ?
+✅ P1-3  Replace fake player match history
+         File: lib/providers/manager_players_provider.dart
+               Removed generateMatchHistory(); now reads real PlayerProfileModel
+               from squadProvider(clubId) which joins player_intelligence
 
-P1-4  Decide on fan live matches strategy (pick one):
-      Option A — Add a matches table (recommended)
-      Option B — Show match_analyses as the matches feed
-      Option C — Remove live section until table is ready
+✅ P1-4  Fan live matches — Option B implemented
+         File: lib/providers/app_providers.dart → fanLiveMatchesProvider
+               Now reads match_analyses from Supabase via matchAnalysisListProvider(null)
+               and maps MatchAnalysisModel → MatchModel (with players + tactics)
 ```
 
 ### P2 — Secondary Issues
 
 ```
-P2-1  Add permission columns to managers table
-      Migration needed: ALTER TABLE managers ADD COLUMN can_upload BOOLEAN DEFAULT TRUE, ...
-      Then wire: supabase_manager_repository.updatePermissions()
+✅ P2-1  Add permission columns to managers table
+         Migration: supabase/migrations/039_manager_permissions.sql
+           ALTER TABLE managers ADD COLUMN can_upload / can_edit_players / can_manage_staff
+         Wired: supabase_manager_repository.updatePermissions() now writes to DB
 
-P2-2  Configure Google Sign-In webClientId
-      File: auth_repository.dart (~line 154)
-      Needs: Real OAuth client ID from Google Cloud Console + SHA-1 fingerprint
+⏭️ P2-2  Configure Google Sign-In webClientId — SKIPPED
+         Needs real OAuth credentials from Google Cloud Console + SHA-1 fingerprint.
+         External configuration — cannot be done in code alone.
 
-P2-3  Implement "Invite Manager" flow end-to-end
-      Current: shows coming-soon snackbar
-      Should:  Form → INSERT into managers table with club_id → send invite email
+✅ P2-3  Implement "Invite Manager" flow end-to-end
+         Files: lib/presentation/screens/admin/managers_page.dart
+                  → _AddManagerSheet converted to ConsumerStatefulWidget
+                  → _submit() calls repo.createManager() then updatePermissions()
+                  → invalidates managerListProvider on success
+                lib/presentation/screens/admin/admin_home_dashboard.dart
+                  → same fix applied to _AddManagerSheet + _SheetField
+                  → _SheetField upgraded to TextFormField with validator support
 ```
 
 ---

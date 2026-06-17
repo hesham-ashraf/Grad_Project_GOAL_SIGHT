@@ -4,6 +4,13 @@ import '../../models/risk_analysis_model.dart';
 abstract interface class IPlayerRepository {
   Future<List<PlayerProfileModel>> fetchSquad({String? clubId});
 
+  Future<PlayerProfileModel> createPlayer({
+    required String fullName,
+    required String position,
+    required String clubId,
+    int? jerseyNumber,
+  });
+
   Future<PlayerProfileModel> fetchPlayerById(String id);
 
   Future<RiskAnalysisModel> fetchRiskAnalysis(String playerId);

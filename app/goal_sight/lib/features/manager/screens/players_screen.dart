@@ -145,6 +145,35 @@ class _PlayersScreenState extends ConsumerState<PlayersScreen>
 
     return Scaffold(
       backgroundColor: Colors.transparent,
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () async {
+          HapticService.medium();
+          await context.push('/manager/add-player');
+          // Refresh player list after returning (provider already invalidated in screen)
+          ref.invalidate(managerPlayersProvider);
+        },
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        label: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          decoration: const BoxDecoration(
+            gradient: AppGradients.brand,
+            borderRadius: AppRadius.button,
+            boxShadow: AppShadows.buttonGlow,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.person_add_rounded, color: Colors.white, size: 18),
+              const SizedBox(width: 8),
+              Text(
+                'Add Player',
+                style: AppTextStyles.button(color: Colors.white).copyWith(fontSize: 14),
+              ),
+            ],
+          ),
+        ),
+      ),
       body: SafeArea(
         bottom: false,
         child: Column(

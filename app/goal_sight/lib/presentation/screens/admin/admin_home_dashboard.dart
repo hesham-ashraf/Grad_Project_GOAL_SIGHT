@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/services/haptic_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
+import '../../../data/models/manager_model.dart';
 import '../../widgets/admin/admin_dashboard_widgets.dart';
 import '../../widgets/admin/tactical_insight_widget.dart';
 import '../../../providers/app_providers.dart';
@@ -230,19 +231,22 @@ class _NotificationBell extends ConsumerWidget {
 
 // ─── Add Manager Bottom Sheet ────────────────────────────────────────────────
 
-class _AddManagerSheet extends StatefulWidget {
+class _AddManagerSheet extends ConsumerStatefulWidget {
   const _AddManagerSheet();
 
   @override
-  State<_AddManagerSheet> createState() => _AddManagerSheetState();
+  ConsumerState<_AddManagerSheet> createState() => _AddManagerSheetState();
 }
 
-class _AddManagerSheetState extends State<_AddManagerSheet> {
+class _AddManagerSheetState extends ConsumerState<_AddManagerSheet> {
+  final _formKey = GlobalKey<FormState>();
   final _nameCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
   bool _canUpload = true;
   bool _canEditPlayers = true;
   bool _canManageStaff = false;
+  bool _saving = false;
+  String? _errorMsg;
 
   @override
   void dispose() {
@@ -251,89 +255,137 @@ class _AddManagerSheetState extends State<_AddManagerSheet> {
     super.dispose();
   }
 
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+    final clubId = ref.read(adminClubIdProvider);
+    if (clubId == null || clubId.isEmpty) {
+      setState(() => _errorMsg = 'Club not found. Please log in again.');
+      return;
+    }
+    setState(() { _saving = true; _errorMsg = null; });
+    try {
+      final repo = ref.read(managerRepositoryProvider);
+      final manager = await repo.createManager(ManagerModel(
+        id: '',
+        name: _nameCtrl.text.trim(),
+        email: _emailCtrl.text.trim(),
+        imageUrl: '',
+        uploadCount: 0,
+        matchesAnalyzed: 0,
+        tacticalRating: 0,
+        lastActive: DateTime.now(),
+        isActive: true,
+        clubId: clubId,
+      ));
+      await repo.updatePermissions(
+        manager.id,
+        canUpload: _canUpload,
+        canEditPlayers: _canEditPlayers,
+        canManageStaff: _canManageStaff,
+      );
+      ref.invalidate(managerListProvider);
+      if (mounted) Navigator.of(context).pop(manager);
+    } catch (e) {
+      setState(() {
+        _saving = false;
+        _errorMsg = e.toString().replaceFirst('Exception: ', '');
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom + 20,
-        top: 20,
-        left: 20,
-        right: 20,
-      ),
-      decoration: const BoxDecoration(
-        color: AppColors.surfaceElevated,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Center(
-            child: Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: AppColors.outline,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-          ),
-          const SizedBox(height: 20),
-          Row(
+    return Form(
+      key: _formKey,
+      child: Container(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+          top: 20,
+          left: 20,
+          right: 20,
+        ),
+        decoration: const BoxDecoration(
+          color: AppColors.surfaceElevated,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryPurple.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(10),
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppColors.outline,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
-                child: const Icon(Icons.person_add_outlined, color: AppColors.primaryPurple, size: 18),
               ),
-              const SizedBox(width: 10),
-              Text('Add New Manager', style: AppTextStyles.title(color: Colors.white)),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryPurple.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(Icons.person_add_outlined, color: AppColors.primaryPurple, size: 18),
+                  ),
+                  const SizedBox(width: 10),
+                  Text('Add New Manager', style: AppTextStyles.title(color: Colors.white)),
+                ],
+              ),
+              if (_errorMsg != null) ...[
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: AppColors.danger.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(AppRadius.md),
+                    border: Border.all(color: AppColors.danger.withValues(alpha: 0.35)),
+                  ),
+                  child: Text(_errorMsg!, style: AppTextStyles.caption(color: AppColors.danger)),
+                ),
+              ],
+              const SizedBox(height: 20),
+              _SheetField(controller: _nameCtrl, label: 'Full Name', hint: 'e.g. Jose Mourinho', icon: Icons.person_outline,
+                validator: (v) => (v == null || v.trim().length < 2) ? 'Enter a valid name' : null),
+              const SizedBox(height: 12),
+              _SheetField(controller: _emailCtrl, label: 'Email Address', hint: 'jose@club.com', icon: Icons.email_outlined,
+                keyboardType: TextInputType.emailAddress,
+                validator: (v) {
+                  if (v == null || v.trim().isEmpty) return 'Email is required';
+                  if (!v.contains('@')) return 'Enter a valid email';
+                  return null;
+                }),
+              const SizedBox(height: 20),
+              Text('Permissions', style: AppTextStyles.body(color: AppColors.textSecondary)),
+              const SizedBox(height: 8),
+              _PermissionToggle(title: 'Upload Matches', subtitle: 'Allow video uploads', value: _canUpload, onChanged: (v) => setState(() => _canUpload = v)),
+              _PermissionToggle(title: 'Edit Player Data', subtitle: 'Modify squad information', value: _canEditPlayers, onChanged: (v) => setState(() => _canEditPlayers = v)),
+              _PermissionToggle(title: 'Manage Sub-Staff', subtitle: 'Add assistant managers', value: _canManageStaff, onChanged: (v) => setState(() => _canManageStaff = v)),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _saving ? null : _submit,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primaryPurple,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg)),
+                  ),
+                  child: _saving
+                      ? const SizedBox(width: 18, height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                      : Text('Add Manager', style: AppTextStyles.button(color: Colors.white)),
+                ),
+              ),
             ],
           ),
-          const SizedBox(height: 20),
-          _SheetField(controller: _nameCtrl, label: 'Full Name', hint: 'e.g. Jose Mourinho', icon: Icons.person_outline),
-          const SizedBox(height: 12),
-          _SheetField(controller: _emailCtrl, label: 'Email Address', hint: 'jose@club.com', icon: Icons.email_outlined),
-          const SizedBox(height: 20),
-          Text('Permissions', style: AppTextStyles.body(color: AppColors.textSecondary)),
-          const SizedBox(height: 8),
-          _PermissionToggle(
-            title: 'Upload Matches',
-            subtitle: 'Allow video uploads',
-            value: _canUpload,
-            onChanged: (v) => setState(() => _canUpload = v),
-          ),
-          _PermissionToggle(
-            title: 'Edit Player Data',
-            subtitle: 'Modify squad information',
-            value: _canEditPlayers,
-            onChanged: (v) => setState(() => _canEditPlayers = v),
-          ),
-          _PermissionToggle(
-            title: 'Manage Sub-Staff',
-            subtitle: 'Add assistant managers',
-            value: _canManageStaff,
-            onChanged: (v) => setState(() => _canManageStaff = v),
-          ),
-          const SizedBox(height: 20),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () => Navigator.of(context).pop(),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryPurple,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppRadius.lg),
-                ),
-              ),
-              child: Text('Add Manager', style: AppTextStyles.button(color: Colors.white)),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -344,7 +396,16 @@ class _SheetField extends StatelessWidget {
   final String label;
   final String hint;
   final IconData icon;
-  const _SheetField({required this.controller, required this.label, required this.hint, required this.icon});
+  final FormFieldValidator<String>? validator;
+  final TextInputType? keyboardType;
+  const _SheetField({
+    required this.controller,
+    required this.label,
+    required this.hint,
+    required this.icon,
+    this.validator,
+    this.keyboardType,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -353,9 +414,11 @@ class _SheetField extends StatelessWidget {
       children: [
         Text(label, style: AppTextStyles.caption(color: AppColors.textSecondary)),
         const SizedBox(height: 6),
-        TextField(
+        TextFormField(
           controller: controller,
           style: AppTextStyles.body(color: Colors.white),
+          keyboardType: keyboardType,
+          validator: validator,
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: AppTextStyles.body(color: AppColors.textMuted),
@@ -374,6 +437,7 @@ class _SheetField extends StatelessWidget {
               borderRadius: BorderRadius.circular(AppRadius.md),
               borderSide: const BorderSide(color: AppColors.primaryPurple),
             ),
+            errorStyle: AppTextStyles.caption(color: AppColors.danger).copyWith(fontSize: 11),
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           ),
         ),

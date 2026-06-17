@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../core/constants/app_roles.dart';
 import '../features/auth/auth_state.dart';
+import '../features/manager/screens/add_player_screen.dart';
 import '../features/manager/screens/manager_navigation_screen.dart';
 import '../features/manager/screens/player_profile_screen.dart';
 import '../features/manager/screens/upload_history_screen.dart';
@@ -149,6 +150,14 @@ final routerProvider = Provider<GoRouter>((ref) {
         pageBuilder: (context, state) => goalSightTransitionPage(
           state: state,
           child: const ManagerNavigationScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/manager/add-player',
+        pageBuilder: (context, state) => goalSightTransitionPage(
+          state: state,
+          child: const AddPlayerScreen(),
+          transition: GoalSightPageTransition.modal,
         ),
       ),
       GoRoute(

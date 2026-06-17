@@ -8,7 +8,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/models/player_profile_model.dart';
-import '../features/auth/auth_state.dart';
 import 'app_providers.dart';
 import 'repository_providers.dart';
 
