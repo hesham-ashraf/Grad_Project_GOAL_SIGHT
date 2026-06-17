@@ -32,7 +32,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
   bool _acceptTerms = true;
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
-  UserRole _selectedRole = UserRole.manager;
+  final UserRole _selectedRole = UserRole.fan;
 
   late AnimationController _ctrl;
   late List<Animation<double>> _fades;
@@ -230,94 +230,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                                       }
                                       return null;
                                     },
-                                  ),
-
-                                  SizedBox(height: context.rs(18, min: 12, max: 22)),
-
-                                  // Account type
-                                  Text(
-                                    'Account Type',
-                                    style: AppTextStyles.body(
-                                      color: AppColors.textSecondary,
-                                    ).copyWith(fontWeight: FontWeight.w700, fontSize: 13),
-                                  ),
-                                  SizedBox(height: context.rs(10, min: 6, max: 14)),
-                                  Wrap(
-                                    spacing: 8,
-                                    runSpacing: 8,
-                                    children: UserRole.values.map((role) {
-                                      final selected = _selectedRole == role;
-                                      final label = role == UserRole.fan
-                                          ? 'Fan'
-                                          : role == UserRole.manager
-                                              ? 'Manager'
-                                              : 'Admin';
-                                      final icon = role == UserRole.fan
-                                          ? Icons.sports_soccer_rounded
-                                          : role == UserRole.manager
-                                              ? Icons.analytics_outlined
-                                              : Icons.shield_outlined;
-                                      final color = role == UserRole.fan
-                                          ? AppColors.accentCyan
-                                          : role == UserRole.manager
-                                              ? AppColors.primaryPurple
-                                              : AppColors.accentGreen;
-
-                                      return GestureDetector(
-                                        onTap: () => setState(
-                                          () => _selectedRole = role,
-                                        ),
-                                        child: AnimatedContainer(
-                                          duration: const Duration(
-                                            milliseconds: 200,
-                                          ),
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 14,
-                                            vertical: 10,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: selected
-                                                ? color.withValues(alpha: 0.14)
-                                                : AppColors.surface,
-                                            borderRadius: BorderRadius.circular(
-                                              AppRadius.pill,
-                                            ),
-                                            border: Border.all(
-                                              color: selected
-                                                  ? color.withValues(alpha: 0.5)
-                                                  : AppColors.outline,
-                                              width: selected ? 1.5 : 1.0,
-                                            ),
-                                          ),
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Icon(
-                                                icon,
-                                                color: selected
-                                                    ? color
-                                                    : AppColors.textMuted,
-                                                size: 15,
-                                              ),
-                                              const SizedBox(width: 6),
-                                              Text(
-                                                label,
-                                                style: AppTextStyles.caption(
-                                                  color: selected
-                                                      ? color
-                                                      : AppColors.textMuted,
-                                                ).copyWith(
-                                                  fontWeight: selected
-                                                      ? FontWeight.w700
-                                                      : FontWeight.w500,
-                                                  fontSize: 13,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      );
-                                    }).toList(),
                                   ),
 
                                   SizedBox(height: context.rs(16, min: 10, max: 20)),

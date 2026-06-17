@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart' show PlatformException;
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart'
     show
@@ -150,16 +151,43 @@ class SupabaseAuthRepository implements IAuthRepository {
   Future<UserModel> signInWithGoogle() async {
     const webClientId =
         '1027783536420-dcbglh3k7vsn05dd7k8fessmk4l96qfl.apps.googleusercontent.com';
-    final googleSignIn = GoogleSignIn(serverClientId: webClientId);
-    final googleUser = await googleSignIn.signIn();
+
+    // Step 1: native Google picker
+    GoogleSignInAccount? googleUser;
+    try {
+      final googleSignIn = GoogleSignIn(serverClientId: webClientId);
+      // Disconnect any stale session so the account picker always shows fresh.
+      await googleSignIn.disconnect().catchError((_) {});
+      googleUser = await googleSignIn.signIn();
+    } on PlatformException catch (e) {
+      throw AuthException(
+        'Google sign-in failed at native step (code ${e.code}): ${e.message ?? e.details ?? 'unknown'}',
+      );
+    }
+
     if (googleUser == null) {
       throw const AuthException('Google sign-in cancelled.');
     }
-    final googleAuth = await googleUser.authentication;
+
+    // Step 2: get tokens
+    GoogleSignInAuthentication googleAuth;
+    try {
+      googleAuth = await googleUser.authentication;
+    } on PlatformException catch (e) {
+      throw AuthException(
+        'Google token fetch failed (code ${e.code}): ${e.message ?? 'unknown'}',
+      );
+    }
+
     final idToken = googleAuth.idToken;
     if (idToken == null) {
-      throw const AuthException('Google sign-in failed: no ID token.');
+      throw const AuthException(
+        'Google sign-in failed: no ID token returned. '
+        'Ensure the Web Client ID (serverClientId) is the OAuth 2.0 Web client from your Firebase project.',
+      );
     }
+
+    // Step 3: exchange with Supabase
     final res = await _client.auth.signInWithIdToken(
       provider: OAuthProvider.google,
       idToken: idToken,

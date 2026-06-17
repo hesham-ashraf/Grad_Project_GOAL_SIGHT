@@ -98,13 +98,13 @@ class _OtpInputState extends State<OtpInput> {
       children: List.generate(widget.length, (i) {
         final isFilled = _controllers[i].text.isNotEmpty;
         return Padding(
-          padding: EdgeInsets.symmetric(horizontal: widget.length > 4 ? 5 : 8),
+          padding: EdgeInsets.symmetric(horizontal: widget.length > 4 ? 4 : 8),
           child: KeyboardListener(
             focusNode: FocusNode(skipTraversal: true),
             onKeyEvent: (e) => _onKeyEvent(i, e),
             child: SizedBox(
-              width: 46,
-              height: 56,
+              width: 42,
+              height: 52,
               child: TextFormField(
                 controller: _controllers[i],
                 focusNode: _nodes[i],

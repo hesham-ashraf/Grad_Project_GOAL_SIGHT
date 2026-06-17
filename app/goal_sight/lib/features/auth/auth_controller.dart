@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart' show PlatformException;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' show AuthException;
 
@@ -8,7 +9,23 @@ import 'auth_state.dart';
 /// Maps backend errors to a user-friendly message.
 String _authError(Object error) {
   if (error is AuthException) return error.message;
-  return 'Something went wrong. Please try again.';
+  if (error is PlatformException) {
+    // Google Sign-In native errors — surface the real code so the user knows what failed.
+    final code = error.code;
+    if (code == 'sign_in_canceled' || code == 'sign_in_cancelled') {
+      return 'Sign-in was cancelled.';
+    }
+    if (code == 'network_error') {
+      return 'Network error. Check your connection and try again.';
+    }
+    if (code == '10') {
+      // DEVELOPER_ERROR: SHA-1 fingerprint or OAuth client ID is misconfigured.
+      return 'Google sign-in is misconfigured (error 10). '
+          'Ensure the debug SHA-1 is registered in Firebase and the Supabase Google provider is enabled.';
+    }
+    return 'Google sign-in failed (${error.code}): ${error.message ?? 'unknown error'}';
+  }
+  return 'Something went wrong: ${error.toString()}';
 }
 
 class AuthController extends StateNotifier<AuthState> {
