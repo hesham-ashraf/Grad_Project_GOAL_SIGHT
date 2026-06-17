@@ -255,7 +255,6 @@ class _AddManagerSheet extends ConsumerStatefulWidget {
 
 class _AddManagerSheetState extends ConsumerState<_AddManagerSheet> {
   final _formKey = GlobalKey<FormState>();
-  final _nameCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
   bool _canUpload = true;
   bool _canEditPlayers = true;
@@ -265,7 +264,6 @@ class _AddManagerSheetState extends ConsumerState<_AddManagerSheet> {
 
   @override
   void dispose() {
-    _nameCtrl.dispose();
     _emailCtrl.dispose();
     super.dispose();
   }
@@ -286,26 +284,13 @@ class _AddManagerSheetState extends ConsumerState<_AddManagerSheet> {
 
     try {
       final repo = ref.read(managerRepositoryProvider);
-      final manager = await repo.createManager(ManagerModel(
-        id: '',
-        name: _nameCtrl.text.trim(),
+      final manager = await repo.promoteUserToManager(
         email: _emailCtrl.text.trim(),
-        imageUrl: '',
-        uploadCount: 0,
-        matchesAnalyzed: 0,
-        tacticalRating: 0,
-        lastActive: DateTime.now(),
-        isActive: true,
         clubId: clubId,
-      ));
-      // Apply permission flags immediately.
-      await repo.updatePermissions(
-        manager.id,
         canUpload: _canUpload,
         canEditPlayers: _canEditPlayers,
         canManageStaff: _canManageStaff,
       );
-      // Refresh manager list.
       ref.invalidate(managerListProvider);
       if (mounted) Navigator.of(context).pop(manager);
     } catch (e) {
@@ -355,11 +340,16 @@ class _AddManagerSheetState extends ConsumerState<_AddManagerSheet> {
                       color: AppColors.primaryPurple.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Icon(Icons.person_add_outlined, color: AppColors.primaryPurple, size: 18),
+                    child: const Icon(Icons.manage_accounts_outlined, color: AppColors.primaryPurple, size: 18),
                   ),
                   const SizedBox(width: 10),
-                  Text('Add New Manager', style: AppTextStyles.title(color: Colors.white)),
+                  Text('Promote to Manager', style: AppTextStyles.title(color: Colors.white)),
                 ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'The user must have a GoalSight account. Enter their email to promote them from fan to manager.',
+                style: AppTextStyles.caption(color: AppColors.textMuted),
               ),
               if (_errorMsg != null) ...[
                 const SizedBox(height: 14),
@@ -383,10 +373,7 @@ class _AddManagerSheetState extends ConsumerState<_AddManagerSheet> {
                 ),
               ],
               const SizedBox(height: 20),
-              _Field(ctrl: _nameCtrl, label: 'Full Name', hint: 'e.g. Jose Mourinho', icon: Icons.person_outline,
-                validator: (v) => (v == null || v.trim().length < 2) ? 'Enter a valid name' : null),
-              const SizedBox(height: 12),
-              _Field(ctrl: _emailCtrl, label: 'Email Address', hint: 'jose@club.com', icon: Icons.email_outlined,
+              _Field(ctrl: _emailCtrl, label: 'Fan Email Address', hint: 'user@example.com', icon: Icons.email_outlined,
                 keyboardType: TextInputType.emailAddress,
                 validator: (v) {
                   if (v == null || v.trim().isEmpty) return 'Email is required';
@@ -428,7 +415,7 @@ class _AddManagerSheetState extends ConsumerState<_AddManagerSheet> {
                               width: 18, height: 18,
                               child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                             )
-                          : Text('Add Manager', style: AppTextStyles.button(color: Colors.white)),
+                          : Text('Promote', style: AppTextStyles.button(color: Colors.white)),
                     ),
                   ),
                 ],

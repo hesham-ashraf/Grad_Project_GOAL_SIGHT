@@ -89,6 +89,25 @@ final class SupabaseManagerRepository implements IManagerRepository {
     }).eq('id', id);
   }
 
+  @override
+  Future<ManagerModel> promoteUserToManager({
+    required String email,
+    required String clubId,
+    bool canUpload = true,
+    bool canEditPlayers = true,
+    bool canManageStaff = false,
+  }) async {
+    final result = await _client.rpc('promote_to_manager', params: {
+      'p_email': email.trim(),
+      'p_club_id': clubId,
+      'p_can_upload': canUpload,
+      'p_can_edit_players': canEditPlayers,
+      'p_can_manage_staff': canManageStaff,
+    });
+    final data = result as Map<String, dynamic>;
+    return fetchManagerById(data['id'].toString());
+  }
+
   ManagerModel _mapManager(Map<String, dynamic> r) => ManagerModel(
         id: r['id'].toString(),
         name: (r['name'] ?? '').toString(),

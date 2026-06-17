@@ -15,4 +15,14 @@ abstract interface class IManagerRepository {
     required bool canEditPlayers,
     required bool canManageStaff,
   });
+
+  /// Finds an existing fan by email and promotes them to manager role in the
+  /// given club. Calls the `promote_to_manager` Postgres RPC.
+  Future<ManagerModel> promoteUserToManager({
+    required String email,
+    required String clubId,
+    bool canUpload = true,
+    bool canEditPlayers = true,
+    bool canManageStaff = false,
+  });
 }
