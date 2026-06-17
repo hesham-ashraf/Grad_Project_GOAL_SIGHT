@@ -111,9 +111,16 @@ class _FanNavigationScreenState extends State<FanNavigationScreen>
                 opacity: _fadeAnimation,
                 child: SlideTransition(
                   position: _slideAnimation,
-                  child: IndexedStack(
-                    index: _selectedIndex,
-                    children: _screens,
+                  child: MediaQuery(
+                    data: MediaQuery.of(context).copyWith(
+                      padding: MediaQuery.of(context).padding.copyWith(
+                        bottom: FanBottomNavigationBar.totalHeight(context),
+                      ),
+                    ),
+                    child: IndexedStack(
+                      index: _selectedIndex,
+                      children: _screens,
+                    ),
                   ),
                 ),
               ),

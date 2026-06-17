@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/services/haptic_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
-import '../manager_dashboard_mock_data.dart';
+import '../../../providers/app_providers.dart';
+import '../../../shared/animations/gs_shimmer.dart';
 import '../manager_dashboard_models.dart';
 import '../widgets/insight_card.dart';
 import '../widgets/manager_bottom_navigation_bar.dart';
@@ -12,14 +15,14 @@ import '../widgets/player_card.dart';
 import '../widgets/stat_card.dart';
 import '../widgets/manager_dashboard_advanced_widgets.dart';
 
-class ManagerHomeScreen extends StatefulWidget {
+class ManagerHomeScreen extends ConsumerStatefulWidget {
   const ManagerHomeScreen({super.key});
 
   @override
-  State<ManagerHomeScreen> createState() => _ManagerHomeScreenState();
+  ConsumerState<ManagerHomeScreen> createState() => _ManagerHomeScreenState();
 }
 
-class _ManagerHomeScreenState extends State<ManagerHomeScreen>
+class _ManagerHomeScreenState extends ConsumerState<ManagerHomeScreen>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
 
@@ -37,7 +40,8 @@ class _ManagerHomeScreenState extends State<ManagerHomeScreen>
     if (_refreshing) return;
     setState(() => _refreshing = true);
     await HapticService.refresh();
-    await Future.delayed(const Duration(milliseconds: 900));
+    ref.invalidate(managerDashboardProvider);
+    await Future.delayed(const Duration(milliseconds: 600));
     if (mounted) setState(() => _refreshing = false);
   }
 
@@ -49,15 +53,76 @@ class _ManagerHomeScreenState extends State<ManagerHomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    const data = kManagerDashboardMockData;
-    final stats = data.keyStats;
-    final players = data.topPerformers;
-    final insights = data.insights;
+    final asyncData = ref.watch(managerDashboardProvider);
 
     final horizontalPadding = context.rs(20, min: 14, max: 28);
     final sectionSpacing = context.rs(18, min: 14, max: 24);
     final bottomPadding = ManagerBottomNavigationBar.totalHeight(context) +
         context.rs(10, min: 6, max: 14);
+
+    return asyncData.when(
+      loading: () => Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Padding(
+          padding: EdgeInsets.fromLTRB(
+            horizontalPadding,
+            context.rs(12, min: 10, max: 18),
+            horizontalPadding,
+            bottomPadding,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              GsShimmer.card(height: context.rs(90, min: 80, max: 100), radius: AppRadius.cardLarge.topLeft.x),
+              SizedBox(height: sectionSpacing),
+              Row(children: [
+                Expanded(child: GsShimmer.card(height: context.rs(155, min: 135, max: 175), radius: AppRadius.card.topLeft.x)),
+                SizedBox(width: context.rs(10, min: 8, max: 14)),
+                Expanded(child: GsShimmer.card(height: context.rs(155, min: 135, max: 175), radius: AppRadius.card.topLeft.x)),
+              ]),
+              SizedBox(height: sectionSpacing),
+              GsShimmer.card(height: context.rs(130, min: 115, max: 148)),
+              SizedBox(height: sectionSpacing),
+              GsShimmer.card(height: context.rs(100, min: 88, max: 112)),
+            ],
+          ),
+        ),
+      ),
+      error: (e, _) => Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Center(
+          child: Padding(
+            padding: context.padAll(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.cloud_off_rounded, color: AppColors.textMuted, size: 48),
+                const SizedBox(height: 16),
+                Text(
+                  'Could not load dashboard',
+                  style: AppTextStyles.title(color: AppColors.textPrimary),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  e.toString(),
+                  style: AppTextStyles.caption(color: AppColors.textMuted),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 20),
+                TextButton.icon(
+                  onPressed: () => ref.invalidate(managerDashboardProvider),
+                  icon: const Icon(Icons.refresh_rounded),
+                  label: const Text('Retry'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      data: (data) {
+    final stats = data.keyStats;
+    final players = data.topPerformers;
+    final insights = data.insights;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -108,6 +173,16 @@ class _ManagerHomeScreenState extends State<ManagerHomeScreen>
                     stats: stats,
                   ),
                   SizedBox(height: sectionSpacing),
+
+                  // ── Primary CTA: Upload Match ──
+                  _StaggeredReveal(
+                    controller: _controller,
+                    start: 0.22,
+                    end: 0.42,
+                    child: _UploadMatchCtaBanner(),
+                  ),
+                  SizedBox(height: sectionSpacing),
+
                   _StaggeredReveal(
                     controller: _controller,
                     start: 0.26,
@@ -195,6 +270,72 @@ class _ManagerHomeScreenState extends State<ManagerHomeScreen>
           ),
         ),
       ),
+      ),
+    );
+      }, // end data:
+    ); // end asyncData.when
+  }
+}
+
+// ─── Upload Match CTA Banner ──────────────────────────────────────────────────
+
+class _UploadMatchCtaBanner extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        HapticService.medium();
+        context.push('/manager/upload-match');
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: context.rs(18, min: 14, max: 22),
+          vertical: context.rs(14, min: 12, max: 18),
+        ),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              AppColors.primaryPurple.withValues(alpha: 0.22),
+              AppColors.accentCyan.withValues(alpha: 0.1),
+            ],
+          ),
+          borderRadius: AppRadius.cardLarge,
+          border: Border.all(color: AppColors.primaryPurple.withValues(alpha: 0.35)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 46,
+              height: 46,
+              decoration: const BoxDecoration(
+                gradient: AppGradients.brand,
+                shape: BoxShape.circle,
+                boxShadow: AppShadows.buttonGlow,
+              ),
+              child: const Icon(Icons.upload_file_outlined,
+                  color: Colors.white, size: 22),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Upload New Match',
+                      style: AppTextStyles.title(color: Colors.white)
+                          .copyWith(fontSize: context.sp(15, min: 13, max: 17))),
+                  const SizedBox(height: 2),
+                  Text('Get AI tactical analysis in minutes',
+                      style: AppTextStyles.caption(color: AppColors.textMuted)
+                          .copyWith(fontSize: context.sp(12, min: 10, max: 14))),
+                ],
+              ),
+            ),
+            const Icon(Icons.arrow_forward_ios_rounded,
+                color: AppColors.accentCyan, size: 16),
+          ],
+        ),
       ),
     );
   }

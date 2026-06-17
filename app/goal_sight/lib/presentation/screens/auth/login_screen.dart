@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -240,15 +241,23 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
 
                             SizedBox(height: context.rs(20, min: 14, max: 26)),
 
-                            // Demo login
-                            const AuthDividerLabel(label: 'Quick Demo'),
+                            // Google sign-in
+                            const AuthDividerLabel(label: 'Or continue with'),
                             SizedBox(height: context.rs(14, min: 10, max: 18)),
-                            DemoLoginSection(
-                              loading: loading,
-                              onLogin: _demoLogin,
-                            ),
+                            _GoogleSignInButton(loading: loading),
 
                             SizedBox(height: context.rs(20, min: 14, max: 26)),
+
+                            // Demo login — dev only
+                            if (kDebugMode) ...[
+                              const AuthDividerLabel(label: 'Quick Demo'),
+                              SizedBox(height: context.rs(14, min: 10, max: 18)),
+                              DemoLoginSection(
+                                loading: loading,
+                                onLogin: _demoLogin,
+                              ),
+                              SizedBox(height: context.rs(20, min: 14, max: 26)),
+                            ],
 
                             // Register link
                             Center(
@@ -301,6 +310,79 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+// ─── Google Sign-In Button ────────────────────────────────────────────────────
+
+class _GoogleSignInButton extends ConsumerWidget {
+  const _GoogleSignInButton({required this.loading});
+  final bool loading;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        onPressed: loading
+            ? null
+            : () async {
+                await HapticService.medium();
+                await ref
+                    .read(authControllerProvider.notifier)
+                    .signInWithGoogle();
+              },
+        style: OutlinedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          side: const BorderSide(color: AppColors.outlineSubtle),
+          backgroundColor: AppColors.surfaceElevated.withValues(alpha: 0.5),
+          shape: RoundedRectangleBorder(
+            borderRadius: AppRadius.button,
+          ),
+        ),
+        icon: loading
+            ? const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: AppColors.primaryPurple,
+                ),
+              )
+            : const _GoogleIcon(),
+        label: Text(
+          'Continue with Google',
+          style: AppTextStyles.button(color: AppColors.textPrimary).copyWith(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _GoogleIcon extends StatelessWidget {
+  const _GoogleIcon();
+
+  @override
+  Widget build(BuildContext context) {
+    // Simple "G" colored circle as a stand-in; replace with official SVG asset.
+    return Container(
+      width: 20,
+      height: 20,
+      decoration: const BoxDecoration(shape: BoxShape.circle),
+      child: const Text(
+        'G',
+        style: TextStyle(
+          color: Color(0xFF4285F4),
+          fontSize: 16,
+          fontWeight: FontWeight.w700,
+          height: 1.25,
+        ),
+        textAlign: TextAlign.center,
       ),
     );
   }

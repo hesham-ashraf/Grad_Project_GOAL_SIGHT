@@ -26,7 +26,9 @@ import '../data/repositories/supabase/supabase_storage_repository.dart';
 import '../data/repositories/supabase/supabase_club_repository.dart';
 import '../data/repositories/supabase/supabase_manager_repository.dart';
 import '../data/repositories/supabase/supabase_upload_repository.dart';
+import '../data/repositories/supabase/supabase_notification_repository.dart';
 import '../data/models/upload_job_model.dart';
+import '../data/models/notification_model.dart';
 
 // ── Repository singletons ─────────────────────────────────────────────────
 
@@ -197,3 +199,30 @@ final storedReportsProvider =
   (ref, type) =>
       ref.watch(storageRepositoryProvider).fetchReports(type: type),
 );
+
+// ── Notification providers ────────────────────────────────────────────────
+
+/// Notification repository singleton.
+final notificationRepositoryProvider =
+    Provider<SupabaseNotificationRepository>(
+  (_) => const SupabaseNotificationRepository(),
+);
+
+/// All notifications for the signed-in admin (newest first).
+final notificationsProvider = FutureProvider<List<NotificationModel>>(
+  (ref) => ref.watch(notificationRepositoryProvider).fetchNotifications(),
+);
+
+/// Unread notification count (0 while loading / on error).
+final unreadNotificationCountProvider = Provider<int>((ref) {
+  return ref.watch(notificationsProvider).maybeWhen(
+        data: (list) => list.where((n) => !n.isRead).length,
+        orElse: () => 0,
+      );
+});
+
+/// Realtime stream of notifications (auto-updates on INSERT/UPDATE via Supabase Realtime).
+final notificationsStreamProvider =
+    StreamProvider<List<NotificationModel>>((ref) {
+  return ref.watch(notificationRepositoryProvider).watchNotifications();
+});

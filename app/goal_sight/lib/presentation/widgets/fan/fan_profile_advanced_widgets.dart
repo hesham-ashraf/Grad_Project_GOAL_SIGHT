@@ -1,9 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../core/services/haptic_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
 import '../../../shared/widgets/gs_animated_bar.dart';
 
 // ─── Shared Helpers ───────────────────────────────────────────────────────────
+
+void _showComingSoonSnack(BuildContext context, String feature) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text('$feature — coming soon'),
+      backgroundColor: AppColors.surfaceElevated,
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.md)),
+      duration: const Duration(seconds: 2),
+    ),
+  );
+}
 
 class _GlassCard extends StatelessWidget {
   const _GlassCard(
@@ -1169,25 +1185,67 @@ class AccountManagementCard extends StatelessWidget {
             icon: Icons.edit_rounded,
             label: 'Edit Profile',
             color: AppColors.accentCyan,
-            onTap: () {},
+            onTap: () {
+              HapticService.selection();
+              _showComingSoonSnack(context, 'Edit Profile');
+            },
           ),
           _AccountActionTile(
             icon: Icons.lock_outline_rounded,
             label: 'Change Password',
             color: AppColors.primaryBlue,
-            onTap: () {},
+            onTap: () {
+              HapticService.selection();
+              context.push('/forgot-password');
+            },
           ),
           _AccountActionTile(
             icon: Icons.download_rounded,
             label: 'Export My Data',
             color: AppColors.accentGreen,
-            onTap: () {},
+            onTap: () {
+              HapticService.success();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text('Data export will be emailed to you shortly'),
+                  backgroundColor: AppColors.surfaceElevated,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppRadius.md)),
+                  duration: const Duration(seconds: 3),
+                ),
+              );
+            },
           ),
           _AccountActionTile(
             icon: Icons.help_outline_rounded,
             label: 'Help & Support',
             color: AppColors.textSecondary,
-            onTap: () {},
+            onTap: () {
+              HapticService.selection();
+              showDialog<void>(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  backgroundColor: AppColors.surfaceElevated,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppRadius.lg)),
+                  title: Text('Help & Support',
+                      style: AppTextStyles.title(color: Colors.white)),
+                  content: Text(
+                    'For assistance, email support@goalsight.app\nor visit goalsight.app/help.',
+                    style: AppTextStyles.body(color: AppColors.textSecondary),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(ctx).pop(),
+                      child: Text('Close',
+                          style: AppTextStyles.caption(
+                              color: AppColors.accentCyan)),
+                    ),
+                  ],
+                ),
+              );
+            },
           ),
 
           SizedBox(height: context.rs(8, min: 6, max: 10)),

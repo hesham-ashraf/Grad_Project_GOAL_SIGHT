@@ -1,4 +1,14 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:supabase_flutter/supabase_flutter.dart'
+    show
+        AuthException,
+        OAuthProvider,
+        OtpType,
+        Session,
+        Supabase,
+        SupabaseClient,
+        User,
+        UserAttributes;
 
 import '../../core/constants/app_roles.dart';
 import '../../core/services/secure_storage_service.dart';
@@ -24,11 +34,23 @@ abstract interface class IAuthRepository {
   /// Current access token, or null when signed out.
   Future<String?> getToken();
 
-  /// Sends a password-reset email.
+  /// Sends a password-reset OTP email.
   Future<void> sendPasswordReset(String email);
 
   /// Re-sends the signup confirmation email/OTP.
   Future<void> resendVerification(String email);
+
+  /// Signs in via Google OAuth; returns the authenticated user.
+  Future<UserModel> signInWithGoogle();
+
+  /// Verifies a password-reset OTP and returns a live session.
+  Future<void> verifyPasswordResetOtp({
+    required String email,
+    required String token,
+  });
+
+  /// Updates the authenticated user's password (call after [verifyPasswordResetOtp]).
+  Future<void> updatePassword(String newPassword);
 
   /// Confirms a signup using the emailed OTP [token].
   Future<UserModel> verifyEmailOtp({
@@ -120,7 +142,56 @@ class SupabaseAuthRepository implements IAuthRepository {
 
   @override
   Future<void> sendPasswordReset(String email) {
+    // Uses Supabase's OTP-mode reset (configure "OTP" email template in dashboard).
     return _client.auth.resetPasswordForEmail(email.trim());
+  }
+
+  @override
+  Future<UserModel> signInWithGoogle() async {
+    // TODO: Set the webClientId from your Google Cloud Console OAuth credential.
+    // Enable Google provider in Supabase Dashboard → Auth → Providers → Google.
+    const webClientId =
+        'YOUR_GOOGLE_WEB_CLIENT_ID.apps.googleusercontent.com';
+    final googleSignIn = GoogleSignIn(serverClientId: webClientId);
+    final googleUser = await googleSignIn.signIn();
+    if (googleUser == null) {
+      throw const AuthException('Google sign-in cancelled.');
+    }
+    final googleAuth = await googleUser.authentication;
+    final idToken = googleAuth.idToken;
+    if (idToken == null) {
+      throw const AuthException('Google sign-in failed: no ID token.');
+    }
+    final res = await _client.auth.signInWithIdToken(
+      provider: OAuthProvider.google,
+      idToken: idToken,
+      accessToken: googleAuth.accessToken,
+    );
+    final user = res.user;
+    if (user == null) throw const AuthException('Google sign-in failed.');
+    return _hydrate(user, res.session);
+  }
+
+  @override
+  Future<void> verifyPasswordResetOtp({
+    required String email,
+    required String token,
+  }) async {
+    final res = await _client.auth.verifyOTP(
+      email: email.trim(),
+      token: token.trim(),
+      type: OtpType.recovery,
+    );
+    if (res.user == null) {
+      throw const AuthException('Invalid or expired reset code.');
+    }
+  }
+
+  @override
+  Future<void> updatePassword(String newPassword) async {
+    await _client.auth.updateUser(
+      UserAttributes(password: newPassword),
+    );
   }
 
   @override

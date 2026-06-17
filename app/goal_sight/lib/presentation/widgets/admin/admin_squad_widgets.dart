@@ -9,21 +9,26 @@
 // ---------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../data/models/player_analysis_model.dart';
-import '../../../features/admin/data/admin_mock_data.dart';
+import '../../../providers/app_providers.dart';
 
 // ============================================================================
 // SQUAD CONDITION SUMMARY HEADER
 // ============================================================================
 
-class SquadConditionHeader extends StatelessWidget {
+class SquadConditionHeader extends ConsumerWidget {
   const SquadConditionHeader({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final squad = AdminMockData.squad;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final squad = ref.watch(adminSquadProvider).maybeWhen(
+          data: (s) => s,
+          orElse: () => const <PlayerAnalysisModel>[],
+        );
+    if (squad.isEmpty) return const SizedBox.shrink();
     final avgFatigue = squad.map((p) => p.fatigueLevel).reduce((a, b) => a + b) / squad.length;
     final avgRisk = squad.map((p) => p.injuryRisk).reduce((a, b) => a + b) / squad.length;
     final avgWorkRate = squad.map((p) => p.workRate).reduce((a, b) => a + b) / squad.length;
@@ -132,13 +137,17 @@ class _CondStat extends StatelessWidget {
 // RISK RANKING SECTION
 // ============================================================================
 
-class SquadRiskRankingSection extends StatelessWidget {
+class SquadRiskRankingSection extends ConsumerWidget {
   const SquadRiskRankingSection({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final squad = List<PlayerAnalysisModel>.from(AdminMockData.squad)
-      ..sort((a, b) => b.injuryRisk.compareTo(a.injuryRisk));
+  Widget build(BuildContext context, WidgetRef ref) {
+    final squad = ref.watch(adminSquadProvider).maybeWhen(
+          data: (s) => List<PlayerAnalysisModel>.from(s)
+            ..sort((a, b) => b.injuryRisk.compareTo(a.injuryRisk)),
+          orElse: () => const <PlayerAnalysisModel>[],
+        );
+    if (squad.isEmpty) return const SizedBox.shrink();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -304,13 +313,17 @@ class _RiskRow extends StatelessWidget {
 // TACTICAL CONTRIBUTION SECTION
 // ============================================================================
 
-class SquadTacticalContributionSection extends StatelessWidget {
+class SquadTacticalContributionSection extends ConsumerWidget {
   const SquadTacticalContributionSection({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final squad = List<PlayerAnalysisModel>.from(AdminMockData.squad)
-      ..sort((a, b) => b.tacticalImpact.compareTo(a.tacticalImpact));
+  Widget build(BuildContext context, WidgetRef ref) {
+    final squad = ref.watch(adminSquadProvider).maybeWhen(
+          data: (s) => List<PlayerAnalysisModel>.from(s)
+            ..sort((a, b) => b.tacticalImpact.compareTo(a.tacticalImpact)),
+          orElse: () => const <PlayerAnalysisModel>[],
+        );
+    if (squad.isEmpty) return const SizedBox.shrink();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -396,14 +409,19 @@ class _ContribRow extends StatelessWidget {
 // SQUAD STRENGTHS HEAT GRID
 // ============================================================================
 
-class SquadStrengthsGrid extends StatelessWidget {
+class SquadStrengthsGrid extends ConsumerWidget {
   const SquadStrengthsGrid({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final squad = ref.watch(adminSquadProvider).maybeWhen(
+          data: (s) => s,
+          orElse: () => const <PlayerAnalysisModel>[],
+        );
+    if (squad.isEmpty) return const SizedBox.shrink();
     // Aggregate all strengths
     final Map<String, int> strengthCounts = {};
-    for (final player in AdminMockData.squad) {
+    for (final player in squad) {
       for (final s in player.keyStrengths) {
         strengthCounts[s] = (strengthCounts[s] ?? 0) + 1;
       }
@@ -425,7 +443,7 @@ class SquadStrengthsGrid extends StatelessWidget {
           spacing: 8,
           runSpacing: 8,
           children: sorted.map((e) {
-            final intensity = (e.value / AdminMockData.squad.length).clamp(0.1, 1.0);
+            final intensity = (e.value / squad.length).clamp(0.1, 1.0);
             return Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(

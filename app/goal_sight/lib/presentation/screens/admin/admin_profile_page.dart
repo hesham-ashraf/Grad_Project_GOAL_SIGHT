@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../core/services/haptic_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../providers/app_providers.dart';
 
@@ -47,6 +49,24 @@ class _AdminProfilePageState extends ConsumerState<AdminProfilePage>
     return FadeTransition(opacity: _fades[i], child: SlideTransition(position: _slides[i], child: child));
   }
 
+  void _changePassword() {
+    HapticService.selection();
+    context.push('/forgot-password');
+  }
+
+  void _showComingSoon(String feature) {
+    HapticService.light();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('$feature — coming soon'),
+        backgroundColor: AppColors.surfaceElevated,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -77,13 +97,13 @@ class _AdminProfilePageState extends ConsumerState<AdminProfilePage>
             icon: Icons.shield_outlined,
             color: AppColors.primaryPurple,
             children: [
-              _SettingTile(icon: Icons.shield_outlined, label: 'Club Details', subtitle: 'GoalSight FC — Premier League', color: AppColors.primaryPurple, onTap: () {}),
+              _SettingTile(icon: Icons.shield_outlined, label: 'Club Details', subtitle: 'GoalSight FC — Premier League', color: AppColors.primaryPurple, onTap: () => _showComingSoon('Club Details')),
               _Divider(),
-              _SettingTile(icon: Icons.sports_soccer_outlined, label: 'Season Settings', subtitle: '2024–25 Season', color: AppColors.accentCyan, onTap: () {}),
+              _SettingTile(icon: Icons.sports_soccer_outlined, label: 'Season Settings', subtitle: '2024–25 Season', color: AppColors.accentCyan, onTap: () => _showComingSoon('Season Settings')),
               _Divider(),
-              _SettingTile(icon: Icons.group_outlined, label: 'Staff Directory', subtitle: '6 managers · 2 analysts', color: AppColors.accentGreen, onTap: () {}),
+              _SettingTile(icon: Icons.group_outlined, label: 'Staff Directory', subtitle: '6 managers · 2 analysts', color: AppColors.accentGreen, onTap: () => context.push('/admin/managers')),
               _Divider(),
-              _SettingTile(icon: Icons.workspace_premium_outlined, label: 'Plan & Billing', subtitle: 'Enterprise · Renews Jan 2026', color: AppColors.warning, onTap: () {}),
+              _SettingTile(icon: Icons.workspace_premium_outlined, label: 'Plan & Billing', subtitle: 'Enterprise · Renews Jan 2026', color: AppColors.warning, onTap: () => _showComingSoon('Plan & Billing')),
             ],
           )),
           const SizedBox(height: 16),
@@ -113,11 +133,11 @@ class _AdminProfilePageState extends ConsumerState<AdminProfilePage>
             children: [
               _ToggleTile(icon: Icons.lock_outlined, label: 'Two-Factor Authentication', subtitle: '2FA via Authenticator app', value: _twoFaEnabled, onChanged: (v) => setState(() => _twoFaEnabled = v), color: AppColors.accentGreen),
               _Divider(),
-              _SettingTile(icon: Icons.password_outlined, label: 'Change Password', subtitle: 'Last changed 3 months ago', color: AppColors.accentCyan, onTap: () {}),
+              _SettingTile(icon: Icons.password_outlined, label: 'Change Password', subtitle: 'Last changed 3 months ago', color: AppColors.accentCyan, onTap: _changePassword),
               _Divider(),
-              _SettingTile(icon: Icons.devices_outlined, label: 'Active Sessions', subtitle: '2 devices signed in', color: AppColors.warning, onTap: () {}),
+              _SettingTile(icon: Icons.devices_outlined, label: 'Active Sessions', subtitle: '2 devices signed in', color: AppColors.warning, onTap: () => _showComingSoon('Active Sessions')),
               _Divider(),
-              _SettingTile(icon: Icons.history_outlined, label: 'Login History', subtitle: 'View recent sign-ins', color: AppColors.textMuted, onTap: () {}),
+              _SettingTile(icon: Icons.history_outlined, label: 'Login History', subtitle: 'View recent sign-ins', color: AppColors.textMuted, onTap: () => _showComingSoon('Login History')),
             ],
           )),
           const SizedBox(height: 16),
@@ -130,9 +150,9 @@ class _AdminProfilePageState extends ConsumerState<AdminProfilePage>
                 icon: Icons.palette_outlined,
                 color: AppColors.warning,
                 children: [
-                  _SettingTile(icon: Icons.dark_mode_outlined, label: 'Theme', subtitle: 'Dark Mode Active', color: AppColors.warning, onTap: () {}),
+                  _SettingTile(icon: Icons.dark_mode_outlined, label: 'Theme', subtitle: 'Dark Mode Active', color: AppColors.warning, onTap: () => _showComingSoon('Theme settings')),
                   _Divider(),
-                  _SettingTile(icon: Icons.language_outlined, label: 'Language', subtitle: 'English (UK)', color: AppColors.textMuted, onTap: () {}),
+                  _SettingTile(icon: Icons.language_outlined, label: 'Language', subtitle: 'English (UK)', color: AppColors.textMuted, onTap: () => _showComingSoon('Language settings')),
                 ],
               ),
               const SizedBox(height: 24),

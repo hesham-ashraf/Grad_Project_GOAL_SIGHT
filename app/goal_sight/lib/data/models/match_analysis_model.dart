@@ -250,6 +250,7 @@ class MatchAnalysisModel {
     required this.recommendations,
     this.highlightText,
     this.intensity = 0,
+    this.analyzedVideoUrl,
   });
 
   final String matchId;
@@ -272,6 +273,10 @@ class MatchAnalysisModel {
 
   /// Match intensity score (0–100)
   final int intensity;
+
+  /// Signed URL for the analyzed/annotated video produced by the AI pipeline.
+  /// Null while processing or when no video artifact exists.
+  final String? analyzedVideoUrl;
 
   // ── Derived helpers ────────────────────────────────────────────────────────
 
@@ -320,6 +325,7 @@ class MatchAnalysisModel {
       recommendations: List<String>.from(json['recommendations'] ?? []),
       highlightText: json['highlight_text']?.toString(),
       intensity: (json['intensity'] as num? ?? 0).toInt(),
+      analyzedVideoUrl: json['analyzed_video_url']?.toString(),
     );
   }
 }

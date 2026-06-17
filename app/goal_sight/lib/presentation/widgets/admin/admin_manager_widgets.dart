@@ -13,7 +13,6 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../data/models/manager_model.dart';
-import '../../../features/admin/data/admin_mock_data.dart';
 import '../../../providers/repository_providers.dart';
 
 // ============================================================================
@@ -91,8 +90,6 @@ class EnhancedManagerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final perf = AdminMockData.managerPerformance[manager.id];
-
     return GestureDetector(
       onTap: onTap ?? () => context.push('/admin/managers/${manager.id}'),
       child: Container(
@@ -204,18 +201,13 @@ class EnhancedManagerCard extends StatelessWidget {
                   _MiniDivider(),
                   _MiniStat(
                     icon: Icons.trending_up,
-                    value: perf != null ? '${perf.uploadsThisMonth}' : '—',
-                    label: 'This Month',
+                    value: manager.tacticalRating.toStringAsFixed(1),
+                    label: 'AI Rating',
                     color: AppColors.accentGreen,
                   ),
                 ],
               ),
             ),
-            // Performance trend if available
-            if (perf != null) ...[
-              const SizedBox(height: 10),
-              _MiniTrend(ratings: perf.weeklyRatings),
-            ],
           ],
         ),
       ),
@@ -255,73 +247,4 @@ class _MiniDivider extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(width: 1, height: 28, color: AppColors.outline);
   }
-}
-
-class _MiniTrend extends StatelessWidget {
-  final List<double> ratings;
-  const _MiniTrend({required this.ratings});
-
-  @override
-  Widget build(BuildContext context) {
-    if (ratings.isEmpty) return const SizedBox.shrink();
-    final max = ratings.reduce((a, b) => a > b ? a : b);
-    final min = ratings.reduce((a, b) => a < b ? a : b);
-    final isUp = ratings.last >= ratings.first;
-
-    return Row(
-      children: [
-        Expanded(
-          child: SizedBox(
-            height: 24,
-            child: CustomPaint(
-              painter: _TrendPainter(ratings: ratings, max: max, min: min, color: isUp ? AppColors.accentGreen : AppColors.danger),
-            ),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Icon(isUp ? Icons.trending_up : Icons.trending_down,
-            color: isUp ? AppColors.accentGreen : AppColors.danger, size: 14),
-        const SizedBox(width: 4),
-        Text(
-          isUp ? '+${(ratings.last - ratings.first).toStringAsFixed(1)}' : (ratings.last - ratings.first).toStringAsFixed(1),
-          style: AppTextStyles.caption(color: isUp ? AppColors.accentGreen : AppColors.danger).copyWith(fontSize: 11),
-        ),
-      ],
-    );
-  }
-}
-
-class _TrendPainter extends CustomPainter {
-  final List<double> ratings;
-  final double max;
-  final double min;
-  final Color color;
-  const _TrendPainter({required this.ratings, required this.max, required this.min, required this.color});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    if (ratings.length < 2) return;
-    final range = (max - min).clamp(0.01, double.infinity);
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = 1.5
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round;
-
-    final path = Path();
-    for (int i = 0; i < ratings.length; i++) {
-      final x = (i / (ratings.length - 1)) * size.width;
-      final y = size.height - ((ratings[i] - min) / range) * size.height;
-      if (i == 0) {
-        path.moveTo(x, y);
-      } else {
-        path.lineTo(x, y);
-      }
-    }
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(_TrendPainter old) => old.ratings != ratings;
 }

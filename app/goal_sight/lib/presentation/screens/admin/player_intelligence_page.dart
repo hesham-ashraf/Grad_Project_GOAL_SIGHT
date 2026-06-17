@@ -1,15 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../../features/admin/data/admin_mock_data.dart';
+import '../../../providers/app_providers.dart';
 
-class PlayerIntelligencePage extends StatelessWidget {
+class PlayerIntelligencePage extends ConsumerWidget {
   const PlayerIntelligencePage({super.key, required this.playerId});
   final String playerId;
 
   @override
-  Widget build(BuildContext context) {
-    final player = AdminMockData.squad.firstWhere((p) => p.id == playerId,
-        orElse: () => AdminMockData.squad.first);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final squad = ref.watch(adminSquadProvider).maybeWhen(
+      data: (s) => s,
+      orElse: () => null,
+    );
+    if (squad == null || squad.isEmpty) {
+      return const Scaffold(
+        backgroundColor: AppColors.background,
+        body: Center(child: CircularProgressIndicator(color: AppColors.accentCyan)),
+      );
+    }
+    final player = squad.firstWhere((p) => p.id == playerId, orElse: () => squad.first);
 
     return Scaffold(
       backgroundColor: AppColors.background,

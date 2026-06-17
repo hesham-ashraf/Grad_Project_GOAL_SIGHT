@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../../features/admin/data/admin_mock_data.dart';
 import '../../../data/models/manager_model.dart';
 import '../../../providers/repository_providers.dart';
 
@@ -61,7 +60,6 @@ class _ManagerDetailsPageState extends ConsumerState<ManagerDetailsPage>
       (m) => m.id == widget.managerId,
       orElse: () => managers.first,
     );
-    final perf = AdminMockData.managerPerformance[manager.id];
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -100,34 +98,12 @@ class _ManagerDetailsPageState extends ConsumerState<ManagerDetailsPage>
                   Expanded(child: _StatCard(label: 'Rating', value: manager.tacticalRating.toStringAsFixed(1), icon: Icons.star_outline, color: AppColors.warning)),
                 ],
               ),
-              if (perf != null) ...[
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    Expanded(child: _StatCard(label: 'This Week', value: '${perf.uploadsThisWeek}', icon: Icons.calendar_today_outlined, color: AppColors.accentGreen)),
-                    const SizedBox(width: 10),
-                    Expanded(child: _StatCard(label: 'This Month', value: '${perf.uploadsThisMonth}', icon: Icons.date_range_outlined, color: AppColors.accentCyan)),
-                    const SizedBox(width: 10),
-                    Expanded(child: _StatCard(label: 'Reports', value: '${perf.reportsGenerated}', icon: Icons.summarize_outlined, color: AppColors.primaryPurple)),
-                  ],
-                ),
-              ],
             ],
           )),
           const SizedBox(height: 20),
 
-          // 2 — Performance trend
-          if (perf != null)
-            _reveal(2, _PerformanceTrendCard(record: perf)),
-          const SizedBox(height: 20),
-
-          // 3 — Recent activity
-          if (perf != null)
-            _reveal(3, _ActivityHistoryCard(record: perf)),
-          const SizedBox(height: 20),
-
-          // 4 — Permissions
-          _reveal(4, _PermissionsCard(
+          // 2 — Permissions
+          _reveal(2, _PermissionsCard(
             canUpload: _canUpload,
             canEditPlayers: _canEditPlayers,
             canManageStaff: _canManageStaff,
@@ -295,224 +271,6 @@ class _StatCard extends StatelessWidget {
           const SizedBox(height: 6),
           Text(value, style: AppTextStyles.title(color: Colors.white).copyWith(fontSize: 18)),
           Text(label, style: AppTextStyles.caption(color: AppColors.textMuted).copyWith(fontSize: 10), textAlign: TextAlign.center),
-        ],
-      ),
-    );
-  }
-}
-
-// ─── Performance Trend Card ───────────────────────────────────────────────────
-
-class _PerformanceTrendCard extends StatelessWidget {
-  final ManagerPerformanceRecord record;
-  const _PerformanceTrendCard({required this.record});
-
-  @override
-  Widget build(BuildContext context) {
-    final ratings = record.weeklyRatings;
-    final max = ratings.isNotEmpty ? ratings.reduce((a, b) => a > b ? a : b) : 10.0;
-    final min = ratings.isNotEmpty ? ratings.reduce((a, b) => a < b ? a : b) : 0.0;
-    final avg = ratings.isNotEmpty ? ratings.reduce((a, b) => a + b) / ratings.length : 0.0;
-    final isImproving = ratings.length >= 2 && ratings.last >= ratings.first;
-
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceElevated,
-        borderRadius: BorderRadius.circular(AppRadius.xl),
-        border: Border.all(color: AppColors.accentCyan.withValues(alpha: 0.2)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('Performance Trend', style: AppTextStyles.title(color: Colors.white).copyWith(fontSize: 16)),
-              Row(
-                children: [
-                  Icon(
-                    isImproving ? Icons.trending_up : Icons.trending_down,
-                    color: isImproving ? AppColors.accentGreen : AppColors.danger,
-                    size: 16,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    isImproving ? 'Improving' : 'Declining',
-                    style: AppTextStyles.caption(
-                      color: isImproving ? AppColors.accentGreen : AppColors.danger,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          SizedBox(
-            height: 64,
-            child: CustomPaint(
-              painter: _RatingTrendPainter(
-                ratings: ratings,
-                max: max,
-                min: min,
-                color: isImproving ? AppColors.accentCyan : AppColors.danger,
-              ),
-              size: Size.infinite,
-            ),
-          ),
-          const SizedBox(height: 10),
-          // X labels
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: List.generate(ratings.length, (i) {
-              return Text('W${i + 1}', style: AppTextStyles.caption(color: AppColors.textMuted).copyWith(fontSize: 9));
-            }),
-          ),
-          const SizedBox(height: 14),
-          Row(
-            children: [
-              Expanded(child: _TrendStat(label: 'Peak', value: max.toStringAsFixed(1), color: AppColors.accentGreen)),
-              Expanded(child: _TrendStat(label: 'Average', value: avg.toStringAsFixed(1), color: AppColors.accentCyan)),
-              Expanded(child: _TrendStat(label: 'Lowest', value: min.toStringAsFixed(1), color: AppColors.danger)),
-              Expanded(child: _TrendStat(label: 'Current', value: ratings.last.toStringAsFixed(1), color: AppColors.warning)),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _TrendStat extends StatelessWidget {
-  final String label;
-  final String value;
-  final Color color;
-  const _TrendStat({required this.label, required this.value, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(value, style: AppTextStyles.body(color: color).copyWith(fontWeight: FontWeight.w800)),
-        Text(label, style: AppTextStyles.caption(color: AppColors.textMuted).copyWith(fontSize: 10)),
-      ],
-    );
-  }
-}
-
-class _RatingTrendPainter extends CustomPainter {
-  final List<double> ratings;
-  final double max;
-  final double min;
-  final Color color;
-
-  const _RatingTrendPainter({required this.ratings, required this.max, required this.min, required this.color});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    if (ratings.length < 2) return;
-    final range = (max - min).clamp(0.01, double.infinity);
-
-    final linePaint = Paint()
-      ..color = color
-      ..strokeWidth = 2
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
-
-    final fillPaint = Paint()
-      ..color = color.withValues(alpha: 0.1)
-      ..style = PaintingStyle.fill;
-
-    final points = <Offset>[];
-    for (int i = 0; i < ratings.length; i++) {
-      final x = (i / (ratings.length - 1)) * size.width;
-      final y = size.height - ((ratings[i] - min) / range) * (size.height - 8) - 4;
-      points.add(Offset(x, y));
-    }
-
-    // Fill area
-    final fillPath = Path();
-    fillPath.moveTo(points.first.dx, size.height);
-    for (final p in points) {
-      fillPath.lineTo(p.dx, p.dy);
-    }
-    fillPath.lineTo(points.last.dx, size.height);
-    fillPath.close();
-    canvas.drawPath(fillPath, fillPaint);
-
-    // Line
-    final linePath = Path();
-    linePath.moveTo(points.first.dx, points.first.dy);
-    for (int i = 1; i < points.length; i++) {
-      linePath.lineTo(points[i].dx, points[i].dy);
-    }
-    canvas.drawPath(linePath, linePaint);
-
-    // Dots
-    final dotPaint = Paint()..color = color..style = PaintingStyle.fill;
-    for (final p in points) {
-      canvas.drawCircle(p, 3, dotPaint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(_RatingTrendPainter old) => old.ratings != ratings;
-}
-
-// ─── Activity History Card ────────────────────────────────────────────────────
-
-class _ActivityHistoryCard extends StatelessWidget {
-  final ManagerPerformanceRecord record;
-  const _ActivityHistoryCard({required this.record});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Recent Activity', style: AppTextStyles.title(color: Colors.white).copyWith(fontSize: 16)),
-        const SizedBox(height: 12),
-        Container(
-          decoration: BoxDecoration(
-            color: AppColors.surfaceElevated,
-            borderRadius: BorderRadius.circular(AppRadius.xl),
-            border: Border.all(color: AppColors.outline),
-          ),
-          child: Column(
-            children: record.recentActions.map((action) {
-              return _ActivityRow(action: action);
-            }).toList(),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _ActivityRow extends StatelessWidget {
-  final String action;
-  const _ActivityRow({required this.action});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Row(
-        children: [
-          Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              color: AppColors.primaryPurple.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: const Icon(Icons.history_outlined, color: AppColors.primaryPurple, size: 14),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(action, style: AppTextStyles.caption(color: AppColors.textSecondary).copyWith(fontWeight: FontWeight.w600)),
-          ),
-          const Icon(Icons.chevron_right, color: AppColors.textMuted, size: 16),
         ],
       ),
     );

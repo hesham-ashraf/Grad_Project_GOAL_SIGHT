@@ -29,6 +29,7 @@ class _PlayersScreenState extends ConsumerState<PlayersScreen>
   late List<Animation<Offset>> _slides;
 
   String _selectedPosition = 'All';
+  String _secondaryFilter = 'All'; // All | High Risk | Improving | Declining | Elite
   String _sortMode = 'Rating'; // Rating | Fatigue | Risk
   String _searchQuery = '';
   final _searchCtrl = TextEditingController();
@@ -58,13 +59,53 @@ class _PlayersScreenState extends ConsumerState<PlayersScreen>
     context.push('/manager-player-profile', extra: player);
   }
 
+  // Maps display category → whether a player's position belongs to it.
+  // Positions from Supabase use short codes: GK, CB, LB, RB, CM, DM, CAM, ST, LW, RW, etc.
+  bool _matchesPosition(PlayerProfileModel p, String category) {
+    if (category == 'All') return true;
+    final pos = p.position.toUpperCase();
+    switch (category) {
+      case 'GK':
+        return pos.contains('GK') || pos == 'GOALKEEPER';
+      case 'DEF':
+        return pos.contains('CB') || pos.contains('LB') || pos.contains('RB') ||
+            pos.contains('WB') || pos.startsWith('SW') || pos == 'DEF';
+      case 'MID':
+        return pos.contains('CM') || pos.contains('DM') || pos.contains('CAM') ||
+            pos.contains('CDM') || pos == 'MID';
+      case 'ATT':
+        return pos.contains('ST') || pos.contains('CF') || pos.contains('FW') ||
+            pos.contains('LW') || pos.contains('RW') || pos == 'ATT';
+      default:
+        return true;
+    }
+  }
+
+  bool _matchesSecondary(PlayerProfileModel p, String filter) {
+    switch (filter) {
+      case 'High Risk':
+        return p.fatigue > 75;
+      case 'Improving':
+        return p.trend == PerformanceTrend.improving;
+      case 'Declining':
+        return p.trend == PerformanceTrend.declining;
+      case 'Elite':
+        return p.currentRating >= 8.5;
+      default:
+        return true;
+    }
+  }
+
   List<PlayerProfileModel> _buildFilteredList(List<PlayerProfileModel> allPlayers) {
+    final q = _searchQuery.toLowerCase();
     var list = allPlayers.where((p) {
-      final matchPos = _selectedPosition == 'All' || p.position.contains(_selectedPosition);
-      final matchSearch = _searchQuery.isEmpty ||
-          p.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          p.position.toLowerCase().contains(_searchQuery.toLowerCase());
-      return matchPos && matchSearch;
+      final matchPos = _matchesPosition(p, _selectedPosition);
+      final matchSec = _matchesSecondary(p, _secondaryFilter);
+      final matchSearch = q.isEmpty ||
+          p.name.toLowerCase().contains(q) ||
+          p.position.toLowerCase().contains(q) ||
+          p.status.toLowerCase().contains(q);
+      return matchPos && matchSec && matchSearch;
     }).toList();
 
     switch (_sortMode) {
@@ -73,8 +114,12 @@ class _PlayersScreenState extends ConsumerState<PlayersScreen>
       case 'Fatigue':
         list.sort((a, b) => b.fatigue.compareTo(a.fatigue));
       case 'Risk':
-        // Use fatigue as a proxy for risk
-        list.sort((a, b) => b.fatigue.compareTo(a.fatigue));
+        // Risk = composite of fatigue + declining trend penalty
+        list.sort((a, b) {
+          final riskA = a.fatigue + (a.improvementRate < 0 ? (-a.improvementRate * 0.3) : 0);
+          final riskB = b.fatigue + (b.improvementRate < 0 ? (-b.improvementRate * 0.3) : 0);
+          return riskB.compareTo(riskA);
+        });
     }
     return list;
   }
@@ -268,6 +313,13 @@ class _PlayersScreenState extends ConsumerState<PlayersScreen>
                   )),
                   SizedBox(height: context.rs(8, min: 6, max: 10)),
 
+                  // Secondary filter chips (Risk / Form / Rating tier)
+                  _reveal(1, _SecondaryFilterRow(
+                    selected: _secondaryFilter,
+                    onSelect: (f) => setState(() => _secondaryFilter = f),
+                  )),
+                  SizedBox(height: context.rs(8, min: 6, max: 10)),
+
                   // Sort mode + count indicator
                   _reveal(1, Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -312,7 +364,11 @@ class _PlayersScreenState extends ConsumerState<PlayersScreen>
             // ── Player list ───────────────────────────────────────────────
             Expanded(
               child: _reveal(2, filteredPlayers.isEmpty
-                  ? _EmptyState(query: _searchQuery, position: _selectedPosition)
+                  ? _EmptyState(
+                      query: _searchQuery,
+                      position: _selectedPosition,
+                      secondary: _secondaryFilter,
+                    )
                   : ListView.builder(
                       padding: EdgeInsets.fromLTRB(hPad, 0, hPad, bottomPad),
                       physics: const BouncingScrollPhysics(
@@ -406,6 +462,79 @@ class _PositionFilterRow extends StatelessWidget {
                 style: AppTextStyles.button(
                   color: isSelected ? AppColors.primaryBlue : AppColors.textSecondary,
                 ).copyWith(fontSize: 13),
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+}
+
+// ─── Secondary Filter Row (Risk / Form / Rating tier) ────────────────────────
+
+class _SecondaryFilterRow extends StatelessWidget {
+  final String selected;
+  final ValueChanged<String> onSelect;
+  const _SecondaryFilterRow({required this.selected, required this.onSelect});
+
+  static const _filters = <(String, IconData, Color)>[
+    ('All', Icons.apps_rounded, AppColors.textSecondary),
+    ('High Risk', Icons.local_fire_department_outlined, AppColors.danger),
+    ('Improving', Icons.trending_up, AppColors.accentGreen),
+    ('Declining', Icons.trending_down, AppColors.warning),
+    ('Elite', Icons.star_rounded, AppColors.accentCyan),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      physics: const BouncingScrollPhysics(),
+      child: Row(
+        children: _filters.map(((String label, IconData icon, Color color) rec) {
+          final isSelected = selected == rec.$1;
+          return GestureDetector(
+            onTap: () => onSelect(rec.$1),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              curve: Curves.easeOutCubic,
+              margin: const EdgeInsets.only(right: 8),
+              padding: EdgeInsets.symmetric(
+                horizontal: context.rs(10, min: 8, max: 12),
+                vertical: context.rs(5, min: 4, max: 7),
+              ),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? rec.$3.withValues(alpha: 0.14)
+                    : AppColors.surfaceElevated,
+                border: Border.all(
+                  color: isSelected
+                      ? rec.$3.withValues(alpha: 0.55)
+                      : AppColors.outline.withValues(alpha: 0.3),
+                  width: 1.5,
+                ),
+                borderRadius: AppRadius.chip,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    rec.$2,
+                    size: 12,
+                    color: isSelected ? rec.$3 : AppColors.textMuted,
+                  ),
+                  const SizedBox(width: 5),
+                  Text(
+                    rec.$1,
+                    style: AppTextStyles.caption(
+                      color: isSelected ? rec.$3 : AppColors.textSecondary,
+                    ).copyWith(
+                      fontSize: context.sp(11, min: 10, max: 13),
+                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                    ),
+                  ),
+                ],
               ),
             ),
           );
@@ -598,10 +727,26 @@ class _EnhancedPlayerCard extends StatelessWidget {
 class _EmptyState extends StatelessWidget {
   final String query;
   final String position;
-  const _EmptyState({required this.query, required this.position});
+  final String secondary;
+  const _EmptyState({
+    required this.query,
+    required this.position,
+    required this.secondary,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final String label;
+    if (query.isNotEmpty) {
+      label = 'No results for "$query"';
+    } else if (secondary != 'All') {
+      label = 'No $secondary players${position != 'All' ? ' in $position' : ''}';
+    } else if (position != 'All') {
+      label = 'No $position players found';
+    } else {
+      label = 'No players found';
+    }
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 60),
@@ -610,14 +755,7 @@ class _EmptyState extends StatelessWidget {
           children: [
             const Icon(Icons.person_off_outlined, color: AppColors.textMuted, size: 48),
             const SizedBox(height: 16),
-            Text(
-              query.isNotEmpty
-                  ? 'No results for "$query"'
-                  : position != 'All'
-                      ? 'No $position players found'
-                      : 'No players found',
-              style: AppTextStyles.body(color: AppColors.textSecondary),
-            ),
+            Text(label, style: AppTextStyles.body(color: AppColors.textSecondary)),
             const SizedBox(height: 8),
             Text('Try adjusting your filters', style: AppTextStyles.caption(color: AppColors.textMuted)),
           ],

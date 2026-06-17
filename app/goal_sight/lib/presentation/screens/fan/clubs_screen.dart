@@ -211,7 +211,15 @@ class _ClubsScreenState extends ConsumerState<ClubsScreen>
                       crossAxisSpacing: context.rs(16, min: 12, max: 20),
                       mainAxisSpacing: context.rs(16, min: 12, max: 20),
                     ),
-                    emptyBuilder: (_) => _EmptyClubsState(query: _searchQuery),
+                    emptyBuilder: (_) => _EmptyClubsState(
+                      query: _searchQuery,
+                      onClearSearch: _searchQuery.isNotEmpty
+                          ? () {
+                              HapticService.selection();
+                              _searchController.clear();
+                            }
+                          : null,
+                    ),
                     itemBuilder: (context, club, index) => ClubCard(
                       club: club,
                       onTap: () => context.push('/fan-club-details', extra: club),
@@ -230,9 +238,10 @@ class _ClubsScreenState extends ConsumerState<ClubsScreen>
 // ─── Empty State ─────────────────────────────────────────────────────────────
 
 class _EmptyClubsState extends StatelessWidget {
-  const _EmptyClubsState({required this.query});
+  const _EmptyClubsState({required this.query, this.onClearSearch});
 
   final String query;
+  final VoidCallback? onClearSearch;
 
   @override
   Widget build(BuildContext context) {
@@ -273,6 +282,34 @@ class _EmptyClubsState extends StatelessWidget {
                 fontSize: context.rs(13, min: 12, max: 14),
               ),
               textAlign: TextAlign.center,
+            ),
+            SizedBox(height: context.rs(20, min: 16, max: 24)),
+            GestureDetector(
+              onTap: onClearSearch ?? () {},
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: context.rs(22, min: 18, max: 28),
+                  vertical: context.rs(12, min: 10, max: 14),
+                ),
+                decoration: const BoxDecoration(
+                  gradient: AppGradients.brand,
+                  borderRadius: AppRadius.button,
+                  boxShadow: AppShadows.buttonGlow,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.sports_soccer_outlined,
+                        color: Colors.white, size: 16),
+                    const SizedBox(width: 8),
+                    Text(
+                      query.isNotEmpty ? 'Clear Search' : 'Browse Live Matches',
+                      style: AppTextStyles.button(color: Colors.white)
+                          .copyWith(fontSize: context.sp(13, min: 12, max: 15)),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ),

@@ -17,7 +17,7 @@ final class SupabaseAnalysisRepository implements IAnalysisRepository {
   SupabaseClient get _client => Supabase.instance.client;
 
   static const _columns =
-      '*, team_match_analysis(*), match_player_analysis(*)';
+      '*, team_match_analysis(*), match_player_analysis(*), analysis_artifacts(artifact_type, signed_url)';
 
   @override
   Future<List<MatchAnalysisModel>> fetchAnalyses({String? clubId}) async {
@@ -79,6 +79,14 @@ final class SupabaseAnalysisRepository implements IAnalysisRepository {
         .map((p) => _mapPlayer(p as Map<String, dynamic>))
         .toList();
 
+    // Find the analyzed_video artifact signed URL if present.
+    final artifacts = (row['analysis_artifacts'] as List? ?? const [])
+        .cast<Map<String, dynamic>>();
+    final videoArtifact = artifacts.where(
+      (a) => a['artifact_type'] == 'analyzed_video',
+    ).firstOrNull;
+    final analyzedVideoUrl = videoArtifact?['signed_url']?.toString();
+
     return MatchAnalysisModel(
       matchId: row['id'].toString(),
       homeTeam: (row['home_team_name'] ?? '').toString(),
@@ -89,6 +97,7 @@ final class SupabaseAnalysisRepository implements IAnalysisRepository {
       intensity: (row['intensity'] as num? ?? 0).toInt(),
       highlightText: row['highlight_text']?.toString(),
       recommendations: _stringList(row['recommendations']),
+      analyzedVideoUrl: analyzedVideoUrl,
       summary: MatchSummaryModel(
         dominantTeam: (row['dominant_team'] ?? '').toString(),
         homeAvgRating: (row['home_avg_rating'] as num? ?? 0).toDouble(),

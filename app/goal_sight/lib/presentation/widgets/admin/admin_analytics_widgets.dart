@@ -11,7 +11,34 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
-import '../../../features/admin/data/admin_mock_data.dart';
+
+// Lightweight local model — will be replaced by a Supabase FutureProvider
+// once a `match_week_stats` table is introduced.
+class _PerfTrend {
+  const _PerfTrend({
+    required this.label,
+    required this.possession,
+    required this.pressureIndex,
+    required this.xg,
+    required this.teamRating,
+  });
+  final String label;
+  final double possession;
+  final double pressureIndex;
+  final double xg;
+  final double teamRating;
+}
+
+const _kTrends = [
+  _PerfTrend(label: 'W1', possession: 54, pressureIndex: 72, xg: 1.4, teamRating: 7.6),
+  _PerfTrend(label: 'W2', possession: 58, pressureIndex: 75, xg: 1.8, teamRating: 7.9),
+  _PerfTrend(label: 'W3', possession: 61, pressureIndex: 80, xg: 2.2, teamRating: 8.3),
+  _PerfTrend(label: 'W4', possession: 59, pressureIndex: 78, xg: 1.9, teamRating: 8.0),
+  _PerfTrend(label: 'W5', possession: 63, pressureIndex: 84, xg: 2.4, teamRating: 8.6),
+  _PerfTrend(label: 'W6', possession: 62, pressureIndex: 82, xg: 2.1, teamRating: 8.4),
+  _PerfTrend(label: 'W7', possession: 65, pressureIndex: 86, xg: 2.6, teamRating: 8.8),
+  _PerfTrend(label: 'W8', possession: 66, pressureIndex: 88, xg: 2.8, teamRating: 9.0),
+];
 
 // ============================================================================
 // CLUB TACTICAL EVOLUTION
@@ -22,7 +49,7 @@ class ClubTacticalEvolutionSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final trends = AdminMockData.performanceTrends;
+    const trends = _kTrends;
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -175,7 +202,7 @@ class _TrendValue extends StatelessWidget {
 // ─── Multi-Line Chart Painter ──────────────────────────────────────────────
 
 class _MultiLinePainter extends CustomPainter {
-  final List<ClubPerformanceTrend> trends;
+  final List<_PerfTrend> trends;
   const _MultiLinePainter({required this.trends});
 
   @override

@@ -10,11 +10,13 @@
 // ---------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../data/models/activity_model.dart';
-import '../../../features/admin/data/admin_mock_data.dart';
+import '../../../providers/app_providers.dart';
+import '../../../providers/repository_providers.dart';
 
 // ============================================================================
 // TACTICAL ANALYTICS SECTION
@@ -207,12 +209,15 @@ class _RatingCell extends StatelessWidget {
 // ACTIVITY FEED SECTION
 // ============================================================================
 
-class AdminActivityFeedSection extends StatelessWidget {
+class AdminActivityFeedSection extends ConsumerWidget {
   const AdminActivityFeedSection({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final activities = AdminMockData.recentActivity;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final activities = ref.watch(adminActivityProvider).maybeWhen(
+          data: (list) => list,
+          orElse: () => const <ActivityModel>[],
+        );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -331,12 +336,16 @@ class _ActivityTile extends StatelessWidget {
 // SQUAD CONDITION SECTION
 // ============================================================================
 
-class AdminSquadConditionSection extends StatelessWidget {
+class AdminSquadConditionSection extends ConsumerWidget {
   const AdminSquadConditionSection({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final squad = AdminMockData.squad;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final squad = ref.watch(adminSquadProvider).maybeWhen(
+          data: (s) => s,
+          orElse: () => const [],
+        );
+    if (squad.isEmpty) return const SizedBox.shrink();
     final avgFatigue = squad.map((p) => p.fatigueLevel).reduce((a, b) => a + b) / squad.length;
     final avgRisk = squad.map((p) => p.injuryRisk).reduce((a, b) => a + b) / squad.length;
     final highRiskCount = squad.where((p) => p.injuryRisk > 50).length;
@@ -366,7 +375,7 @@ class AdminSquadConditionSection extends StatelessWidget {
               const SizedBox(width: 10),
               Text('Squad Condition', style: AppTextStyles.title(color: Colors.white).copyWith(fontSize: 16)),
               const Spacer(),
-              _HealthScore(value: squadHealth),
+              _HealthScore(value: squadHealth.toDouble()),
             ],
           ),
           const SizedBox(height: 18),
@@ -626,135 +635,49 @@ class _ActionTile extends StatelessWidget {
 // ALERTS SECTION
 // ============================================================================
 
-class AdminAlertsSection extends StatelessWidget {
+class AdminAlertsSection extends ConsumerWidget {
   const AdminAlertsSection({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final alerts = AdminMockData.alerts;
-    final unreadCount = alerts.where((a) => !a.isRead).length;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final alerts = ref.watch(adminSystemAlertsProvider);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Text('Alerts', style: AppTextStyles.title(color: Colors.white).copyWith(fontSize: 16)),
-            if (unreadCount > 0) ...[
-              const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                decoration: BoxDecoration(
-                  color: AppColors.danger.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(AppRadius.pill),
-                ),
-                child: Text('$unreadCount', style: AppTextStyles.caption(color: AppColors.danger).copyWith(fontWeight: FontWeight.bold)),
-              ),
-            ],
-          ],
-        ),
+        Text('System Status',
+            style: AppTextStyles.title(color: Colors.white).copyWith(fontSize: 16)),
         const SizedBox(height: 12),
-        ...alerts.take(4).map((alert) => _AlertCard(alert: alert)),
+        ...alerts.take(4).map((msg) => _SystemAlertTile(message: msg)),
       ],
     );
   }
 }
 
-class _AlertCard extends StatelessWidget {
-  final AdminAlertModel alert;
-  const _AlertCard({required this.alert});
-
-  Color get _levelColor {
-    switch (alert.level) {
-      case AlertLevel.critical:
-        return AppColors.danger;
-      case AlertLevel.warning:
-        return AppColors.warning;
-      case AlertLevel.info:
-        return AppColors.accentCyan;
-    }
-  }
-
-  IconData get _levelIcon {
-    switch (alert.level) {
-      case AlertLevel.critical:
-        return Icons.error_outline;
-      case AlertLevel.warning:
-        return Icons.warning_amber_outlined;
-      case AlertLevel.info:
-        return Icons.info_outline;
-    }
-  }
-
-  String get _timeAgo {
-    final diff = DateTime.now().difference(alert.timestamp);
-    if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
-    if (diff.inHours < 24) return '${diff.inHours}h ago';
-    return '${diff.inDays}d ago';
-  }
+class _SystemAlertTile extends StatelessWidget {
+  final String message;
+  const _SystemAlertTile({required this.message});
 
   @override
   Widget build(BuildContext context) {
+    final isWarning = message.contains('processing') || message.contains('active');
+    final color = isWarning ? AppColors.warning : AppColors.accentCyan;
+    final icon = isWarning ? Icons.sync_rounded : Icons.check_circle_outline;
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: alert.isRead
-            ? AppColors.surfaceElevated
-            : _levelColor.withValues(alpha: 0.06),
+        color: AppColors.surfaceElevated,
         borderRadius: BorderRadius.circular(AppRadius.lg),
-        border: Border.all(
-          color: alert.isRead
-              ? AppColors.outline
-              : _levelColor.withValues(alpha: 0.35),
-        ),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
-          Container(
-            padding: const EdgeInsets.all(7),
-            decoration: BoxDecoration(
-              color: _levelColor.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(_levelIcon, color: _levelColor, size: 16),
-          ),
+          Icon(icon, color: color, size: 18),
           const SizedBox(width: 12),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        alert.title,
-                        style: AppTextStyles.caption(color: Colors.white)
-                            .copyWith(fontWeight: alert.isRead ? FontWeight.w500 : FontWeight.w700),
-                      ),
-                    ),
-                    if (!alert.isRead)
-                      Container(
-                        width: 7,
-                        height: 7,
-                        decoration: BoxDecoration(
-                          color: _levelColor,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                  ],
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  alert.description,
-                  style: AppTextStyles.caption(color: AppColors.textMuted).copyWith(fontSize: 11),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
+            child: Text(message,
+                style: AppTextStyles.caption(color: AppColors.textSecondary)),
           ),
-          const SizedBox(width: 8),
-          Text(_timeAgo, style: AppTextStyles.caption(color: AppColors.textMuted).copyWith(fontSize: 10)),
         ],
       ),
     );
@@ -765,15 +688,20 @@ class _AlertCard extends StatelessWidget {
 // ADMIN HERO HEADER
 // ============================================================================
 
-class AdminDashboardHero extends StatelessWidget {
+class AdminDashboardHero extends ConsumerWidget {
   const AdminDashboardHero({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final managers = AdminMockData.managers;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final managers = ref.watch(adminManagersProvider);
     final activeManagers = managers.where((m) => m.isActive).length;
-    final squad = AdminMockData.squad;
-    final unreadAlerts = AdminMockData.alerts.where((a) => !a.isRead).length;
+    final squadCount = ref.watch(adminSquadProvider).maybeWhen(
+          data: (s) => s.length,
+          orElse: () => 0,
+        );
+    final overview = ref.watch(adminSystemOverviewProvider);
+    final totalAnalyses = overview.maybeWhen(data: (o) => o.totalMatches, orElse: () => 0);
+    const unreadAlerts = 0; // Task 8: wire to notifications table
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -838,9 +766,9 @@ class AdminDashboardHero extends StatelessWidget {
             children: [
               _HeroStat(value: '$activeManagers/${managers.length}', label: 'Active Managers', icon: Icons.manage_accounts_outlined, color: AppColors.accentCyan),
               _VertDivider(),
-              _HeroStat(value: '${squad.length}', label: 'Players Tracked', icon: Icons.groups_outlined, color: AppColors.primaryPurple),
+              _HeroStat(value: '$squadCount', label: 'Players Tracked', icon: Icons.groups_outlined, color: AppColors.primaryPurple),
               _VertDivider(),
-              const _HeroStat(value: '391', label: 'Total Analyses', icon: Icons.analytics_outlined, color: AppColors.accentGreen),
+              _HeroStat(value: '$totalAnalyses', label: 'Total Analyses', icon: Icons.analytics_outlined, color: AppColors.accentGreen),
             ],
           ),
         ],

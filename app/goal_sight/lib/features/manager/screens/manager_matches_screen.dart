@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/services/haptic_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
 import '../../../data/models/match_analysis_model.dart';
-import '../manager_matches_mock_data.dart';
+import '../../../providers/match_analysis_providers.dart';
 import '../widgets/manager_bottom_navigation_bar.dart';
 import '../widgets/match_card.dart';
 
-class ManagerMatchesScreen extends StatefulWidget {
+class ManagerMatchesScreen extends ConsumerStatefulWidget {
   const ManagerMatchesScreen({super.key});
 
   @override
-  State<ManagerMatchesScreen> createState() => _ManagerMatchesScreenState();
+  ConsumerState<ManagerMatchesScreen> createState() => _ManagerMatchesScreenState();
 }
 
-class _ManagerMatchesScreenState extends State<ManagerMatchesScreen>
+class _ManagerMatchesScreenState extends ConsumerState<ManagerMatchesScreen>
     with SingleTickerProviderStateMixin {
   late final AnimationController _ctrl;
   late final Animation<double> _headerFade;
@@ -61,24 +62,24 @@ class _ManagerMatchesScreenState extends State<ManagerMatchesScreen>
     super.dispose();
   }
 
-  List<MatchAnalysisModel> get _filteredMatches {
-    final list = kManagerMockMatches;
+  List<MatchAnalysisModel> _filteredMatches(List<MatchAnalysisModel> all) {
     if (_filter == 'High Intensity') {
-      return List<MatchAnalysisModel>.from(list)
+      return List<MatchAnalysisModel>.from(all)
         ..sort((a, b) => b.intensity.compareTo(a.intensity));
     }
     if (_filter == 'Best') {
-      return List<MatchAnalysisModel>.from(list)
+      return List<MatchAnalysisModel>.from(all)
         ..sort((a, b) => b.summary.homeAvgRating.compareTo(a.summary.homeAvgRating));
     }
-    return list;
+    return List.from(all.reversed);
   }
 
   Future<void> _handleRefresh() async {
     if (_refreshing) return;
     setState(() => _refreshing = true);
     await HapticService.refresh();
-    await Future.delayed(const Duration(milliseconds: 800));
+    ref.invalidate(mockAnalysisMatchesProvider);
+    await Future.delayed(const Duration(milliseconds: 600));
     if (mounted) setState(() => _refreshing = false);
   }
 
@@ -95,7 +96,8 @@ class _ManagerMatchesScreenState extends State<ManagerMatchesScreen>
 
   @override
   Widget build(BuildContext context) {
-    final matches = _filteredMatches;
+    final allMatches = ref.watch(mockAnalysisMatchesProvider);
+    final matches = _filteredMatches(allMatches);
     final hPad = context.rs(20, min: 16, max: 28);
     final bottomPad = ManagerBottomNavigationBar.totalHeight(context) +
         context.rs(10, min: 6, max: 14);
@@ -274,31 +276,102 @@ class _ManagerMatchesScreenState extends State<ManagerMatchesScreen>
             Expanded(
               child: FadeTransition(
                 opacity: _listFade,
-                child: RefreshIndicator(
-                  onRefresh: _handleRefresh,
-                  color: AppColors.accentCyan,
-                  backgroundColor: AppColors.surface,
-                  strokeWidth: 2.5,
-                  child: ListView.builder(
-                    padding: EdgeInsets.fromLTRB(hPad, 0, hPad, bottomPad),
-                    physics: const BouncingScrollPhysics(
-                      parent: AlwaysScrollableScrollPhysics(),
-                    ),
-                    itemCount: matches.length,
-                    itemBuilder: (context, index) {
-                      final item = matches[index];
-                      final isRecent = index == 0 && _filter == 'Recent';
-                      return _AnimatedMatchCard(
-                        key: ValueKey('${item.matchId}_$_filter'),
-                        delay: Duration(milliseconds: 50 * index),
-                        child: MatchCard(
-                          match: item,
-                          isRecent: isRecent,
-                          onTap: () => _openAnalysis(item),
+                child: matches.isEmpty
+                    ? _MatchesEmptyState(
+                        onUpload: () {
+                          HapticService.selection();
+                          context.push('/manager/upload-match');
+                        },
+                      )
+                    : RefreshIndicator(
+                        onRefresh: _handleRefresh,
+                        color: AppColors.accentCyan,
+                        backgroundColor: AppColors.surface,
+                        strokeWidth: 2.5,
+                        child: ListView.builder(
+                          padding: EdgeInsets.fromLTRB(hPad, 0, hPad, bottomPad),
+                          physics: const BouncingScrollPhysics(
+                            parent: AlwaysScrollableScrollPhysics(),
+                          ),
+                          itemCount: matches.length,
+                          itemBuilder: (context, index) {
+                            final item = matches[index];
+                            final isRecent = index == 0 && _filter == 'Recent';
+                            return _AnimatedMatchCard(
+                              key: ValueKey('${item.matchId}_$_filter'),
+                              delay: Duration(milliseconds: 50 * index),
+                              child: MatchCard(
+                                match: item,
+                                isRecent: isRecent,
+                                onTap: () => _openAnalysis(item),
+                              ),
+                            );
+                          },
                         ),
-                      );
-                    },
-                  ),
+                      ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Matches empty state ───────────────────────────────────────────────────────
+
+class _MatchesEmptyState extends StatelessWidget {
+  const _MatchesEmptyState({required this.onUpload});
+  final VoidCallback onUpload;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                gradient: AppGradients.brand,
+                shape: BoxShape.circle,
+                boxShadow: AppShadows.buttonGlow,
+              ),
+              child: const Icon(Icons.sports_soccer_outlined,
+                  color: Colors.white, size: 36),
+            ),
+            const SizedBox(height: 20),
+            Text('No matches yet',
+                style: AppTextStyles.title(color: Colors.white)
+                    .copyWith(fontSize: 20)),
+            const SizedBox(height: 8),
+            Text(
+              'Upload your first match video and let\nGoalSight AI generate tactical insights.',
+              style: AppTextStyles.body(color: AppColors.textSecondary),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            GestureDetector(
+              onTap: onUpload,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+                decoration: const BoxDecoration(
+                  gradient: AppGradients.brand,
+                  borderRadius: AppRadius.button,
+                  boxShadow: AppShadows.buttonGlow,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.upload_file_outlined,
+                        color: Colors.white, size: 18),
+                    const SizedBox(width: 8),
+                    Text('Upload First Match',
+                        style: AppTextStyles.button(color: Colors.white)),
+                  ],
                 ),
               ),
             ),

@@ -1,10 +1,12 @@
 ﻿import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/services/haptic_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
 import '../../../data/models/match_analysis_model.dart';
 import '../../widgets/fan/analysis_widgets.dart';
+import '../../widgets/fan/analyzed_video_card.dart';
 import '../../widgets/fan/match_tactical_widgets.dart';
 
 class MatchAnalysisScreen extends StatefulWidget {
@@ -21,7 +23,7 @@ class _MatchAnalysisScreenState extends State<MatchAnalysisScreen>
   late final List<Animation<double>> _fades;
   late final List<Animation<Offset>> _slides;
 
-  static const int _sectionCount = 18;
+  static const int _sectionCount = 20;
 
   @override
   void initState() {
@@ -78,83 +80,91 @@ class _MatchAnalysisScreenState extends State<MatchAnalysisScreen>
             _section(0, AnalysisOverviewCard(match: match)),
             SizedBox(height: h),
 
-            // ── 1. Tactical Summary ──────────────────────────────────────
-            _section(1, TacticalSummaryCard(match: match)),
+            // ── 1. Analyzed Video ────────────────────────────────────────
+            _section(1, AnalyzedVideoCard(videoUrl: match.analyzedVideoUrl)),
             SizedBox(height: h),
 
-            // ── 2. Key Moments ───────────────────────────────────────────
+            // ── 2. Tactical Summary ──────────────────────────────────────
+            _section(2, TacticalSummaryCard(match: match)),
+            SizedBox(height: h),
+
+            // ── 3. Key Moments ───────────────────────────────────────────
             if (match.summary.keyMoments.isNotEmpty) ...[
-              _section(2, KeyMomentsCard(moments: match.summary.keyMoments)),
+              _section(3, KeyMomentsCard(moments: match.summary.keyMoments)),
               SizedBox(height: h),
             ],
 
-            // ── 3. Team Comparison ───────────────────────────────────────
-            _section(3, TeamComparisonCard(match: match)),
+            // ── 4. Team Comparison ───────────────────────────────────────
+            _section(4, TeamComparisonCard(match: match)),
             SizedBox(height: h),
 
-            // ── 4. Possession Charts ─────────────────────────────────────
-            _section(4, PossessionChartCard(match: match)),
+            // ── 5. Possession Charts ─────────────────────────────────────
+            _section(5, PossessionChartCard(match: match)),
             SizedBox(height: h),
 
-            // ── 5. Momentum Graph ────────────────────────────────────────
-            _section(5, MomentumGraphCard(match: match)),
+            // ── 6. Momentum Graph ────────────────────────────────────────
+            _section(6, MomentumGraphCard(match: match)),
             SizedBox(height: h),
 
-            // ── 6. Key Performers ────────────────────────────────────────
+            // ── 7. Key Performers ────────────────────────────────────────
             if (match.motm != null || match.worstPlayer != null) ...[
-              _section(6,
+              _section(7,
                   KeyPerformerRow(motm: match.motm, worst: match.worstPlayer)),
               SizedBox(height: h),
             ],
 
-            // ── 7. Tactical Strengths ────────────────────────────────────
-            _section(7, TacticalStrengthsCard(match: match)),
+            // ── 8. Tactical Strengths ────────────────────────────────────
+            _section(8, TacticalStrengthsCard(match: match)),
             SizedBox(height: h),
 
-            // ── 8. Tactical Weaknesses ───────────────────────────────────
-            _section(8, TacticalWeaknessesCard(match: match)),
+            // ── 9. Tactical Weaknesses ───────────────────────────────────
+            _section(9, TacticalWeaknessesCard(match: match)),
             SizedBox(height: h),
 
-            // ── 9. Attack Zones ──────────────────────────────────────────
-            _section(9, AttackZonesCard(match: match)),
+            // ── 10. Attack Zones ─────────────────────────────────────────
+            _section(10, AttackZonesCard(match: match)),
             SizedBox(height: h),
 
-            // ── 10. Formation Visualization ──────────────────────────────
-            _section(10, FormationCard(match: match)),
+            // ── 11. Formation Visualization ──────────────────────────────
+            _section(11, FormationCard(match: match)),
             SizedBox(height: h),
 
-            // ── 11. Heatmaps ─────────────────────────────────────────────
-            _section(11, HeatmapCard(match: match)),
+            // ── 12. Heatmaps ─────────────────────────────────────────────
+            _section(12, HeatmapCard(match: match)),
             SizedBox(height: h),
 
-            // ── 12. Bird-Eye View ────────────────────────────────────────
-            _section(12, BirdEyeCard(match: match)),
+            // ── 13. Bird-Eye View ────────────────────────────────────────
+            _section(13, BirdEyeCard(match: match)),
             SizedBox(height: h),
 
-            // ── 13. Player Impact ────────────────────────────────────────
-            _section(13, PlayerImpactCard(players: match.players)),
+            // ── 14. Player Impact ────────────────────────────────────────
+            _section(14, PlayerImpactCard(players: match.players)),
             SizedBox(height: h),
 
-            // ── 14. Fatigue Analysis ─────────────────────────────────────
-            _section(14, FatigueAnalysisCard(players: match.players)),
+            // ── 15. Fatigue Analysis ─────────────────────────────────────
+            _section(15, FatigueAnalysisCard(players: match.players)),
             SizedBox(height: h),
 
-            // ── 15. Risk Analysis ────────────────────────────────────────
-            _section(15,
+            // ── 16. Risk Analysis ────────────────────────────────────────
+            _section(16,
                 RiskAnalysisCard(players: match.players, match: match)),
             SizedBox(height: h),
 
-            // ── 16. Tactical Analysis (existing) ────────────────────────
-            _section(16, TacticalAnalysisCard(match: match)),
+            // ── 17. Tactical Analysis ────────────────────────────────────
+            _section(17, TacticalAnalysisCard(match: match)),
             SizedBox(height: h),
 
-            // ── 17. AI Insights ──────────────────────────────────────────
-            _section(17, AIInsightsCard(match: match)),
+            // ── 18. AI Insights ──────────────────────────────────────────
+            _section(18, AIInsightsCard(match: match)),
             SizedBox(height: h),
 
             // ── Coach Recommendations ────────────────────────────────────
             if (match.recommendations.isNotEmpty)
               CoachRecommendationsCard(recommendations: match.recommendations),
+            SizedBox(height: h),
+
+            // ── 19. Share CTA ─────────────────────────────────────────────
+            _section(19, _ShareAnalysisCta(match: match)),
             SizedBox(height: h),
 
             // ── Player Ratings ───────────────────────────────────────────
@@ -247,6 +257,137 @@ class _MatchAnalysisScreenState extends State<MatchAnalysisScreen>
           ),
         ),
       ],
+    );
+  }
+}
+
+// ─── Share Analysis CTA ───────────────────────────────────────────────────────
+
+class _ShareAnalysisCta extends StatelessWidget {
+  const _ShareAnalysisCta({required this.match});
+  final MatchAnalysisModel match;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(context.rs(20, min: 16, max: 24)),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF1A1040), Color(0xFF0D1E30)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: AppRadius.cardLarge,
+        border: Border.all(color: AppColors.outlineSubtle),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: const BoxDecoration(
+                  gradient: AppGradients.brand,
+                  shape: BoxShape.circle,
+                  boxShadow: AppShadows.buttonGlow,
+                ),
+                child: const Icon(Icons.share_outlined, color: Colors.white, size: 20),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Share Analysis',
+                        style: AppTextStyles.title(color: AppColors.textPrimary)
+                            .copyWith(fontSize: context.sp(14, min: 13, max: 16))),
+                    Text('Share this match report with your team',
+                        style: AppTextStyles.caption(color: AppColors.textSecondary)
+                            .copyWith(fontSize: context.sp(12, min: 11, max: 13))),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: context.rs(16, min: 12, max: 20)),
+          Row(
+            children: [
+              Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    HapticService.success();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Text('Report link copied to clipboard'),
+                        backgroundColor: AppColors.surfaceElevated,
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(AppRadius.md)),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    padding: EdgeInsets.symmetric(vertical: context.rs(12, min: 10, max: 14)),
+                    decoration: const BoxDecoration(
+                      gradient: AppGradients.brand,
+                      borderRadius: AppRadius.button,
+                      boxShadow: AppShadows.buttonGlow,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.copy_rounded, color: Colors.white, size: 16),
+                        const SizedBox(width: 6),
+                        Text('Copy Link',
+                            style: AppTextStyles.button(color: Colors.white)
+                                .copyWith(fontSize: context.sp(13, min: 12, max: 14))),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    HapticService.medium();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Text('PDF export — coming soon'),
+                        backgroundColor: AppColors.surfaceElevated,
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(AppRadius.md)),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    padding: EdgeInsets.symmetric(vertical: context.rs(12, min: 10, max: 14)),
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceElevated,
+                      borderRadius: AppRadius.button,
+                      border: Border.all(color: AppColors.outlineSubtle),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.picture_as_pdf_outlined,
+                            color: AppColors.textSecondary, size: 16),
+                        const SizedBox(width: 6),
+                        Text('Export PDF',
+                            style: AppTextStyles.button(color: AppColors.textSecondary)
+                                .copyWith(fontSize: context.sp(13, min: 12, max: 14))),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

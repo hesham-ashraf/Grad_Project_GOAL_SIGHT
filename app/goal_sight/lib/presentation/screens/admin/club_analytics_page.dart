@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
-import '../../../features/admin/data/admin_mock_data.dart';
 import '../../widgets/admin/tactical_insight_widget.dart';
 import '../../widgets/admin/admin_analytics_widgets.dart';
+import '../../../providers/app_providers.dart';
 
-class ClubAnalyticsPage extends StatefulWidget {
+class ClubAnalyticsPage extends ConsumerStatefulWidget {
   const ClubAnalyticsPage({super.key});
 
   @override
-  State<ClubAnalyticsPage> createState() => _ClubAnalyticsPageState();
+  ConsumerState<ClubAnalyticsPage> createState() => _ClubAnalyticsPageState();
 }
 
-class _ClubAnalyticsPageState extends State<ClubAnalyticsPage>
+class _ClubAnalyticsPageState extends ConsumerState<ClubAnalyticsPage>
     with SingleTickerProviderStateMixin {
   late AnimationController _ctrl;
   late List<Animation<double>> _fades;
@@ -43,7 +44,10 @@ class _ClubAnalyticsPageState extends State<ClubAnalyticsPage>
 
   @override
   Widget build(BuildContext context) {
-    final insights = AdminMockData.tacticalInsights;
+    final insights = ref.watch(adminTacticalInsightsProvider).maybeWhen(
+      data: (list) => list,
+      orElse: () => const [],
+    );
 
     return Scaffold(
       backgroundColor: Colors.transparent,

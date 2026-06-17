@@ -6,6 +6,7 @@ import '../features/auth/auth_state.dart';
 import '../features/manager/screens/manager_navigation_screen.dart';
 import '../features/manager/screens/player_profile_screen.dart';
 import '../features/manager/screens/upload_history_screen.dart';
+import '../features/manager/screens/upload_match_screen.dart';
 import '../data/models/club_model.dart';
 import '../data/models/match_analysis_model.dart';
 import '../data/models/player_profile_model.dart';
@@ -16,6 +17,7 @@ import '../../presentation/screens/auth/register_screen.dart';
 import '../../presentation/screens/admin/admin_navigation_screen.dart';
 import '../../presentation/screens/admin/manager_details_page.dart';
 import '../../presentation/screens/admin/player_intelligence_page.dart';
+import '../../presentation/screens/admin/admin_notifications_page.dart';
 import '../../presentation/screens/auth/email_verification_screen.dart';
 import '../../presentation/screens/auth/forgot_password_screen.dart';
 import '../../presentation/screens/fan/club_details_screen.dart';
@@ -158,6 +160,14 @@ final routerProvider = Provider<GoRouter>((ref) {
         ),
       ),
       GoRoute(
+        path: '/manager/upload-match',
+        pageBuilder: (context, state) => goalSightTransitionPage(
+          state: state,
+          child: const UploadMatchScreen(),
+          transition: GoalSightPageTransition.slideLeft,
+        ),
+      ),
+      GoRoute(
         path: '/fan',
         pageBuilder: (context, state) => goalSightTransitionPage(
           state: state,
@@ -225,6 +235,14 @@ final routerProvider = Provider<GoRouter>((ref) {
             transition: GoalSightPageTransition.slideLeft,
           );
         },
+      ),
+      GoRoute(
+        path: '/admin/notifications',
+        pageBuilder: (context, state) => goalSightTransitionPage(
+          state: state,
+          child: const AdminNotificationsPage(),
+          transition: GoalSightPageTransition.slideLeft,
+        ),
       ),
       GoRoute(
         path: '/fan-match-analysis',

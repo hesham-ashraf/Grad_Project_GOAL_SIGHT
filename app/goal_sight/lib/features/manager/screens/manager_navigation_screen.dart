@@ -111,9 +111,16 @@ class _ManagerNavigationScreenState extends State<ManagerNavigationScreen>
                 opacity: _fadeAnimation,
                 child: SlideTransition(
                   position: _slideAnimation,
-                  child: IndexedStack(
-                    index: _selectedIndex,
-                    children: _screens,
+                  child: MediaQuery(
+                    data: MediaQuery.of(context).copyWith(
+                      padding: MediaQuery.of(context).padding.copyWith(
+                        bottom: ManagerBottomNavigationBar.totalHeight(context),
+                      ),
+                    ),
+                    child: IndexedStack(
+                      index: _selectedIndex,
+                      children: _screens,
+                    ),
                   ),
                 ),
               ),

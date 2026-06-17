@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../core/services/haptic_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
 import '../../../providers/app_providers.dart';
@@ -58,6 +60,50 @@ class _ManagerProfileScreenState extends ConsumerState<ManagerProfileScreen>
         child: SlideTransition(position: _slides[i], child: child),
       );
 
+  void _changePassword() {
+    HapticService.selection();
+    context.push('/forgot-password');
+  }
+
+  void _showComingSoon(String feature) {
+    HapticService.light();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('$feature — coming soon'),
+        backgroundColor: AppColors.surfaceElevated,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadius.md)),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _showHelp() {
+    HapticService.selection();
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surfaceElevated,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadius.lg)),
+        title: Text('Help & Support',
+            style: AppTextStyles.title(color: Colors.white)),
+        content: Text(
+          'For assistance, email support@goalsight.app\nor visit goalsight.app/help.',
+          style: AppTextStyles.body(color: AppColors.textSecondary),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text('Close',
+                style: AppTextStyles.caption(color: AppColors.accentCyan)),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authControllerProvider);
@@ -106,7 +152,12 @@ class _ManagerProfileScreenState extends ConsumerState<ManagerProfileScreen>
                   SizedBox(height: context.rs(18, min: 14, max: 24)),
 
                   // ── 3. Tools & Settings ────────────────────────────────────
-                  _section(3, const _ToolsCard()),
+                  _section(3, _ToolsCard(
+                    onEditProfile: () => _showComingSoon('Edit Profile'),
+                    onNotificationSettings: () => _showComingSoon('Notification Settings'),
+                    onChangePassword: _changePassword,
+                    onHelp: _showHelp,
+                  )),
 
                   SizedBox(height: context.rs(18, min: 14, max: 24)),
 
@@ -343,7 +394,17 @@ class _AccountDetailsCard extends StatelessWidget {
 // ─── Tools Card ──────────────────────────────────────────────────────────────
 
 class _ToolsCard extends StatelessWidget {
-  const _ToolsCard();
+  const _ToolsCard({
+    required this.onEditProfile,
+    required this.onNotificationSettings,
+    required this.onChangePassword,
+    required this.onHelp,
+  });
+
+  final VoidCallback onEditProfile;
+  final VoidCallback onNotificationSettings;
+  final VoidCallback onChangePassword;
+  final VoidCallback onHelp;
 
   @override
   Widget build(BuildContext context) {
@@ -355,17 +416,22 @@ class _ToolsCard extends StatelessWidget {
         _ActionRow(
           icon: Icons.edit_outlined,
           label: 'Edit Profile',
-          onTap: () {},
+          onTap: onEditProfile,
         ),
         _ActionRow(
           icon: Icons.notifications_outlined,
           label: 'Notification Settings',
-          onTap: () {},
+          onTap: onNotificationSettings,
+        ),
+        _ActionRow(
+          icon: Icons.password_outlined,
+          label: 'Change Password',
+          onTap: onChangePassword,
         ),
         _ActionRow(
           icon: Icons.help_outline_rounded,
           label: 'Help & Support',
-          onTap: () {},
+          onTap: onHelp,
         ),
       ],
     );

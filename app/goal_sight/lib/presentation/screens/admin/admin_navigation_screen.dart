@@ -113,9 +113,16 @@ class _AdminNavigationScreenState extends State<AdminNavigationScreen>
                 opacity: _fadeAnimation,
                 child: SlideTransition(
                   position: _slideAnimation,
-                  child: IndexedStack(
-                    index: _selectedIndex,
-                    children: _screens,
+                  child: MediaQuery(
+                    data: MediaQuery.of(context).copyWith(
+                      padding: MediaQuery.of(context).padding.copyWith(
+                        bottom: AdminBottomNavigationBar.totalHeight(context),
+                      ),
+                    ),
+                    child: IndexedStack(
+                      index: _selectedIndex,
+                      children: _screens,
+                    ),
                   ),
                 ),
               ),

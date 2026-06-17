@@ -6,6 +6,7 @@ enum AuthStatus {
   authenticated,
   unauthenticated,
   emailVerificationRequired,
+  passwordResetOtpVerified, // OTP verified; user should now set a new password
   error,
 }
 

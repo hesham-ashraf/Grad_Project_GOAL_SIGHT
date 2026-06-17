@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/services/haptic_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
 import '../../widgets/admin/admin_dashboard_widgets.dart';
 import '../../widgets/admin/tactical_insight_widget.dart';
-import '../../../features/admin/data/admin_mock_data.dart';
+import '../../../providers/app_providers.dart';
+import '../../../providers/repository_providers.dart';
 
-class AdminHomeDashboard extends StatefulWidget {
+class AdminHomeDashboard extends ConsumerStatefulWidget {
   const AdminHomeDashboard({super.key});
 
   @override
-  State<AdminHomeDashboard> createState() => _AdminHomeDashboardState();
+  ConsumerState<AdminHomeDashboard> createState() => _AdminHomeDashboardState();
 }
 
-class _AdminHomeDashboardState extends State<AdminHomeDashboard>
+class _AdminHomeDashboardState extends ConsumerState<AdminHomeDashboard>
     with SingleTickerProviderStateMixin {
   late AnimationController _ctrl;
   late List<Animation<double>> _fades;
@@ -68,7 +71,10 @@ class _AdminHomeDashboardState extends State<AdminHomeDashboard>
 
   @override
   Widget build(BuildContext context) {
-    final insights = AdminMockData.tacticalInsights;
+    final insights = ref.watch(adminTacticalInsightsProvider).maybeWhen(
+      data: (list) => list,
+      orElse: () => const [],
+    );
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -87,26 +93,7 @@ class _AdminHomeDashboardState extends State<AdminHomeDashboard>
         foregroundColor: Colors.white,
         elevation: 0,
         actions: [
-          Stack(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.notifications_outlined),
-                onPressed: () {},
-              ),
-              Positioned(
-                right: 10,
-                top: 10,
-                child: Container(
-                  width: 8,
-                  height: 8,
-                  decoration: const BoxDecoration(
-                    color: AppColors.danger,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-              ),
-            ],
-          ),
+          _NotificationBell(),
         ],
       ),
       body: RefreshIndicator(
@@ -195,6 +182,48 @@ class _AdminHomeDashboardState extends State<AdminHomeDashboard>
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (_) => const _AddManagerSheet(),
+    );
+  }
+}
+
+// ─── Notification Bell ────────────────────────────────────────────────────────
+
+class _NotificationBell extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final unread = ref.watch(unreadNotificationCountProvider);
+    return Stack(
+      children: [
+        IconButton(
+          icon: const Icon(Icons.notifications_outlined),
+          onPressed: () {
+            HapticService.selection();
+            context.push('/admin/notifications');
+          },
+        ),
+        if (unread > 0)
+          Positioned(
+            right: 8,
+            top: 8,
+            child: Container(
+              constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              decoration: const BoxDecoration(
+                color: AppColors.danger,
+                shape: BoxShape.circle,
+              ),
+              child: Text(
+                unread > 99 ? '99+' : '$unread',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 9,
+                  fontWeight: FontWeight.w800,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

@@ -126,6 +126,60 @@ class AuthController extends StateNotifier<AuthState> {
     }
   }
 
+  Future<void> signInWithGoogle() async {
+    state = state.copyWith(status: AuthStatus.loading, clearError: true);
+    try {
+      final user = await _authRepository.signInWithGoogle();
+      final token = await _authRepository.getToken();
+      state = state.copyWith(
+        status: AuthStatus.authenticated,
+        user: user,
+        token: token,
+        clearError: true,
+      );
+    } catch (error) {
+      state = state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: _authError(error),
+      );
+    }
+  }
+
+  Future<void> verifyPasswordResetOtp({
+    required String email,
+    required String token,
+  }) async {
+    state = state.copyWith(status: AuthStatus.loading, clearError: true);
+    try {
+      await _authRepository.verifyPasswordResetOtp(email: email, token: token);
+      // Keep email in state so the next step (update password) knows the address.
+      state = state.copyWith(
+        status: AuthStatus.passwordResetOtpVerified,
+        clearError: true,
+      );
+    } catch (error) {
+      state = state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: _authError(error),
+      );
+    }
+  }
+
+  Future<void> updatePassword(String newPassword) async {
+    state = state.copyWith(status: AuthStatus.loading, clearError: true);
+    try {
+      await _authRepository.updatePassword(newPassword);
+      // After password update, sign out so the user logs in fresh.
+      await _authRepository.logout();
+      state = const AuthState(status: AuthStatus.unauthenticated);
+    } catch (error) {
+      state = state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: _authError(error),
+      );
+    }
+  }
+
   Future<void> resendVerificationEmail() async {
     final email = state.user?.email;
     if (email == null || email.isEmpty) return;
