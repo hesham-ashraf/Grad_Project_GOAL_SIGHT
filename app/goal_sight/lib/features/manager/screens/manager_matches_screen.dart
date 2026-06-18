@@ -7,6 +7,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
 import '../../../data/models/match_analysis_model.dart';
 import '../../../providers/match_analysis_providers.dart';
+import '../../../providers/repository_providers.dart';
 import '../widgets/manager_bottom_navigation_bar.dart';
 import '../widgets/match_card.dart';
 
@@ -78,7 +79,9 @@ class _ManagerMatchesScreenState extends ConsumerState<ManagerMatchesScreen>
     if (_refreshing) return;
     setState(() => _refreshing = true);
     await HapticService.refresh();
-    ref.invalidate(mockAnalysisMatchesProvider);
+    // Refetch the club's analyses from Supabase (RLS-scoped to the manager's
+    // club), then the wrapper provider recomputes off the fresh data.
+    ref.invalidate(matchAnalysisListProvider(null));
     await Future.delayed(const Duration(milliseconds: 600));
     if (mounted) setState(() => _refreshing = false);
   }

@@ -273,7 +273,8 @@ class _AddManagerSheetState extends ConsumerState<_AddManagerSheet> {
 
     final clubId = ref.read(adminClubIdProvider);
     if (clubId == null || clubId.isEmpty) {
-      setState(() => _errorMsg = 'Club not found. Please log in again.');
+      setState(() =>
+          _errorMsg = 'Create your club first (from the dashboard), then add managers.');
       return;
     }
 

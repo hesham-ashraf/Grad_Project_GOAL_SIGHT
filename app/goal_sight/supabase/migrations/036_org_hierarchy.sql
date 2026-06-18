@@ -77,10 +77,10 @@ CREATE POLICY "analyses_club_select" ON public.match_analyses
   FOR SELECT USING (
     EXISTS (
       SELECT 1 FROM public.profiles p
-      WHERE p.id = match_analyses.manager_id
+      WHERE p.id = match_analyses.generated_by
         AND p.club_id = public.auth_club_id()
     )
-    OR manager_id = auth.uid()
+    OR generated_by = auth.uid()
     OR public.auth_club_id() IS NULL
   );
 
@@ -90,9 +90,9 @@ CREATE POLICY "upload_jobs_club_select" ON public.upload_jobs
   FOR SELECT USING (
     EXISTS (
       SELECT 1 FROM public.profiles p
-      WHERE p.id = upload_jobs.manager_id
+      WHERE p.id = upload_jobs.uploaded_by
         AND p.club_id = public.auth_club_id()
     )
-    OR manager_id = auth.uid()
+    OR uploaded_by = auth.uid()
     OR public.auth_club_id() IS NULL
   );

@@ -9,6 +9,12 @@ abstract interface class IPlayerRepository {
     required String position,
     required String clubId,
     int? jerseyNumber,
+    int? age,
+    int? heightCm,
+    int? weightKg,
+    String? nationality,
+    String? marketValue,
+    bool isCaptain,
   });
 
   Future<PlayerProfileModel> fetchPlayerById(String id);

@@ -75,6 +75,7 @@ class _AdminHomeDashboardState extends ConsumerState<AdminHomeDashboard>
       data: (list) => list,
       orElse: () => const [],
     );
+    final hasNoClub = (ref.watch(adminClubIdProvider) ?? '').isEmpty;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -112,6 +113,12 @@ class _AdminHomeDashboardState extends ConsumerState<AdminHomeDashboard>
             parent: AlwaysScrollableScrollPhysics(),
           ),
         children: [
+          // Club onboarding — shown until the admin owns a club.
+          if (hasNoClub) ...[
+            _CreateClubBanner(onCreate: _promptCreateClub),
+            SizedBox(height: context.rs(20, min: 16, max: 26)),
+          ],
+
           // 0 — Hero Header
           _reveal(0, const AdminDashboardHero()),
           SizedBox(height: context.rs(20, min: 16, max: 26)),
@@ -182,6 +189,115 @@ class _AdminHomeDashboardState extends ConsumerState<AdminHomeDashboard>
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (_) => const _AddManagerSheet(),
+    );
+  }
+
+  Future<void> _promptCreateClub() async {
+    final ctrl = TextEditingController();
+    final name = await showDialog<String>(
+      context: context,
+      builder: (dialogCtx) => AlertDialog(
+        backgroundColor: AppColors.surfaceElevated,
+        title: Text('Create your club',
+            style: AppTextStyles.title(color: Colors.white).copyWith(fontSize: 18)),
+        content: TextField(
+          controller: ctrl,
+          autofocus: true,
+          textCapitalization: TextCapitalization.words,
+          style: AppTextStyles.body(color: Colors.white),
+          decoration: const InputDecoration(
+            hintText: 'e.g. Al Ahly',
+            labelText: 'Club name',
+          ),
+          onSubmitted: (v) => Navigator.of(dialogCtx).pop(v.trim()),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogCtx).pop(),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogCtx).pop(ctrl.text.trim()),
+            child: const Text('Create'),
+          ),
+        ],
+      ),
+    );
+    if (name == null || name.isEmpty) return;
+
+    try {
+      await ref.read(managerRepositoryProvider).createAdminClub(name);
+      await ref.read(authControllerProvider.notifier).refreshUser();
+      ref.invalidate(managerListProvider);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Club "$name" created.')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString().replaceFirst('Exception: ', '')),
+            backgroundColor: AppColors.danger,
+          ),
+        );
+      }
+    }
+  }
+}
+
+// ─── Create Club Banner ───────────────────────────────────────────────────────
+
+class _CreateClubBanner extends StatelessWidget {
+  const _CreateClubBanner({required this.onCreate});
+
+  final VoidCallback onCreate;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            AppColors.primaryPurple.withValues(alpha: 0.22),
+            AppColors.accentCyan.withValues(alpha: 0.12),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
+        border: Border.all(color: AppColors.primaryPurple.withValues(alpha: 0.4)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.add_business_rounded, color: AppColors.accentCyan, size: 22),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text('Set up your club',
+                    style: AppTextStyles.title(color: Colors.white).copyWith(fontSize: 16)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Create your club to start adding managers, players and match '
+            'analyses. Your club\'s data stays private to you and your managers.',
+            style: AppTextStyles.body(color: AppColors.textSecondary).copyWith(fontSize: 13),
+          ),
+          const SizedBox(height: 14),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton.icon(
+              onPressed: onCreate,
+              icon: const Icon(Icons.add_rounded, size: 18),
+              label: const Text('Create Club'),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -256,7 +372,8 @@ class _AddManagerSheetState extends ConsumerState<_AddManagerSheet> {
     if (!_formKey.currentState!.validate()) return;
     final clubId = ref.read(adminClubIdProvider);
     if (clubId == null || clubId.isEmpty) {
-      setState(() => _errorMsg = 'Club not found. Please log in again.');
+      setState(() =>
+          _errorMsg = 'Create your club first (from the dashboard), then add managers.');
       return;
     }
     setState(() { _saving = true; _errorMsg = null; });

@@ -161,6 +161,14 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
                   _buildHeaderCard(context),
                   SizedBox(height: context.rs(AppSpacing.xl)),
 
+                  // Player Info (bio / physical attributes) — only if present
+                  if (_hasBio) ...[
+                    _buildSectionTitle('Player Info', context),
+                    SizedBox(height: context.rs(AppSpacing.lg)),
+                    _buildBioCard(context),
+                    SizedBox(height: context.rs(AppSpacing.xl)),
+                  ],
+
                   // Performance Overview Section
                   _buildSectionTitle('Performance Overview', context),
                   SizedBox(height: context.rs(AppSpacing.lg)),
@@ -378,6 +386,79 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  bool get _hasBio {
+    final p = widget.player;
+    return p.age != null ||
+        p.heightCm != null ||
+        p.weightKg != null ||
+        (p.nationality != null && p.nationality!.isNotEmpty) ||
+        p.jerseyNumber != null ||
+        (p.marketValue != null && p.marketValue!.isNotEmpty) ||
+        p.isCaptain;
+  }
+
+  Widget _buildBioCard(BuildContext context) {
+    final p = widget.player;
+    final items = <(IconData, String, String)>[
+      if (p.jerseyNumber != null)
+        (Icons.tag_rounded, 'Shirt No.', '#${p.jerseyNumber}'),
+      if (p.age != null) (Icons.cake_outlined, 'Age', '${p.age} yrs'),
+      if (p.heightCm != null)
+        (Icons.height_rounded, 'Height', '${p.heightCm} cm'),
+      if (p.weightKg != null)
+        (Icons.monitor_weight_outlined, 'Weight', '${p.weightKg} kg'),
+      if (p.nationality != null && p.nationality!.isNotEmpty)
+        (Icons.flag_outlined, 'Nationality', p.nationality!),
+      if (p.marketValue != null && p.marketValue!.isNotEmpty)
+        (Icons.payments_outlined, 'Market Value', p.marketValue!),
+      if (p.isCaptain) (Icons.star_rounded, 'Role', 'Captain'),
+    ];
+
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surfaceElevated,
+        border: Border.all(
+          color: AppColors.outline.withValues(alpha: 0.3),
+          width: 1,
+        ),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+      ),
+      padding: EdgeInsets.all(context.rs(AppSpacing.lg)),
+      child: Wrap(
+        spacing: context.rs(AppSpacing.md),
+        runSpacing: context.rs(AppSpacing.lg),
+        children: items.map((item) {
+          return SizedBox(
+            width: context.isWideLayout ? 180.0 : 140.0,
+            child: Row(
+              children: [
+                Icon(item.$1,
+                    color: AppColors.accentCyan, size: context.rs(18)),
+                SizedBox(width: context.rs(AppSpacing.sm)),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      item.$2,
+                      style:
+                          AppTextStyles.caption(color: AppColors.textMuted),
+                    ),
+                    SizedBox(height: context.rs(AppSpacing.xxs)),
+                    Text(
+                      item.$3,
+                      style: AppTextStyles.body(color: AppColors.textPrimary)
+                          .copyWith(fontWeight: FontWeight.w600),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        }).toList(),
       ),
     );
   }

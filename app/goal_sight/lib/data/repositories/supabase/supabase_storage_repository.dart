@@ -13,15 +13,85 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../models/analysis_export_model.dart';
 
+/// Result of uploading a raw match video to Storage + recording its `videos` row.
+class MatchVideoUpload {
+  const MatchVideoUpload({
+    required this.videoId,
+    required this.storagePath,
+    required this.signedUrl,
+  });
+
+  final String videoId;
+  final String storagePath;
+  final String signedUrl;
+}
+
 class SupabaseStorageRepository {
   const SupabaseStorageRepository();
 
   static const exportsBucket = 'analysis-exports';
   static const reportsBucket = 'reports';
+  static const matchVideosBucket = 'match-videos';
   static const _signedUrlTtl = 60 * 60; // 1 hour
+  static const _videoSignedUrlTtl = 60 * 60 * 24 * 7; // 7 days (playback)
 
   SupabaseClient get _client => Supabase.instance.client;
   String? get _uid => _client.auth.currentUser?.id;
+
+  // ── Match Videos ──────────────────────────────────────────────────────────
+
+  /// Uploads a raw match video to the private `match-videos` bucket and records
+  /// a `videos` row (owner_club_id is stamped by the DB trigger). Returns the
+  /// new video id, its storage path, and a time-limited signed URL for
+  /// playback. This is the real upload step the manager triggers before the
+  /// model analyses the match.
+  ///
+  /// The object path is `<clubId>/<uid>/<ts>_<fileName>` — the club_id is the
+  /// first segment so the club-scoped storage RLS policy isolates raw files per
+  /// club (only the owning club's admin/managers can read or write them).
+  Future<MatchVideoUpload> uploadMatchVideo({
+    required Uint8List bytes,
+    required String fileName,
+    required String clubId,
+    String mimeType = 'video/mp4',
+  }) async {
+    final uid = _uid ?? 'anonymous';
+    final path = '$clubId/$uid/${DateTime.now().millisecondsSinceEpoch}_$fileName';
+
+    await _client.storage.from(matchVideosBucket).uploadBinary(
+          path,
+          bytes,
+          fileOptions: FileOptions(contentType: mimeType, upsert: true),
+        );
+
+    final signedUrl = await _client.storage
+        .from(matchVideosBucket)
+        .createSignedUrl(path, _videoSignedUrlTtl);
+
+    final row = await _client
+        .from('videos')
+        .insert({
+          'video_url': path, // store the path; sign on demand for playback
+          'file_name': fileName,
+          'processing_status': 'processing',
+          'uploaded_by': _uid,
+          // owner_club_id stamped by the set_owner_club_id() trigger.
+        })
+        .select('id')
+        .single();
+
+    return MatchVideoUpload(
+      videoId: row['id'].toString(),
+      storagePath: path,
+      signedUrl: signedUrl,
+    );
+  }
+
+  /// Generates a fresh signed URL for a stored match-video path (for playback).
+  Future<String> signedMatchVideoUrl(String storagePath) =>
+      _client.storage
+          .from(matchVideosBucket)
+          .createSignedUrl(storagePath, _videoSignedUrlTtl);
 
   // ── Analysis Exports ──────────────────────────────────────────────────────
 

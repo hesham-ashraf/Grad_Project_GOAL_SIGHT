@@ -39,7 +39,13 @@ class _AddPlayerScreenState extends ConsumerState<AddPlayerScreen>
   final _formKey = GlobalKey<FormState>();
   final _nameCtrl = TextEditingController();
   final _jerseyCtrl = TextEditingController();
+  final _ageCtrl = TextEditingController();
+  final _heightCtrl = TextEditingController();
+  final _weightCtrl = TextEditingController();
+  final _nationalityCtrl = TextEditingController();
+  final _marketValueCtrl = TextEditingController();
 
+  bool _isCaptain = false;
   String _selectedPosition = 'ST';
   bool _saving = false;
   String? _errorMsg;
@@ -71,6 +77,11 @@ class _AddPlayerScreenState extends ConsumerState<AddPlayerScreen>
     _ctrl.dispose();
     _nameCtrl.dispose();
     _jerseyCtrl.dispose();
+    _ageCtrl.dispose();
+    _heightCtrl.dispose();
+    _weightCtrl.dispose();
+    _nationalityCtrl.dispose();
+    _marketValueCtrl.dispose();
     super.dispose();
   }
 
@@ -102,6 +113,20 @@ class _AddPlayerScreenState extends ConsumerState<AddPlayerScreen>
         jerseyNumber: _jerseyCtrl.text.isNotEmpty
             ? int.tryParse(_jerseyCtrl.text.trim())
             : null,
+        age: _ageCtrl.text.isNotEmpty ? int.tryParse(_ageCtrl.text.trim()) : null,
+        heightCm: _heightCtrl.text.isNotEmpty
+            ? int.tryParse(_heightCtrl.text.trim())
+            : null,
+        weightKg: _weightCtrl.text.isNotEmpty
+            ? int.tryParse(_weightCtrl.text.trim())
+            : null,
+        nationality: _nationalityCtrl.text.trim().isNotEmpty
+            ? _nationalityCtrl.text.trim()
+            : null,
+        marketValue: _marketValueCtrl.text.trim().isNotEmpty
+            ? _marketValueCtrl.text.trim()
+            : null,
+        isCaptain: _isCaptain,
       );
 
       // Invalidate the players cache so the list refreshes on pop.
@@ -337,6 +362,150 @@ class _AddPlayerScreenState extends ConsumerState<AddPlayerScreen>
                         ),
                       ),
 
+                      SizedBox(height: context.rs(20, min: 16, max: 24)),
+
+                      // Age + Height (side by side)
+                      _reveal(
+                        3,
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: _numberField(
+                                label: 'Age',
+                                controller: _ageCtrl,
+                                hint: 'Years',
+                                icon: Icons.cake_outlined,
+                                min: 14,
+                                max: 60,
+                                maxLen: 2,
+                              ),
+                            ),
+                            SizedBox(width: context.rs(12, min: 8, max: 16)),
+                            Expanded(
+                              child: _numberField(
+                                label: 'Height',
+                                controller: _heightCtrl,
+                                hint: 'cm',
+                                icon: Icons.height_rounded,
+                                min: 120,
+                                max: 220,
+                                maxLen: 3,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      SizedBox(height: context.rs(20, min: 16, max: 24)),
+
+                      // Weight + Nationality
+                      _reveal(
+                        3,
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: _numberField(
+                                label: 'Weight',
+                                controller: _weightCtrl,
+                                hint: 'kg',
+                                icon: Icons.monitor_weight_outlined,
+                                min: 40,
+                                max: 150,
+                                maxLen: 3,
+                              ),
+                            ),
+                            SizedBox(width: context.rs(12, min: 8, max: 16)),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  _FieldLabel(
+                                      label: 'Nationality', required: false),
+                                  SizedBox(
+                                      height: context.rs(8, min: 6, max: 10)),
+                                  TextFormField(
+                                    controller: _nationalityCtrl,
+                                    style: AppTextStyles.body(
+                                        color: AppColors.textPrimary),
+                                    textCapitalization:
+                                        TextCapitalization.words,
+                                    decoration: _inputDecoration(
+                                      hint: 'e.g. Egypt',
+                                      icon: Icons.flag_outlined,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      SizedBox(height: context.rs(20, min: 16, max: 24)),
+
+                      // Market value (optional)
+                      _reveal(
+                        3,
+                        _FieldLabel(label: 'Market Value', required: false),
+                      ),
+                      SizedBox(height: context.rs(8, min: 6, max: 10)),
+                      _reveal(
+                        3,
+                        TextFormField(
+                          controller: _marketValueCtrl,
+                          style:
+                              AppTextStyles.body(color: AppColors.textPrimary),
+                          decoration: _inputDecoration(
+                            hint: 'Optional (e.g. €45M)',
+                            icon: Icons.payments_outlined,
+                          ),
+                        ),
+                      ),
+
+                      SizedBox(height: context.rs(20, min: 16, max: 24)),
+
+                      // Captain toggle
+                      _reveal(
+                        3,
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: AppColors.surfaceElevated,
+                            borderRadius: AppRadius.input,
+                            border:
+                                Border.all(color: AppColors.outlineSubtle),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.star_rounded,
+                                  color: AppColors.warning, size: 18),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  'Squad Captain',
+                                  style: AppTextStyles.body(
+                                          color: AppColors.textSecondary)
+                                      .copyWith(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 13),
+                                ),
+                              ),
+                              Switch(
+                                value: _isCaptain,
+                                activeColor: AppColors.primaryPurple,
+                                onChanged: (v) {
+                                  HapticService.selection();
+                                  setState(() => _isCaptain = v);
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
                       SizedBox(height: context.rs(40, min: 32, max: 56)),
                     ],
                   ),
@@ -385,6 +554,43 @@ class _AddPlayerScreenState extends ConsumerState<AddPlayerScreen>
           .copyWith(fontSize: 11),
       contentPadding:
           const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+    );
+  }
+
+  /// Labeled optional numeric field with a sensible min/max range validator.
+  Widget _numberField({
+    required String label,
+    required TextEditingController controller,
+    required String hint,
+    required IconData icon,
+    required int min,
+    required int max,
+    required int maxLen,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _FieldLabel(label: label, required: false),
+        SizedBox(height: context.rs(8, min: 6, max: 10)),
+        TextFormField(
+          controller: controller,
+          style: AppTextStyles.body(color: AppColors.textPrimary),
+          keyboardType: TextInputType.number,
+          inputFormatters: [
+            FilteringTextInputFormatter.digitsOnly,
+            LengthLimitingTextInputFormatter(maxLen),
+          ],
+          decoration: _inputDecoration(hint: hint, icon: icon),
+          validator: (v) {
+            if (v == null || v.isEmpty) return null;
+            final n = int.tryParse(v);
+            if (n == null || n < min || n > max) {
+              return '$min–$max';
+            }
+            return null;
+          },
+        ),
+      ],
     );
   }
 }

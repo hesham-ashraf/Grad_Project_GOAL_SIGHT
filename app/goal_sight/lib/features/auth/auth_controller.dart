@@ -107,6 +107,19 @@ class AuthController extends StateNotifier<AuthState> {
     }
   }
 
+  /// Re-reads the signed-in user's profile (e.g. after the admin creates a
+  /// club so `clubId` becomes available) without disrupting the session.
+  Future<void> refreshUser() async {
+    try {
+      final user = await _authRepository.restoreSession();
+      if (user != null) {
+        state = state.copyWith(user: user, clearError: true);
+      }
+    } catch (_) {
+      // Non-fatal — keep the current state.
+    }
+  }
+
   Future<void> logout() async {
     state = state.copyWith(status: AuthStatus.loading, clearError: true);
     await _authRepository.logout();

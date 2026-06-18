@@ -54,11 +54,40 @@ class PlayerProfileModel {
     required this.totalTackles,
     this.status = 'Stable',
     this.improvementRate = 0.0,
+    this.jerseyNumber,
+    this.age,
+    this.heightCm,
+    this.weightKg,
+    this.nationality,
+    this.marketValue,
+    this.isCaptain = false,
   });
 
   final String id;
   final String name;
   final String position;
+
+  // ── Player bio / physical attributes ──────────────────────────────────────
+  /// Shirt number (1–99), if assigned.
+  final int? jerseyNumber;
+
+  /// Age in years.
+  final int? age;
+
+  /// Height in centimetres.
+  final int? heightCm;
+
+  /// Weight in kilograms.
+  final int? weightKg;
+
+  /// Nationality (free text, e.g. "Egypt").
+  final String? nationality;
+
+  /// Estimated market value label (e.g. "€45M"), if known.
+  final String? marketValue;
+
+  /// Whether this player is the squad captain.
+  final bool isCaptain;
 
   /// Latest match rating (0–10)
   final double currentRating;

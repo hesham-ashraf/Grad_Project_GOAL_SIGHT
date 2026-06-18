@@ -335,7 +335,7 @@ final managerDashboardProvider = FutureProvider<ManagerDashboardData>((ref) asyn
   try {
     final profile = await client
         .from('profiles')
-        .select('display_name, club_id, teams(name)')
+        .select('full_name, club_id, teams(name)')
         .eq('id', uid)
         .maybeSingle();
     final teamMap = profile?['teams'] as Map<String, dynamic>?;

@@ -157,7 +157,7 @@ class SupabaseAuthRepository implements IAuthRepository {
     try {
       final googleSignIn = GoogleSignIn(serverClientId: webClientId);
       // Disconnect any stale session so the account picker always shows fresh.
-      await googleSignIn.disconnect().catchError((_) {});
+      await googleSignIn.disconnect().catchError((_) => null);
       googleUser = await googleSignIn.signIn();
     } on PlatformException catch (e) {
       throw AuthException(

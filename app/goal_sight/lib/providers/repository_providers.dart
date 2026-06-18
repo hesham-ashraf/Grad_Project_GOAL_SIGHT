@@ -27,6 +27,7 @@ import '../data/repositories/supabase/supabase_club_repository.dart';
 import '../data/repositories/supabase/supabase_manager_repository.dart';
 import '../data/repositories/supabase/supabase_upload_repository.dart';
 import '../data/repositories/supabase/supabase_notification_repository.dart';
+import '../data/services/analysis_engine.dart';
 import '../data/models/upload_job_model.dart';
 import '../data/models/notification_model.dart';
 
@@ -55,6 +56,13 @@ final uploadRepositoryProvider = Provider<IUploadRepository>(
 /// Manager repository — Supabase-backed (managers directory table).
 final managerRepositoryProvider = Provider<IManagerRepository>(
   (_) => const SupabaseManagerRepository(),
+);
+
+/// Analysis engine — turns a completed upload into a persisted match analysis.
+/// Currently a simulator; swap for the real model by returning another
+/// IAnalysisEngine here.
+final analysisEngineProvider = Provider<IAnalysisEngine>(
+  (_) => const SimulatedAnalysisEngine(),
 );
 
 /// Storage repository — analysis exports + report persistence.

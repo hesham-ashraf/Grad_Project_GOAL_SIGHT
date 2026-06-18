@@ -108,6 +108,15 @@ final class SupabaseManagerRepository implements IManagerRepository {
     return fetchManagerById(data['id'].toString());
   }
 
+  @override
+  Future<String> createAdminClub(String name) async {
+    final result = await _client.rpc('create_admin_club', params: {
+      'p_name': name.trim(),
+    });
+    final data = result as Map<String, dynamic>;
+    return data['id'].toString();
+  }
+
   ManagerModel _mapManager(Map<String, dynamic> r) => ManagerModel(
         id: r['id'].toString(),
         name: (r['name'] ?? '').toString(),

@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../widgets/fan/fan_bottom_navigation_bar.dart';
 import 'clubs_screen.dart';
-import 'fan_home_screen.dart';
-import 'matches_screen.dart';
 import 'profile_screen.dart';
 import 'standings_screen.dart';
 
@@ -17,26 +15,19 @@ class FanNavigationScreen extends StatefulWidget {
 
 class _FanNavigationScreenState extends State<FanNavigationScreen>
     with SingleTickerProviderStateMixin {
+  // Fans are a public audience: clubs + standings only. Player profiles and
+  // match analyses are private to each club's admin & managers (enforced by
+  // RLS), so those tabs are not shown.
   static const List<FanNavigationItem> _items = <FanNavigationItem>[
     FanNavigationItem(
-      label: 'Home',
-      icon: Icons.home_outlined,
-      activeIcon: Icons.home_rounded,
-    ),
-    FanNavigationItem(
-      label: 'Matches',
-      icon: Icons.sports_soccer,
-      activeIcon: Icons.sports_soccer_rounded,
+      label: 'Clubs',
+      icon: Icons.groups_outlined,
+      activeIcon: Icons.groups_rounded,
     ),
     FanNavigationItem(
       label: 'Standings',
       icon: Icons.leaderboard_outlined,
       activeIcon: Icons.leaderboard_rounded,
-    ),
-    FanNavigationItem(
-      label: 'Clubs',
-      icon: Icons.groups_outlined,
-      activeIcon: Icons.groups_rounded,
     ),
     FanNavigationItem(
       label: 'Profile',
@@ -46,10 +37,8 @@ class _FanNavigationScreenState extends State<FanNavigationScreen>
   ];
 
   static const List<Widget> _screens = <Widget>[
-    FanHomeScreen(),
-    MatchesScreen(),
-    StandingsScreen(),
     ClubsScreen(),
+    StandingsScreen(),
     ProfileScreen(),
   ];
 

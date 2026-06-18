@@ -19,7 +19,9 @@ final class SupabasePlayerRepository implements IPlayerRepository {
   SupabaseClient get _client => Supabase.instance.client;
 
   static const _playerCols =
-      'id, full_name, position, team_id, season_rating, season_goals, '
+      'id, full_name, position, team_id, jersey_number, age, height_cm, '
+      'weight_kg, nationality, market_value, is_captain, '
+      'season_rating, season_goals, '
       'season_assists, season_tackles, appearances, '
       'player_intelligence(current_rating, average_rating, fatigue, '
       'activity_level, primary_contribution, secondary_contribution, '
@@ -38,7 +40,8 @@ final class SupabasePlayerRepository implements IPlayerRepository {
 
     var query = _client.from('players').select(_playerCols);
     if (clubId != null && clubId.isNotEmpty) {
-      query = query.eq('team_id', clubId);
+      // Tenant scope: a club's own squad (RLS also enforces this).
+      query = query.eq('owner_club_id', clubId);
     }
     final rows = await query.order('season_rating', ascending: false);
     final result = (rows as List)
@@ -98,7 +101,7 @@ final class SupabasePlayerRepository implements IPlayerRepository {
       final playerRows = await _client
           .from('players')
           .select('id')
-          .eq('team_id', clubId);
+          .eq('owner_club_id', clubId);
       final ids = (playerRows as List)
           .map((r) => (r as Map<String, dynamic>)['id'].toString())
           .toList();
@@ -136,7 +139,16 @@ final class SupabasePlayerRepository implements IPlayerRepository {
     required String position,
     required String clubId,
     int? jerseyNumber,
+    int? age,
+    int? heightCm,
+    int? weightKg,
+    String? nationality,
+    String? marketValue,
+    bool isCaptain = false,
   }) async {
+    // owner_club_id is stamped automatically by the DB trigger (the caller's
+    // club); team_id is set explicitly so the player also belongs to the club
+    // roster. RLS guarantees the player is only visible to this club's staff.
     final inserted = await _client
         .from('players')
         .insert({
@@ -144,6 +156,14 @@ final class SupabasePlayerRepository implements IPlayerRepository {
           'position': position,
           'team_id': clubId,
           if (jerseyNumber != null) 'jersey_number': jerseyNumber,
+          if (age != null) 'age': age,
+          if (heightCm != null) 'height_cm': heightCm,
+          if (weightKg != null) 'weight_kg': weightKg,
+          if (nationality != null && nationality.isNotEmpty)
+            'nationality': nationality,
+          if (marketValue != null && marketValue.isNotEmpty)
+            'market_value': marketValue,
+          'is_captain': isCaptain,
           'season_rating': 6.0,
           'season_goals': 0,
           'season_assists': 0,
@@ -209,6 +229,15 @@ final class SupabasePlayerRepository implements IPlayerRepository {
     final tackles = (row['season_tackles'] as num? ?? 0).toInt();
     final appearances = (row['appearances'] as num? ?? 0).toInt();
 
+    // Player bio / physical attributes (nullable — may be unset).
+    final jerseyNumber = (row['jersey_number'] as num?)?.toInt();
+    final age = (row['age'] as num?)?.toInt();
+    final heightCm = (row['height_cm'] as num?)?.toInt();
+    final weightKg = (row['weight_kg'] as num?)?.toInt();
+    final nationality = (row['nationality'] as String?)?.trim();
+    final marketValue = (row['market_value'] as String?)?.trim();
+    final isCaptain = row['is_captain'] == true;
+
     if (intel != null) {
       final insightsJson = (intel['insights'] as List?) ?? const [];
       final ratingsJson = (intel['ratings_history'] as List?) ?? const [];
@@ -241,6 +270,13 @@ final class SupabasePlayerRepository implements IPlayerRepository {
         ratingsHistory:
             ratingsJson.map((e) => (e as num).toDouble()).toList(),
         matchHistory: const [],
+        jerseyNumber: jerseyNumber,
+        age: age,
+        heightCm: heightCm,
+        weightKg: weightKg,
+        nationality: nationality,
+        marketValue: marketValue,
+        isCaptain: isCaptain,
       );
     }
 

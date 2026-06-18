@@ -89,7 +89,10 @@ final class SupabaseAnalysisRepository implements IAnalysisRepository {
       intensity: (row['intensity'] as num? ?? 0).toInt(),
       highlightText: row['highlight_text']?.toString(),
       recommendations: _stringList(row['recommendations']),
-      analyzedVideoUrl: null,
+      // The analyzed (model-output) video, when the analysis has produced one.
+      analyzedVideoUrl: (row['analyzed_video_url'] as String?)?.trim().isEmpty ?? true
+          ? null
+          : row['analyzed_video_url'] as String,
       summary: MatchSummaryModel(
         dominantTeam: (row['dominant_team'] ?? '').toString(),
         homeAvgRating: (row['home_avg_rating'] as num? ?? 0).toDouble(),

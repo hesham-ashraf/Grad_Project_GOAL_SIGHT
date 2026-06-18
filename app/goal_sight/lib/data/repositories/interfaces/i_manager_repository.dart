@@ -25,4 +25,8 @@ abstract interface class IManagerRepository {
     bool canEditPlayers = true,
     bool canManageStaff = false,
   });
+
+  /// Creates (or renames) the signed-in admin's club and attaches it to their
+  /// profile. Calls the `create_admin_club` Postgres RPC. Returns the club id.
+  Future<String> createAdminClub(String name);
 }

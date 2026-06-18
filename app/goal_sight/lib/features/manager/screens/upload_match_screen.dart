@@ -1,14 +1,17 @@
 import 'dart:async';
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 
+import '../../../core/services/cache_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
 import '../../../data/models/match_analysis_model.dart';
 import '../manager_upload_mock_data.dart';
 import '../../../data/models/upload_job_model.dart';
+import '../../../providers/app_providers.dart';
+import '../../../providers/manager_players_provider.dart';
 import '../../../providers/repository_providers.dart';
 import '../widgets/ai_processing_widgets.dart';
 import '../widgets/upload_widgets.dart';
@@ -45,6 +48,9 @@ class _UploadMatchScreenState extends ConsumerState<UploadMatchScreen>
   Timer? _processingTimer;
   int _stageIndex = -1;
   String? _jobId; // DB job ID once created
+  String? _analysisId; // real match_analyses ID once the engine persists it
+  XFile? _pickedVideo; // the real video file the manager selected
+  String? _uploadedVideoUrl; // signed URL of the uploaded video (playback)
 
   // Failure state
   String _failureReason = '';
@@ -96,21 +102,44 @@ class _UploadMatchScreenState extends ConsumerState<UploadMatchScreen>
 
   // ── File selection ──────────────────────────────────────────────────────────
 
-  void _onFileSelected() {
-    // Simulate picking a file — generate a mock name/size
-    final r = math.Random();
-    final sizes = ['842 MB', '1.2 GB', '2.1 GB', '650 MB', '1.8 GB'];
-    final mockName =
-        'match_footage_${DateTime.now().millisecondsSinceEpoch}.mp4';
-    final mockSize = sizes[r.nextInt(sizes.length)];
-
-    setState(() {
-      _formData = _formData.copyWith(
-        fileName: mockName,
-        fileSize: mockSize,
+  Future<void> _onFileSelected() async {
+    // Real flow: open the native picker and let the manager choose a video.
+    try {
+      final picker = ImagePicker();
+      final file = await picker.pickVideo(source: ImageSource.gallery);
+      if (file == null) return; // user cancelled
+      final length = await file.length();
+      if (!mounted) return;
+      setState(() {
+        _pickedVideo = file;
+        _formData = _formData.copyWith(
+          fileName: file.name,
+          fileSize: _formatBytes(length),
+        );
+      });
+      _goTo(_UploadStep.matchDetails);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Could not pick a video: $e'),
+          backgroundColor: AppColors.surfaceElevated,
+          behavior: SnackBarBehavior.floating,
+        ),
       );
-    });
-    _goTo(_UploadStep.matchDetails);
+    }
+  }
+
+  String _formatBytes(int bytes) {
+    if (bytes <= 0) return '0 B';
+    const units = ['B', 'KB', 'MB', 'GB'];
+    var size = bytes.toDouble();
+    var i = 0;
+    while (size >= 1024 && i < units.length - 1) {
+      size /= 1024;
+      i++;
+    }
+    return '${size.toStringAsFixed(size >= 100 || i == 0 ? 0 : 1)} ${units[i]}';
   }
 
   void _onFileRemoved() {
@@ -168,9 +197,29 @@ class _UploadMatchScreenState extends ConsumerState<UploadMatchScreen>
   }
 
   Future<void> _createJobThenProcess() async {
-    // Create a real DB record so upload history reflects this job.
     try {
+      final storage = ref.read(storageRepositoryProvider);
       final repo = ref.read(uploadRepositoryProvider);
+      final clubId = ref.read(managerClubIdProvider);
+
+      // 1. Upload the real video bytes to the private match-videos bucket and
+      //    record the videos row (owner_club_id stamped by the DB trigger).
+      //    Files are stored under the club's folder for per-club isolation.
+      if (_pickedVideo != null) {
+        if (clubId == null || clubId.isEmpty) {
+          throw Exception('No club assigned to your account yet. '
+              'Ask your admin to add you to a club, then try again.');
+        }
+        final bytes = await _pickedVideo!.readAsBytes();
+        final result = await storage.uploadMatchVideo(
+          bytes: bytes,
+          fileName: _pickedVideo!.name,
+          clubId: clubId,
+        );
+        _uploadedVideoUrl = result.signedUrl;
+      }
+
+      // 2. Create the upload job (RLS scopes it to the manager's club).
       final job = await repo.createUploadJob(UploadJobModel(
         id: '',
         homeTeam: _formData.homeTeam,
@@ -178,14 +227,20 @@ class _UploadMatchScreenState extends ConsumerState<UploadMatchScreen>
         competition: _formData.competition,
         venue: _formData.venue,
         matchDate: _formData.matchDate,
-        fileName: _formData.fileName ?? 'match.mp4',
+        fileName: _pickedVideo?.name ?? _formData.fileName ?? 'match.mp4',
         uploadedAt: DateTime.now(),
         status: UploadStatus.processing,
         notes: _formData.notes,
       ));
       _jobId = job.id;
-    } catch (_) {
-      // Non-fatal: job creation failed (e.g. offline). Continue simulation.
+    } catch (e) {
+      // Real upload failure → show the failed step instead of faking success.
+      if (mounted) {
+        setState(() => _failureReason =
+            e.toString().replaceFirst('Exception: ', ''));
+        _goTo(_UploadStep.failed);
+      }
+      return;
     }
     if (mounted) {
       Future.delayed(const Duration(milliseconds: 800), _advanceStage);
@@ -206,15 +261,53 @@ class _UploadMatchScreenState extends ConsumerState<UploadMatchScreen>
         _currentStage = stages.last;
         _generatedAnalysis = analysis;
       });
-      // Mark job completed in DB (best-effort).
+      // Mark job completed in DB, then run the analysis engine to persist the
+      // real match analysis (header + team blocks + per-player verdicts +
+      // analyzed video). Best-effort — failures don't block the success UI.
       if (_jobId != null) {
-        final repo = ref.read(uploadRepositoryProvider);
-        unawaited(repo.updateJobStatus(
-          _jobId!,
+        final uploadRepo = ref.read(uploadRepositoryProvider);
+        final engine = ref.read(analysisEngineProvider);
+        final jobForAnalysis = UploadJobModel(
+          id: _jobId!,
+          homeTeam: _formData.homeTeam,
+          awayTeam: _formData.awayTeam,
+          competition: _formData.competition,
+          venue: _formData.venue,
+          matchDate: _formData.matchDate,
+          fileName: _formData.fileName ?? 'match.mp4',
+          uploadedAt: DateTime.now(),
           status: UploadStatus.completed,
-          progress: 1.0,
-          stage: ProcessingStage.finalizingReport,
-        ).then((_) {}, onError: (_) {}));
+          notes: _formData.notes,
+        );
+        unawaited(uploadRepo
+            .updateJobStatus(
+              _jobId!,
+              status: UploadStatus.completed,
+              progress: 1.0,
+              stage: ProcessingStage.finalizingReport,
+            )
+            .then((_) => engine.analyzeUpload(
+                  uploadJobId: _jobId!,
+                  job: jobForAnalysis,
+                  sourceVideoUrl: _uploadedVideoUrl,
+                ))
+            .then((analysisId) {
+          if (!mounted) return;
+          _analysisId = analysisId;
+          // The analysis (+ analyzed video), per-player verdicts and the
+          // recomputed player profiles are now in the DB. Bust the caches and
+          // invalidate the providers so the dashboard, Matches tab, squad and
+          // every player profile reflect this match immediately — for THIS
+          // manager and every other manager in the same club.
+          CacheService.invalidatePrefix('squad:');
+          CacheService.invalidatePrefix('player:');
+          ref.invalidate(matchAnalysisListProvider);
+          ref.invalidate(squadProvider);
+          ref.invalidate(squadRiskProvider);
+          ref.invalidate(uploadHistoryProvider);
+          ref.invalidate(managerPlayersProvider);
+          ref.invalidate(managerDashboardProvider);
+        }, onError: (_) {}));
       }
       // Short pause then go to success
       Future.delayed(const Duration(milliseconds: 600), () {
@@ -273,9 +366,21 @@ class _UploadMatchScreenState extends ConsumerState<UploadMatchScreen>
 
   // ── Analysis navigation ─────────────────────────────────────────────────────
 
-  void _viewAnalysis() {
-    if (_generatedAnalysis != null) {
-      context.push('/fan-match-analysis', extra: _generatedAnalysis);
+  Future<void> _viewAnalysis() async {
+    // Prefer the REAL persisted analysis (with the analyzed video) over the
+    // on-screen preview. Fall back to the latest club analysis, then the mock.
+    final repo = ref.read(analysisRepositoryProvider);
+    MatchAnalysisModel? real;
+    try {
+      real = _analysisId != null
+          ? await repo.fetchAnalysisById(_analysisId!)
+          : await repo.fetchLatestAnalysis(clubId: null);
+    } catch (_) {
+      real = null;
+    }
+    final toShow = real ?? _generatedAnalysis;
+    if (toShow != null && mounted) {
+      context.push('/fan-match-analysis', extra: toShow);
     }
   }
 
@@ -289,6 +394,10 @@ class _UploadMatchScreenState extends ConsumerState<UploadMatchScreen>
       _step = _UploadStep.fileSelection;
       _formData = UploadFormData();
       _generatedAnalysis = null;
+      _analysisId = null;
+      _jobId = null;
+      _pickedVideo = null;
+      _uploadedVideoUrl = null;
       _currentStage = null;
       _overallProgress = 0.0;
       _stageIndex = -1;

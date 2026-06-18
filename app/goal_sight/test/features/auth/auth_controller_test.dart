@@ -65,6 +65,26 @@ class FakeAuthRepository implements IAuthRepository {
       role: UserRole.manager,
     );
   }
+
+  @override
+  Future<UserModel> signInWithGoogle() async {
+    token = 'token';
+    return const UserModel(
+      id: '4',
+      name: 'Google User',
+      email: 'google@test.com',
+      role: UserRole.fan,
+    );
+  }
+
+  @override
+  Future<void> verifyPasswordResetOtp({
+    required String email,
+    required String token,
+  }) async {}
+
+  @override
+  Future<void> updatePassword(String newPassword) async {}
 }
 
 void main() {
