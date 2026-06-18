@@ -114,6 +114,7 @@ class MatchAnalysisResult {
     required this.away,
     required this.players,
     this.analyzedVideoUrl,
+    this.rawModelOutputs = const {},
     this.score = '',
     this.resultStatus = 'FT',
     this.dominantTeam = '',
@@ -127,7 +128,12 @@ class MatchAnalysisResult {
   });
 
   final String? analyzedVideoUrl;
-  final String score, resultStatus, dominantTeam, highlightText, overallNarrative;
+  final Map<String, dynamic> rawModelOutputs;
+  final String score,
+      resultStatus,
+      dominantTeam,
+      highlightText,
+      overallNarrative;
   final double homeAvgRating, awayAvgRating;
   final int intensity;
   final List<String> keyMoments, recommendations;
@@ -180,14 +186,29 @@ class _AnalysisPersister {
           'recommendations': result.recommendations,
           // The playable analyzed match: the model's rendered video when
           // provided, else the manager's uploaded video, else a sample clip.
-          'analyzed_video_url':
-              (result.analyzedVideoUrl != null && result.analyzedVideoUrl!.isNotEmpty)
-                  ? result.analyzedVideoUrl
-                  : _sampleAnalyzedVideo,
+          'analyzed_video_url': (result.analyzedVideoUrl != null &&
+                  result.analyzedVideoUrl!.isNotEmpty)
+              ? result.analyzedVideoUrl
+              : _sampleAnalyzedVideo,
         })
         .select('id')
         .single();
     final analysisId = header['id'].toString();
+
+    if (result.rawModelOutputs.isNotEmpty) {
+      await _client.from('analysis_artifacts').insert(
+            result.rawModelOutputs.entries
+                .map((entry) => {
+                      'match_analysis_id': analysisId,
+                      'artifact_type': 'model_output',
+                      'data': {
+                        'model_name': entry.key,
+                        'payload': entry.value,
+                      },
+                    })
+                .toList(),
+          );
+    }
 
     // 2) Per-team tactical block.
     await _client.from('team_match_analysis').insert([
@@ -326,7 +347,10 @@ class _AnalysisPersister {
 ///     "teams":  { "home": <team>, "away": <team> },            // <team> below
 ///     "players":[ { jersey_number, player_name, position, rating, fatigue,
 ///                   performance_status, contribution, impact, insight,
-///                   goals, assists, tackles, key_passes, is_motm, is_worst } ]
+///                   goals, assists, tackles, key_passes, is_motm, is_worst } ],
+///     "model_outputs": {
+///       "tracking": {...}, "possession": {...}, "events": {...}, "tactical": {...}
+///     }
 ///   }
 ///   <team> = { team_name, possession, style, pressure_style, compactness,
 ///              attacking_zones:[], avg_rating, top_players:[], worst_players:[] }
@@ -407,8 +431,7 @@ class ModelAnalysisEngine implements IAnalysisEngine {
         .toList();
 
     return MatchAnalysisResult(
-      analyzedVideoUrl:
-          (j['analyzed_video_url'] as String?) ?? sourceVideoUrl,
+      analyzedVideoUrl: (j['analyzed_video_url'] as String?) ?? sourceVideoUrl,
       score: (match['score'] ?? '').toString(),
       resultStatus: (match['result_status'] ?? 'FT').toString(),
       dominantTeam: (match['dominant_team'] ?? '').toString(),
@@ -419,6 +442,7 @@ class ModelAnalysisEngine implements IAnalysisEngine {
       intensity: _toI(match['intensity']),
       keyMoments: _toSL(match['key_moments']),
       recommendations: _toSL(match['recommendations']),
+      rawModelOutputs: _extractRawModelOutputs(j),
       home: _parseTeam('home', home),
       away: _parseTeam('away', away),
       players: players,
@@ -457,6 +481,20 @@ class ModelAnalysisEngine implements IAnalysisEngine {
         isMotm: p['is_motm'] == true,
         isWorst: p['is_worst'] == true,
       );
+
+  Map<String, dynamic> _extractRawModelOutputs(Map<String, dynamic> j) {
+    for (final key in const [
+      'model_outputs',
+      'modelOutputs',
+      'json_files',
+      'jsonFiles',
+      'outputs',
+    ]) {
+      final value = j[key];
+      if (value is Map) return value.cast<String, dynamic>();
+    }
+    return const {};
+  }
 }
 
 // ───────────────────────── Simulator (fallback) ───────────────────────────
@@ -644,8 +682,18 @@ String _contribution(String? position) {
 
 String _dateLabel(DateTime d) {
   const months = [
-    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec'
   ];
   return '${d.day} ${months[d.month - 1]} ${d.year}';
 }

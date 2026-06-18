@@ -8,7 +8,6 @@ import '../../../core/services/cache_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
 import '../../../data/models/match_analysis_model.dart';
-import '../manager_upload_mock_data.dart';
 import '../../../data/models/upload_job_model.dart';
 import '../../../providers/app_providers.dart';
 import '../../../providers/manager_players_provider.dart';
@@ -236,8 +235,8 @@ class _UploadMatchScreenState extends ConsumerState<UploadMatchScreen>
     } catch (e) {
       // Real upload failure → show the failed step instead of faking success.
       if (mounted) {
-        setState(() => _failureReason =
-            e.toString().replaceFirst('Exception: ', ''));
+        setState(() =>
+            _failureReason = e.toString().replaceFirst('Exception: ', ''));
         _goTo(_UploadStep.failed);
       }
       return;
@@ -254,65 +253,11 @@ class _UploadMatchScreenState extends ConsumerState<UploadMatchScreen>
     _stageIndex++;
 
     if (_stageIndex >= stages.length) {
-      // All stages done — generate analysis
-      final analysis = generateMockMatchAnalysis();
       setState(() {
         _overallProgress = 1.0;
         _currentStage = stages.last;
-        _generatedAnalysis = analysis;
       });
-      // Mark job completed in DB, then run the analysis engine to persist the
-      // real match analysis (header + team blocks + per-player verdicts +
-      // analyzed video). Best-effort — failures don't block the success UI.
-      if (_jobId != null) {
-        final uploadRepo = ref.read(uploadRepositoryProvider);
-        final engine = ref.read(analysisEngineProvider);
-        final jobForAnalysis = UploadJobModel(
-          id: _jobId!,
-          homeTeam: _formData.homeTeam,
-          awayTeam: _formData.awayTeam,
-          competition: _formData.competition,
-          venue: _formData.venue,
-          matchDate: _formData.matchDate,
-          fileName: _formData.fileName ?? 'match.mp4',
-          uploadedAt: DateTime.now(),
-          status: UploadStatus.completed,
-          notes: _formData.notes,
-        );
-        unawaited(uploadRepo
-            .updateJobStatus(
-              _jobId!,
-              status: UploadStatus.completed,
-              progress: 1.0,
-              stage: ProcessingStage.finalizingReport,
-            )
-            .then((_) => engine.analyzeUpload(
-                  uploadJobId: _jobId!,
-                  job: jobForAnalysis,
-                  sourceVideoUrl: _uploadedVideoUrl,
-                ))
-            .then((analysisId) {
-          if (!mounted) return;
-          _analysisId = analysisId;
-          // The analysis (+ analyzed video), per-player verdicts and the
-          // recomputed player profiles are now in the DB. Bust the caches and
-          // invalidate the providers so the dashboard, Matches tab, squad and
-          // every player profile reflect this match immediately — for THIS
-          // manager and every other manager in the same club.
-          CacheService.invalidatePrefix('squad:');
-          CacheService.invalidatePrefix('player:');
-          ref.invalidate(matchAnalysisListProvider);
-          ref.invalidate(squadProvider);
-          ref.invalidate(squadRiskProvider);
-          ref.invalidate(uploadHistoryProvider);
-          ref.invalidate(managerPlayersProvider);
-          ref.invalidate(managerDashboardProvider);
-        }, onError: (_) {}));
-      }
-      // Short pause then go to success
-      Future.delayed(const Duration(milliseconds: 600), () {
-        if (mounted) _goTo(_UploadStep.success);
-      });
+      unawaited(_completeAnalysis());
       return;
     }
 
@@ -339,8 +284,7 @@ class _UploadMatchScreenState extends ConsumerState<UploadMatchScreen>
       }
       tick++;
       final t = (tick / ticks).clamp(0.0, 1.0);
-      final eased = Curves.easeInOut
-          .transform(t.clamp(0.0, 1.0));
+      final eased = Curves.easeInOut.transform(t.clamp(0.0, 1.0));
       setState(() {
         _overallProgress =
             (startProgress + (targetProgress - startProgress) * eased)
@@ -358,6 +302,81 @@ class _UploadMatchScreenState extends ConsumerState<UploadMatchScreen>
   void _retryProcessing() {
     _processingTimer?.cancel();
     _startProcessing();
+  }
+
+  Future<void> _completeAnalysis() async {
+    final jobId = _jobId;
+    if (jobId == null) {
+      if (!mounted) return;
+      setState(() => _failureReason = 'Upload job was not created.');
+      _goTo(_UploadStep.failed);
+      return;
+    }
+
+    final uploadRepo = ref.read(uploadRepositoryProvider);
+    final engine = ref.read(analysisEngineProvider);
+    final analysisRepo = ref.read(analysisRepositoryProvider);
+    final jobForAnalysis = UploadJobModel(
+      id: jobId,
+      homeTeam: _formData.homeTeam,
+      awayTeam: _formData.awayTeam,
+      competition: _formData.competition,
+      venue: _formData.venue,
+      matchDate: _formData.matchDate,
+      fileName: _pickedVideo?.name ?? _formData.fileName ?? 'match.mp4',
+      uploadedAt: DateTime.now(),
+      status: UploadStatus.processing,
+      notes: _formData.notes,
+    );
+
+    try {
+      final analysisId = await engine.analyzeUpload(
+        uploadJobId: jobId,
+        job: jobForAnalysis,
+        sourceVideoUrl: _uploadedVideoUrl,
+      );
+      if (analysisId == null) {
+        throw Exception('The analysis engine did not return an analysis id.');
+      }
+
+      final persisted = await analysisRepo.fetchAnalysisById(analysisId);
+      await uploadRepo.updateJobStatus(
+        jobId,
+        status: UploadStatus.completed,
+        progress: 1.0,
+        stage: ProcessingStage.finalizingReport,
+      );
+
+      if (!mounted) return;
+      setState(() {
+        _analysisId = analysisId;
+        _generatedAnalysis = persisted;
+      });
+
+      // The analysis, analyzed video and per-player verdicts are in the DB now,
+      // so refresh every screen that can surface them.
+      CacheService.invalidatePrefix('squad:');
+      CacheService.invalidatePrefix('player:');
+      ref.invalidate(matchAnalysisListProvider);
+      ref.invalidate(squadProvider);
+      ref.invalidate(squadRiskProvider);
+      ref.invalidate(uploadHistoryProvider);
+      ref.invalidate(managerPlayersProvider);
+      ref.invalidate(managerDashboardProvider);
+
+      _goTo(_UploadStep.success);
+    } catch (e) {
+      unawaited(uploadRepo.updateJobStatus(
+        jobId,
+        status: UploadStatus.failed,
+        progress: _overallProgress,
+        stage: ProcessingStage.finalizingReport,
+      ));
+      if (!mounted) return;
+      setState(
+          () => _failureReason = e.toString().replaceFirst('Exception: ', ''));
+      _goTo(_UploadStep.failed);
+    }
   }
 
   void _retryFromDetails() {
@@ -430,8 +449,8 @@ class _UploadMatchScreenState extends ConsumerState<UploadMatchScreen>
   @override
   Widget build(BuildContext context) {
     final hp = context.rs(20, min: 14, max: 28);
-    final showBack = _step == _UploadStep.matchDetails ||
-        _step == _UploadStep.confirmation;
+    final showBack =
+        _step == _UploadStep.matchDetails || _step == _UploadStep.confirmation;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -660,8 +679,8 @@ class _MatchDetailsStep extends StatelessWidget {
                   AppColors.textPrimary.withValues(alpha: 0.5),
               padding: EdgeInsets.symmetric(
                   vertical: context.rs(15, min: 12, max: 18)),
-              shape: const RoundedRectangleBorder(
-                  borderRadius: AppRadius.button),
+              shape:
+                  const RoundedRectangleBorder(borderRadius: AppRadius.button),
               elevation: 0,
             ),
           ),

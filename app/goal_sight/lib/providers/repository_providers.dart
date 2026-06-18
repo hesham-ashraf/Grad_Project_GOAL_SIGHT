@@ -58,11 +58,10 @@ final managerRepositoryProvider = Provider<IManagerRepository>(
   (_) => const SupabaseManagerRepository(),
 );
 
-/// Analysis engine — turns a completed upload into a persisted match analysis.
-/// Currently a simulator; swap for the real model by returning another
-/// IAnalysisEngine here.
+/// Analysis engine - calls the configured ML backend when ANALYSIS_API_URL is
+/// set, with the simulator kept as a demo/offline fallback.
 final analysisEngineProvider = Provider<IAnalysisEngine>(
-  (_) => const SimulatedAnalysisEngine(),
+  (_) => ModelAnalysisEngine(),
 );
 
 /// Storage repository — analysis exports + report persistence.
@@ -104,23 +103,28 @@ final clubsPagedProvider = StateNotifierProvider.autoDispose
 
 /// Squad for a given club (null = all players)
 final squadProvider = FutureProvider.family<List<PlayerProfileModel>, String?>(
-  (ref, clubId) => ref.watch(playerRepositoryProvider).fetchSquad(clubId: clubId),
+  (ref, clubId) =>
+      ref.watch(playerRepositoryProvider).fetchSquad(clubId: clubId),
 );
 
 /// Single player by id
 final playerDetailProvider = FutureProvider.family<PlayerProfileModel, String>(
-  (ref, playerId) => ref.watch(playerRepositoryProvider).fetchPlayerById(playerId),
+  (ref, playerId) =>
+      ref.watch(playerRepositoryProvider).fetchPlayerById(playerId),
 );
 
 /// Risk analysis for a single player
 final playerRiskProvider = FutureProvider.family<RiskAnalysisModel, String>(
-  (ref, playerId) => ref.watch(playerRepositoryProvider).fetchRiskAnalysis(playerId),
+  (ref, playerId) =>
+      ref.watch(playerRepositoryProvider).fetchRiskAnalysis(playerId),
 );
 
 /// Full squad risk analysis, sorted by composite score descending
-final squadRiskProvider = FutureProvider.family<List<RiskAnalysisModel>, String?>(
-  (ref, clubId) =>
-      ref.watch(playerRepositoryProvider).fetchSquadRiskAnalysis(clubId: clubId),
+final squadRiskProvider =
+    FutureProvider.family<List<RiskAnalysisModel>, String?>(
+  (ref, clubId) => ref
+      .watch(playerRepositoryProvider)
+      .fetchSquadRiskAnalysis(clubId: clubId),
 );
 
 // ── Analysis providers ────────────────────────────────────────────────────
@@ -151,13 +155,13 @@ final latestAnalysisProvider =
 /// Upload history for a given manager (null = all uploads)
 final uploadHistoryProvider =
     FutureProvider.family<List<UploadJobModel>, String?>(
-  (ref, managerId) =>
-      ref.watch(uploadRepositoryProvider).fetchUploadHistory(managerId: managerId),
+  (ref, managerId) => ref
+      .watch(uploadRepositoryProvider)
+      .fetchUploadHistory(managerId: managerId),
 );
 
 /// Single upload job by id
-final uploadJobDetailProvider =
-    FutureProvider.family<UploadJobModel, String>(
+final uploadJobDetailProvider = FutureProvider.family<UploadJobModel, String>(
   (ref, jobId) => ref.watch(uploadRepositoryProvider).fetchUploadById(jobId),
 );
 
@@ -165,8 +169,7 @@ final uploadJobDetailProvider =
 
 /// All managers, optionally filtered by active status
 /// Pass '' to get all, 'active' for active only, 'disabled' for inactive only
-final managerListProvider =
-    FutureProvider.family<List<ManagerModel>, String>(
+final managerListProvider = FutureProvider.family<List<ManagerModel>, String>(
   (ref, filter) {
     bool? activeOnly;
     if (filter == 'active') activeOnly = true;
@@ -204,15 +207,13 @@ final analysisExportsProvider =
 /// Stored reports, optionally filtered by report type (null = all).
 final storedReportsProvider =
     FutureProvider.family<List<StoredReportModel>, StoredReportType?>(
-  (ref, type) =>
-      ref.watch(storageRepositoryProvider).fetchReports(type: type),
+  (ref, type) => ref.watch(storageRepositoryProvider).fetchReports(type: type),
 );
 
 // ── Notification providers ────────────────────────────────────────────────
 
 /// Notification repository singleton.
-final notificationRepositoryProvider =
-    Provider<SupabaseNotificationRepository>(
+final notificationRepositoryProvider = Provider<SupabaseNotificationRepository>(
   (_) => const SupabaseNotificationRepository(),
 );
 
