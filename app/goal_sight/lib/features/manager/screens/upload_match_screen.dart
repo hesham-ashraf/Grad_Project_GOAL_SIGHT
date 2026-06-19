@@ -7,13 +7,16 @@ import 'package:image_picker/image_picker.dart';
 import '../../../core/services/cache_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
+import '../../../data/models/analysis_job_model.dart';
 import '../../../data/models/match_analysis_model.dart';
 import '../../../data/models/upload_job_model.dart';
+import '../../../data/services/analysis_api_client.dart';
 import '../../../providers/app_providers.dart';
 import '../../../providers/manager_players_provider.dart';
 import '../../../providers/repository_providers.dart';
 import '../widgets/ai_processing_widgets.dart';
 import '../widgets/upload_widgets.dart';
+import 'player_naming_screen.dart';
 
 // ─── Step Enum ────────────────────────────────────────────────────────────────
 
@@ -45,11 +48,9 @@ class _UploadMatchScreenState extends ConsumerState<UploadMatchScreen>
   ProcessingStage? _currentStage;
   double _overallProgress = 0.0;
   Timer? _processingTimer;
-  int _stageIndex = -1;
-  String? _jobId; // DB job ID once created
+  String? _serviceJobId; // WSL analysis-service job id
   String? _analysisId; // real match_analyses ID once the engine persists it
   XFile? _pickedVideo; // the real video file the manager selected
-  String? _uploadedVideoUrl; // signed URL of the uploaded video (playback)
 
   // Failure state
   String _failureReason = '';
@@ -188,195 +189,189 @@ class _UploadMatchScreenState extends ConsumerState<UploadMatchScreen>
   void _startProcessing() {
     _goTo(_UploadStep.processing);
     setState(() {
-      _currentStage = null;
+      _currentStage = ProcessingStage.detectingPlayers;
       _overallProgress = 0.0;
-      _stageIndex = -1;
     });
-    _createJobThenProcess();
+    unawaited(_runPipeline());
   }
 
-  Future<void> _createJobThenProcess() async {
+  /// Real pipeline: upload → detect → name players → full analysis → results.
+  /// The WSL FastAPI service runs the model and persists everything to
+  /// Supabase; the app polls status and fetches the persisted analysis.
+  Future<void> _runPipeline() async {
+    final api = ref.read(analysisApiClientProvider);
+    final clubId = ref.read(managerClubIdProvider);
+    final userId = ref.read(authControllerProvider).user?.id;
+
+    if (_pickedVideo == null) {
+      _fail('No video selected.');
+      return;
+    }
+    if (clubId == null || clubId.isEmpty) {
+      _fail('No club assigned to your account yet. Ask your admin to add you '
+          'to a club, then try again.');
+      return;
+    }
+    if (!api.isConfigured) {
+      _fail('No analysis server configured. Set ANALYSIS_API_URL in .env to '
+          'your ngrok URL and restart the app.');
+      return;
+    }
+
     try {
-      final storage = ref.read(storageRepositoryProvider);
-      final repo = ref.read(uploadRepositoryProvider);
-      final clubId = ref.read(managerClubIdProvider);
-
-      // 1. Upload the real video bytes to the private match-videos bucket and
-      //    record the videos row (owner_club_id stamped by the DB trigger).
-      //    Files are stored under the club's folder for per-club isolation.
-      if (_pickedVideo != null) {
-        if (clubId == null || clubId.isEmpty) {
-          throw Exception('No club assigned to your account yet. '
-              'Ask your admin to add you to a club, then try again.');
-        }
-        final bytes = await _pickedVideo!.readAsBytes();
-        final result = await storage.uploadMatchVideo(
-          bytes: bytes,
-          fileName: _pickedVideo!.name,
-          clubId: clubId,
-        );
-        _uploadedVideoUrl = result.signedUrl;
-      }
-
-      // 2. Create the upload job (RLS scopes it to the manager's club).
-      final job = await repo.createUploadJob(UploadJobModel(
-        id: '',
+      // 1) Send the video to the WSL service; detection starts immediately.
+      _serviceJobId = await api.createJob(
+        videoPath: _pickedVideo!.path,
+        fileName: _pickedVideo!.name,
         homeTeam: _formData.homeTeam,
         awayTeam: _formData.awayTeam,
         competition: _formData.competition,
         venue: _formData.venue,
-        matchDate: _formData.matchDate,
-        fileName: _pickedVideo?.name ?? _formData.fileName ?? 'match.mp4',
-        uploadedAt: DateTime.now(),
-        status: UploadStatus.processing,
-        notes: _formData.notes,
-      ));
-      _jobId = job.id;
-    } catch (e) {
-      // Real upload failure → show the failed step instead of faking success.
-      if (mounted) {
-        setState(() =>
-            _failureReason = e.toString().replaceFirst('Exception: ', ''));
-        _goTo(_UploadStep.failed);
+        matchDate: _formData.matchDate.toIso8601String(),
+        clubId: clubId,
+        uploadedBy: userId,
+      );
+
+      // 2) Poll until the model has detected players (awaiting_naming).
+      final detect = await _pollUntil(
+          api,
+          _serviceJobId!,
+          (s) =>
+              s.status == AnalysisJobStatus.awaitingNaming ||
+              s.status.isTerminal);
+      if (detect.status == AnalysisJobStatus.failed) {
+        _fail(detect.error ?? 'Detection failed.');
+        return;
       }
-      return;
-    }
-    if (mounted) {
-      Future.delayed(const Duration(milliseconds: 800), _advanceStage);
+      if (detect.status == AnalysisJobStatus.completed) {
+        await _finish(api, _serviceJobId!); // no naming needed (rare)
+        return;
+      }
+
+      // 3) Show the naming screen and collect the manager's mapping.
+      final naming = await api.getNaming(_serviceJobId!);
+      if (!mounted) return;
+      final result = await Navigator.of(context).push<NamingResult>(
+        MaterialPageRoute(builder: (_) => PlayerNamingScreen(data: naming)),
+      );
+      if (result == null) {
+        _fail('Player naming was cancelled.');
+        return;
+      }
+
+      // 4) Submit names → the model resumes the full analysis.
+      if (mounted) {
+        setState(() {
+          _currentStage = ProcessingStage.trackingBall;
+          _overallProgress = 0.5;
+        });
+      }
+      await api.confirmPlayers(
+        jobId: _serviceJobId!,
+        mappings: result.mappings,
+        myTeamId: result.myTeamId,
+      );
+
+      // 5) Poll until the full analysis is complete.
+      final done =
+          await _pollUntil(api, _serviceJobId!, (s) => s.status.isTerminal);
+      if (done.status == AnalysisJobStatus.failed) {
+        _fail(done.error ?? 'Analysis failed.');
+        return;
+      }
+      await _finish(api, _serviceJobId!);
+    } catch (e) {
+      _fail(e.toString().replaceFirst('Exception: ', ''));
     }
   }
 
-  void _advanceStage() {
-    if (!mounted) return;
+  /// Polls job status (every 3s), updating the progress UI, until [done].
+  Future<AnalysisJobStatusResult> _pollUntil(
+    AnalysisApiClient api,
+    String jobId,
+    bool Function(AnalysisJobStatusResult) done,
+  ) async {
+    while (mounted) {
+      AnalysisJobStatusResult s;
+      try {
+        s = await api.getStatus(jobId);
+      } catch (_) {
+        await Future.delayed(const Duration(seconds: 3));
+        continue; // transient network hiccup → keep polling
+      }
+      if (mounted) {
+        setState(() {
+          _overallProgress = s.progress.clamp(0.0, 1.0);
+          _currentStage = _stageFor(s);
+        });
+      }
+      if (done(s)) return s;
+      await Future.delayed(const Duration(seconds: 3));
+    }
+    return api.getStatus(jobId);
+  }
 
-    const stages = ProcessingStage.values;
-    _stageIndex++;
+  ProcessingStage _stageFor(AnalysisJobStatusResult s) {
+    switch (s.status) {
+      case AnalysisJobStatus.analyzing:
+        final p = s.progress;
+        if (p >= 0.9) return ProcessingStage.finalizingReport;
+        if (p >= 0.8) return ProcessingStage.creatingPlayerReports;
+        if (p >= 0.7) return ProcessingStage.generatingInsights;
+        if (p >= 0.6) return ProcessingStage.buildingTacticalModel;
+        if (p >= 0.5) return ProcessingStage.calculatingSpeed;
+        return ProcessingStage.estimatingPossession;
+      case AnalysisJobStatus.completed:
+        return ProcessingStage.finalizingReport;
+      default:
+        return ProcessingStage.detectingPlayers;
+    }
+  }
 
-    if (_stageIndex >= stages.length) {
-      setState(() {
-        _overallProgress = 1.0;
-        _currentStage = stages.last;
-      });
-      unawaited(_completeAnalysis());
-      return;
+  /// Fetches the result + the Supabase-persisted analysis, refreshes caches.
+  Future<void> _finish(AnalysisApiClient api, String jobId) async {
+    final res = await api.getResult(jobId);
+    _analysisId = res.analysisId;
+
+    MatchAnalysisModel? persisted;
+    if (_analysisId != null) {
+      try {
+        persisted = await ref
+            .read(analysisRepositoryProvider)
+            .fetchAnalysisById(_analysisId!);
+      } catch (_) {
+        persisted = null;
+      }
     }
 
-    final stage = stages[_stageIndex];
-    final targetProgress = stage.completionProgress;
+    // The analysis, analyzed video and per-player verdicts are in Supabase now,
+    // so refresh every screen that can surface them.
+    CacheService.invalidatePrefix('squad:');
+    CacheService.invalidatePrefix('player:');
+    ref.invalidate(matchAnalysisListProvider);
+    ref.invalidate(squadProvider);
+    ref.invalidate(squadRiskProvider);
+    ref.invalidate(uploadHistoryProvider);
+    ref.invalidate(managerPlayersProvider);
+    ref.invalidate(managerDashboardProvider);
 
+    if (!mounted) return;
     setState(() {
-      _currentStage = stage;
+      _generatedAnalysis = persisted;
+      _overallProgress = 1.0;
     });
+    _goTo(_UploadStep.success);
+  }
 
-    // Animate progress toward target over the stage duration
-    const stageDurationMs = 2400; // ~2.4s per stage
-    const tickMs = 80;
-    const ticks = stageDurationMs ~/ tickMs;
-    final startProgress = _overallProgress;
-    int tick = 0;
-
-    _processingTimer?.cancel();
-    _processingTimer =
-        Timer.periodic(const Duration(milliseconds: tickMs), (timer) {
-      if (!mounted) {
-        timer.cancel();
-        return;
-      }
-      tick++;
-      final t = (tick / ticks).clamp(0.0, 1.0);
-      final eased = Curves.easeInOut.transform(t.clamp(0.0, 1.0));
-      setState(() {
-        _overallProgress =
-            (startProgress + (targetProgress - startProgress) * eased)
-                .clamp(0.0, 1.0);
-      });
-
-      if (tick >= ticks) {
-        timer.cancel();
-        // Brief pause between stages
-        Future.delayed(const Duration(milliseconds: 300), _advanceStage);
-      }
-    });
+  void _fail(String reason) {
+    if (!mounted) return;
+    setState(() => _failureReason = reason);
+    _goTo(_UploadStep.failed);
   }
 
   void _retryProcessing() {
     _processingTimer?.cancel();
     _startProcessing();
-  }
-
-  Future<void> _completeAnalysis() async {
-    final jobId = _jobId;
-    if (jobId == null) {
-      if (!mounted) return;
-      setState(() => _failureReason = 'Upload job was not created.');
-      _goTo(_UploadStep.failed);
-      return;
-    }
-
-    final uploadRepo = ref.read(uploadRepositoryProvider);
-    final engine = ref.read(analysisEngineProvider);
-    final analysisRepo = ref.read(analysisRepositoryProvider);
-    final jobForAnalysis = UploadJobModel(
-      id: jobId,
-      homeTeam: _formData.homeTeam,
-      awayTeam: _formData.awayTeam,
-      competition: _formData.competition,
-      venue: _formData.venue,
-      matchDate: _formData.matchDate,
-      fileName: _pickedVideo?.name ?? _formData.fileName ?? 'match.mp4',
-      uploadedAt: DateTime.now(),
-      status: UploadStatus.processing,
-      notes: _formData.notes,
-    );
-
-    try {
-      final analysisId = await engine.analyzeUpload(
-        uploadJobId: jobId,
-        job: jobForAnalysis,
-        sourceVideoUrl: _uploadedVideoUrl,
-      );
-      if (analysisId == null) {
-        throw Exception('The analysis engine did not return an analysis id.');
-      }
-
-      final persisted = await analysisRepo.fetchAnalysisById(analysisId);
-      await uploadRepo.updateJobStatus(
-        jobId,
-        status: UploadStatus.completed,
-        progress: 1.0,
-        stage: ProcessingStage.finalizingReport,
-      );
-
-      if (!mounted) return;
-      setState(() {
-        _analysisId = analysisId;
-        _generatedAnalysis = persisted;
-      });
-
-      // The analysis, analyzed video and per-player verdicts are in the DB now,
-      // so refresh every screen that can surface them.
-      CacheService.invalidatePrefix('squad:');
-      CacheService.invalidatePrefix('player:');
-      ref.invalidate(matchAnalysisListProvider);
-      ref.invalidate(squadProvider);
-      ref.invalidate(squadRiskProvider);
-      ref.invalidate(uploadHistoryProvider);
-      ref.invalidate(managerPlayersProvider);
-      ref.invalidate(managerDashboardProvider);
-
-      _goTo(_UploadStep.success);
-    } catch (e) {
-      unawaited(uploadRepo.updateJobStatus(
-        jobId,
-        status: UploadStatus.failed,
-        progress: _overallProgress,
-        stage: ProcessingStage.finalizingReport,
-      ));
-      if (!mounted) return;
-      setState(
-          () => _failureReason = e.toString().replaceFirst('Exception: ', ''));
-      _goTo(_UploadStep.failed);
-    }
   }
 
   void _retryFromDetails() {
@@ -414,14 +409,11 @@ class _UploadMatchScreenState extends ConsumerState<UploadMatchScreen>
       _formData = UploadFormData();
       _generatedAnalysis = null;
       _analysisId = null;
-      _jobId = null;
+      _serviceJobId = null;
       _pickedVideo = null;
-      _uploadedVideoUrl = null;
       _currentStage = null;
       _overallProgress = 0.0;
-      _stageIndex = -1;
       _failureReason = '';
-      _jobId = null;
     });
     _stepCtrl.forward(from: 0);
   }

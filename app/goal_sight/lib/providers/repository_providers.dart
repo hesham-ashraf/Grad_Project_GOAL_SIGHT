@@ -29,6 +29,7 @@ import '../data/repositories/supabase/supabase_manager_repository.dart';
 import '../data/repositories/supabase/supabase_upload_repository.dart';
 import '../data/repositories/supabase/supabase_notification_repository.dart';
 import '../data/services/analysis_engine.dart';
+import '../data/services/analysis_api_client.dart';
 import '../data/models/upload_job_model.dart';
 import '../data/models/notification_model.dart';
 
@@ -63,6 +64,12 @@ final managerRepositoryProvider = Provider<IManagerRepository>(
 /// set, with the simulator kept as a demo/offline fallback.
 final analysisEngineProvider = Provider<IAnalysisEngine>(
   (_) => ModelAnalysisEngine(),
+);
+
+/// Stateful analysis API client — talks to the WSL FastAPI service (ngrok).
+/// Drives the real upload→detect→name→analyze flow from the manager app.
+final analysisApiClientProvider = Provider<AnalysisApiClient>(
+  (_) => AnalysisApiClient(),
 );
 
 /// Storage repository — analysis exports + report persistence.

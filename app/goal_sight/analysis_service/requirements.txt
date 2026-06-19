@@ -1,0 +1,10 @@
+# GoalSight Analysis Service — API layer deps.
+# The football_ai model's own deps (ultralytics, opencv, numpy, torch, ...)
+# are installed separately from the model's requirements.txt (see Dockerfile),
+# because this service IMPORTS the model package rather than vendoring it.
+fastapi>=0.111.0
+uvicorn[standard]>=0.30.0
+python-multipart>=0.0.9
+pydantic>=2.7.0
+supabase>=2.5.0
+python-dotenv>=1.0.1
