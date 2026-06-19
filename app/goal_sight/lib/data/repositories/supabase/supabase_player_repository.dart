@@ -9,6 +9,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/services/cache_service.dart';
+import '../../models/player_heatmap_model.dart';
 import '../../models/player_profile_model.dart';
 import '../../models/risk_analysis_model.dart';
 import '../interfaces/i_player_repository.dart';
@@ -31,6 +32,39 @@ final class SupabasePlayerRepository implements IPlayerRepository {
   static const _cacheTtl = Duration(minutes: 8);
 
   // ── IPlayerRepository ─────────────────────────────────────────────────────
+
+  @override
+  Future<List<PlayerMatchHeatmap>> fetchPlayerHeatmaps(String playerId) async {
+    // All of a player's per-match heatmaps, joined to the parent match for a
+    // label. RLS scopes this to the caller's club.
+    final rows = await _client
+        .from('match_player_analysis')
+        .select(
+            'heatmap_url, match_analyses(home_team_name, away_team_name, date_label, created_at)')
+        .eq('player_id', playerId)
+        .not('heatmap_url', 'is', null);
+
+    final list = (rows as List).cast<Map<String, dynamic>>().map((r) {
+      final m = (r['match_analyses'] as Map?)?.cast<String, dynamic>() ?? const {};
+      final home = (m['home_team_name'] ?? '').toString();
+      final away = (m['away_team_name'] ?? '').toString();
+      final label = (home.isNotEmpty && away.isNotEmpty)
+          ? '$home vs $away'
+          : 'Match heatmap';
+      return (
+        heatmap: PlayerMatchHeatmap(
+          matchLabel: label,
+          dateLabel: (m['date_label'] ?? '').toString(),
+          url: (r['heatmap_url'] ?? '').toString(),
+        ),
+        createdAt: (m['created_at'] ?? '').toString(),
+      );
+    }).where((e) => e.heatmap.url.isNotEmpty).toList()
+      // Newest match first.
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+    return list.map((e) => e.heatmap).toList();
+  }
 
   @override
   Future<List<PlayerProfileModel>> fetchSquad({String? clubId}) async {

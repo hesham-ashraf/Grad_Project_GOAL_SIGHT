@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/services/haptic_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../providers/app_providers.dart';
+import '../../../providers/repository_providers.dart';
 
 class AdminProfilePage extends ConsumerStatefulWidget {
   const AdminProfilePage({super.key});
@@ -69,6 +70,20 @@ class _AdminProfilePageState extends ConsumerState<AdminProfilePage>
 
   @override
   Widget build(BuildContext context) {
+    final user = ref.watch(authControllerProvider).user;
+    final name = user?.name.isNotEmpty == true ? user!.name : 'Administrator';
+    final email = user?.email.isNotEmpty == true ? user!.email : '—';
+
+    final clubId = ref.watch(adminClubIdProvider);
+    final club = clubId == null
+        ? null
+        : ref.watch(clubDetailProvider(clubId)).asData?.value;
+    final clubSubtitle = club == null
+        ? 'No club yet — create one from the dashboard'
+        : '${club.name}${club.league.isNotEmpty ? ' — ${club.league}' : ''}';
+
+    final managerCount = ref.watch(adminSystemOverviewProvider).asData?.value.totalUsers ?? 0;
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
@@ -88,7 +103,7 @@ class _AdminProfilePageState extends ConsumerState<AdminProfilePage>
         physics: const BouncingScrollPhysics(),
         children: [
           // 0 — Profile header
-          _reveal(0, _ProfileHeader()),
+          _reveal(0, _ProfileHeader(name: name, email: email)),
           const SizedBox(height: 24),
 
           // 1 — Club settings
@@ -97,13 +112,11 @@ class _AdminProfilePageState extends ConsumerState<AdminProfilePage>
             icon: Icons.shield_outlined,
             color: AppColors.primaryPurple,
             children: [
-              _SettingTile(icon: Icons.shield_outlined, label: 'Club Details', subtitle: 'GoalSight FC — Premier League', color: AppColors.primaryPurple, onTap: () => _showComingSoon('Club Details')),
+              _SettingTile(icon: Icons.shield_outlined, label: 'Club Details', subtitle: clubSubtitle, color: AppColors.primaryPurple, onTap: () => _showComingSoon('Club Details')),
               _Divider(),
-              _SettingTile(icon: Icons.sports_soccer_outlined, label: 'Season Settings', subtitle: '2024–25 Season', color: AppColors.accentCyan, onTap: () => _showComingSoon('Season Settings')),
+              _SettingTile(icon: Icons.sports_soccer_outlined, label: 'Season Settings', subtitle: '2025/26 Season', color: AppColors.accentCyan, onTap: () => _showComingSoon('Season Settings')),
               _Divider(),
-              _SettingTile(icon: Icons.group_outlined, label: 'Staff Directory', subtitle: '6 managers · 2 analysts', color: AppColors.accentGreen, onTap: () => context.push('/admin/managers')),
-              _Divider(),
-              _SettingTile(icon: Icons.workspace_premium_outlined, label: 'Plan & Billing', subtitle: 'Enterprise · Renews Jan 2026', color: AppColors.warning, onTap: () => _showComingSoon('Plan & Billing')),
+              _SettingTile(icon: Icons.group_outlined, label: 'Staff Directory', subtitle: '$managerCount manager${managerCount == 1 ? '' : 's'}', color: AppColors.accentGreen, onTap: () => context.push('/admin/managers')),
             ],
           )),
           const SizedBox(height: 16),
@@ -133,9 +146,7 @@ class _AdminProfilePageState extends ConsumerState<AdminProfilePage>
             children: [
               _ToggleTile(icon: Icons.lock_outlined, label: 'Two-Factor Authentication', subtitle: '2FA via Authenticator app', value: _twoFaEnabled, onChanged: (v) => setState(() => _twoFaEnabled = v), color: AppColors.accentGreen),
               _Divider(),
-              _SettingTile(icon: Icons.password_outlined, label: 'Change Password', subtitle: 'Last changed 3 months ago', color: AppColors.accentCyan, onTap: _changePassword),
-              _Divider(),
-              _SettingTile(icon: Icons.devices_outlined, label: 'Active Sessions', subtitle: '2 devices signed in', color: AppColors.warning, onTap: () => _showComingSoon('Active Sessions')),
+              _SettingTile(icon: Icons.password_outlined, label: 'Change Password', subtitle: 'Update your account password', color: AppColors.accentCyan, onTap: _changePassword),
               _Divider(),
               _SettingTile(icon: Icons.history_outlined, label: 'Login History', subtitle: 'View recent sign-ins', color: AppColors.textMuted, onTap: () => _showComingSoon('Login History')),
             ],
@@ -180,6 +191,11 @@ class _AdminProfilePageState extends ConsumerState<AdminProfilePage>
 // ─── Profile Header ──────────────────────────────────────────────────────────
 
 class _ProfileHeader extends StatelessWidget {
+  const _ProfileHeader({required this.name, required this.email});
+
+  final String name;
+  final String email;
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -213,17 +229,18 @@ class _ProfileHeader extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('System Administrator',
-                    style: AppTextStyles.title(color: Colors.white).copyWith(fontSize: 18)),
+                Text(name,
+                    style: AppTextStyles.title(color: Colors.white).copyWith(fontSize: 18),
+                    maxLines: 1, overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 4),
-                Text('admin@goalsight.com',
-                    style: AppTextStyles.caption(color: AppColors.textMuted)),
+                Text(email,
+                    style: AppTextStyles.caption(color: AppColors.textMuted),
+                    maxLines: 1, overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 8),
                 const Wrap(
                   spacing: 8,
                   children: [
                     _Badge(label: 'ADMIN', color: AppColors.primaryPurple),
-                    _Badge(label: 'ENTERPRISE', color: AppColors.accentGreen),
                   ],
                 ),
               ],

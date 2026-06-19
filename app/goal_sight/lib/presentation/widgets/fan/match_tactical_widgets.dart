@@ -3,6 +3,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
 import '../../../data/models/match_analysis_model.dart';
 import '../../../shared/widgets/gs_animated_bar.dart';
+import '../../../shared/widgets/gs_heatmap_image.dart';
 import '../../../shared/widgets/gs_mini_line_chart.dart';
 import '../../../shared/widgets/gs_pitch_painter.dart';
 
@@ -1067,11 +1068,13 @@ class CoachRecommendationsCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              const _SectionHeader(
-                title: 'Coach Recommendations',
-                icon: Icons.lightbulb_rounded,
-                color: AppColors.accentGreen,
-                subtitle: 'AI-generated tactical advice',
+              const Expanded(
+                child: _SectionHeader(
+                  title: 'Coach Recommendations',
+                  icon: Icons.lightbulb_rounded,
+                  color: AppColors.accentGreen,
+                  subtitle: 'AI-generated tactical advice',
+                ),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -1642,7 +1645,10 @@ class HeatmapCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Derive heatmap from team attacking zones
+    final modelHeatmap = match.heatmapUrl;
+    final hasModelHeatmap = modelHeatmap != null && modelHeatmap.isNotEmpty;
+
+    // Derive synthetic fallback heatmap from team attacking zones.
     final homeData = _zoneToHeatmap(match.homeAnalysis.attackingZones, true);
     final awayData = _zoneToHeatmap(match.awayAnalysis.attackingZones, false);
 
@@ -1650,25 +1656,35 @@ class HeatmapCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const _SectionHeader(
+          _SectionHeader(
               title: 'Movement Heatmaps',
               icon: Icons.thermostat_rounded,
               color: AppColors.primaryBlue,
-              subtitle: 'Activity density map'),
+              subtitle: hasModelHeatmap
+                  ? 'AI-generated match heatmap'
+                  : 'Activity density map'),
           SizedBox(height: context.rs(16, min: 12, max: 20)),
-          GsPitchWidget(
-            heatmapData: [...homeData, ...awayData],
-            showZones: false,
-            height: context.rs(160, min: 130, max: 200),
-          ),
-          SizedBox(height: context.rs(10, min: 8, max: 12)),
-          Row(
-            children: [
-              _HeatLegend(color: AppColors.accentCyan, label: match.homeTeam),
-              const SizedBox(width: 16),
-              _HeatLegend(color: AppColors.primaryPurple, label: match.awayTeam),
-            ],
-          ),
+          if (hasModelHeatmap)
+            GsHeatmapImage(
+              url: modelHeatmap,
+              height: context.rs(200, min: 150, max: 260),
+            )
+          else ...[
+            GsPitchWidget(
+              heatmapData: [...homeData, ...awayData],
+              showZones: false,
+              height: context.rs(160, min: 130, max: 200),
+            ),
+            SizedBox(height: context.rs(10, min: 8, max: 12)),
+            Row(
+              children: [
+                _HeatLegend(color: AppColors.accentCyan, label: match.homeTeam),
+                const SizedBox(width: 16),
+                _HeatLegend(
+                    color: AppColors.primaryPurple, label: match.awayTeam),
+              ],
+            ),
+          ],
         ],
       ),
     );
@@ -2018,11 +2034,13 @@ class AIInsightsCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              const _SectionHeader(
-                title: 'AI Match Insights',
-                icon: Icons.auto_awesome_rounded,
-                color: AppColors.primaryPurple,
-                subtitle: 'Neural pattern analysis',
+              const Expanded(
+                child: _SectionHeader(
+                  title: 'AI Match Insights',
+                  icon: Icons.auto_awesome_rounded,
+                  color: AppColors.primaryPurple,
+                  subtitle: 'Neural pattern analysis',
+                ),
               ),
               _AIPulse(),
             ],

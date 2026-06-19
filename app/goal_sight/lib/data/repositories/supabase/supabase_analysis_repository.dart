@@ -93,6 +93,9 @@ final class SupabaseAnalysisRepository implements IAnalysisRepository {
       analyzedVideoUrl: (row['analyzed_video_url'] as String?)?.trim().isEmpty ?? true
           ? null
           : row['analyzed_video_url'] as String,
+      heatmapUrl: (row['heatmap_url'] as String?)?.trim().isEmpty ?? true
+          ? null
+          : row['heatmap_url'] as String,
       summary: MatchSummaryModel(
         dominantTeam: (row['dominant_team'] ?? '').toString(),
         homeAvgRating: (row['home_avg_rating'] as num? ?? 0).toDouble(),
@@ -142,6 +145,9 @@ final class SupabaseAnalysisRepository implements IAnalysisRepository {
         keyPasses: (p['key_passes'] as num? ?? 0).toInt(),
         isMOTM: p['is_motm'] == true,
         isWorst: p['is_worst'] == true,
+        heatmapUrl: (p['heatmap_url'] as String?)?.trim().isEmpty ?? true
+            ? null
+            : p['heatmap_url'] as String,
       );
 
   List<String> _stringList(dynamic value) {

@@ -703,6 +703,11 @@ class AdminDashboardHero extends ConsumerWidget {
     final totalAnalyses = overview.maybeWhen(data: (o) => o.totalMatches, orElse: () => 0);
     const unreadAlerts = 0; // Task 8: wire to notifications table
 
+    final clubId = ref.watch(adminClubIdProvider);
+    final clubName = clubId == null
+        ? 'My Club'
+        : (ref.watch(clubDetailProvider(clubId)).asData?.value.name ?? 'My Club');
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -737,7 +742,7 @@ class AdminDashboardHero extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('GoalSight FC', style: AppTextStyles.title(color: Colors.white)),
+                    Text(clubName, style: AppTextStyles.title(color: Colors.white), maxLines: 1, overflow: TextOverflow.ellipsis),
                     Text('System Operational', style: AppTextStyles.caption(color: AppColors.accentGreen)),
                   ],
                 ),

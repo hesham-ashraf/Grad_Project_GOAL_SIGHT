@@ -12,6 +12,7 @@ import '../data/models/analysis_export_model.dart';
 import '../data/models/club_model.dart';
 import '../data/models/manager_model.dart';
 import '../data/models/match_analysis_model.dart';
+import '../data/models/player_heatmap_model.dart';
 import '../data/models/player_profile_model.dart';
 import '../data/models/risk_analysis_model.dart';
 import '../data/repositories/interfaces/i_analysis_repository.dart';
@@ -111,6 +112,14 @@ final squadProvider = FutureProvider.family<List<PlayerProfileModel>, String?>(
 final playerDetailProvider = FutureProvider.family<PlayerProfileModel, String>(
   (ref, playerId) =>
       ref.watch(playerRepositoryProvider).fetchPlayerById(playerId),
+);
+
+/// Per-match movement heatmaps for a player (newest first). Empty until the
+/// AI pipeline produces heatmaps for the player.
+final playerHeatmapsProvider =
+    FutureProvider.family<List<PlayerMatchHeatmap>, String>(
+  (ref, playerId) =>
+      ref.watch(playerRepositoryProvider).fetchPlayerHeatmaps(playerId),
 );
 
 /// Risk analysis for a single player

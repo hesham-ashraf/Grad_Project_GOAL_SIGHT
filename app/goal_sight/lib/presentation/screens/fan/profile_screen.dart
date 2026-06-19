@@ -4,7 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_roles.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
+import '../../../data/models/fan_profile_model.dart';
 import '../../../providers/app_providers.dart';
+import '../../../providers/fan_profile_provider.dart';
 import '../../../shared/widgets/gs_animated_bar.dart';
 import '../../widgets/fan/fan_profile_advanced_widgets.dart';
 import '../../widgets/fan/profile_widgets.dart';
@@ -100,7 +102,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
               SizedBox(height: h * 1.25),
 
               // ── Section label ─────────────────────────────────────────────
-              _section(2, _GroupLabel('My Content')),
+              _section(2, const _GroupLabel('My Content')),
               SizedBox(height: context.rs(10, min: 8, max: 14)),
 
               // ── 3. Content group (expandable tiles) ───────────────────────
@@ -108,7 +110,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
               SizedBox(height: h * 1.25),
 
               // ── Section label ─────────────────────────────────────────────
-              _section(3, _GroupLabel('Settings')),
+              _section(3, const _GroupLabel('Settings')),
               SizedBox(height: context.rs(10, min: 8, max: 14)),
 
               // ── 4. Settings group ─────────────────────────────────────────
@@ -116,7 +118,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
               SizedBox(height: h * 1.25),
 
               // ── Section label ─────────────────────────────────────────────
-              _section(4, _GroupLabel('Account')),
+              _section(4, const _GroupLabel('Account')),
               SizedBox(height: context.rs(10, min: 8, max: 14)),
 
               // ── 5. Account ────────────────────────────────────────────────
@@ -156,12 +158,17 @@ class _GroupLabel extends StatelessWidget {
 
 // ─── Compact Stats Row ────────────────────────────────────────────────────────
 
-class _CompactStatsRow extends StatelessWidget {
+class _CompactStatsRow extends ConsumerWidget {
   const _CompactStatsRow({required this.name});
   final String name;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final async = ref.watch(fanProfileProvider);
+    final data = async.asData?.value ?? FanProfileData.empty;
+    final xpLabel =
+        '${_fmt(data.xp)} / ${_fmt(data.xpToNext)} XP';
+
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -188,40 +195,50 @@ class _CompactStatsRow extends StatelessWidget {
                       colors: [AppColors.primaryPurple, AppColors.accentCyan]),
                   borderRadius: AppRadius.chip,
                 ),
-                child: Text('GOLD FAN',
+                child: Text('${data.tier.toUpperCase()} FAN',
                     style: AppTextStyles.caption(color: Colors.white)
                         .copyWith(fontWeight: FontWeight.w800, fontSize: 10)),
               ),
               const Spacer(),
-              Text('3,240 / 5,000 XP',
+              Text(xpLabel,
                   style: AppTextStyles.caption(color: AppColors.primaryPurple)
                       .copyWith(fontWeight: FontWeight.w700, fontSize: 10)),
             ],
           ),
           const SizedBox(height: 8),
-          const GsAnimatedBar(
-            value: 0.648,
+          GsAnimatedBar(
+            value: data.xpProgress,
             color: AppColors.primaryPurple,
             backgroundColor: AppColors.surface,
             height: 6,
-            delay: Duration(milliseconds: 400),
+            delay: const Duration(milliseconds: 400),
           ),
           const SizedBox(height: 14),
           // 4 stats
           Row(
             children: [
-              const Expanded(child: _Stat('47', 'Matches\nViewed', AppColors.accentCyan)),
+              Expanded(child: _Stat('${data.matchesViewed}', 'Matches\nViewed', AppColors.accentCyan)),
               _VDivider(),
-              const Expanded(child: _Stat('23', 'Analyses\nRead', AppColors.accentGreen)),
+              Expanded(child: _Stat('${data.analysesRead}', 'Analyses\nRead', AppColors.accentGreen)),
               _VDivider(),
-              const Expanded(child: _Stat('3', 'Clubs\nFollowed', AppColors.warning)),
+              Expanded(child: _Stat('${data.clubsFollowed}', 'Clubs\nFollowed', AppColors.warning)),
               _VDivider(),
-              const Expanded(child: _Stat('12', 'Saved', AppColors.primaryPurple)),
+              Expanded(child: _Stat('${data.savedMatches}', 'Saved', AppColors.primaryPurple)),
             ],
           ),
         ],
       ),
     );
+  }
+
+  static String _fmt(int n) {
+    final s = n.toString();
+    final buf = StringBuffer();
+    for (var i = 0; i < s.length; i++) {
+      if (i > 0 && (s.length - i) % 3 == 0) buf.write(',');
+      buf.write(s[i]);
+    }
+    return buf.toString();
   }
 }
 
@@ -322,18 +339,19 @@ class _PrimaryCtaRow extends StatelessWidget {
 
 // ─── Content Group (Favourites · Saved · Achievements as expandable tiles) ────
 
-class _ContentGroup extends StatefulWidget {
+class _ContentGroup extends ConsumerStatefulWidget {
   @override
-  State<_ContentGroup> createState() => _ContentGroupState();
+  ConsumerState<_ContentGroup> createState() => _ContentGroupState();
 }
 
-class _ContentGroupState extends State<_ContentGroup> {
+class _ContentGroupState extends ConsumerState<_ContentGroup> {
   bool _favExpanded = true;
   bool _savedExpanded = false;
   bool _achievementsExpanded = false;
 
   @override
   Widget build(BuildContext context) {
+    final data = ref.watch(fanProfileProvider).asData?.value ?? FanProfileData.empty;
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surfaceElevated,
@@ -360,7 +378,7 @@ class _ContentGroupState extends State<_ContentGroup> {
             icon: Icons.bookmark_rounded,
             color: AppColors.accentGreen,
             title: 'Saved Analyses',
-            subtitle: '12 saved match reports',
+            subtitle: '${data.savedMatches} saved match reports',
             expanded: _savedExpanded,
             onToggle: () => setState(() => _savedExpanded = !_savedExpanded),
             content: const Padding(
@@ -373,7 +391,7 @@ class _ContentGroupState extends State<_ContentGroup> {
             icon: Icons.emoji_events_rounded,
             color: AppColors.warning,
             title: 'Achievements',
-            subtitle: '3 / 5 unlocked',
+            subtitle: '${data.unlockedAchievements} / ${data.achievements.length} unlocked',
             expanded: _achievementsExpanded,
             onToggle: () => setState(() => _achievementsExpanded = !_achievementsExpanded),
             content: const Padding(

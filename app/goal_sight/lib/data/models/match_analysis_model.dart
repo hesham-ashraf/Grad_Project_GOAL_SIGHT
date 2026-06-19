@@ -30,6 +30,7 @@ class PlayerModel {
     this.keyPasses = 0,
     this.isMOTM = false,
     this.isWorst = false,
+    this.heatmapUrl,
   });
 
   final String id;
@@ -60,6 +61,9 @@ class PlayerModel {
 
   final bool isMOTM;
   final bool isWorst;
+
+  /// URL of this player's movement heatmap PNG for this match (model output).
+  final String? heatmapUrl;
 
   // ── Convenience ────────────────────────────────────────────────────────────
 
@@ -114,6 +118,7 @@ class PlayerModel {
       keyPasses: (json['key_passes'] as num? ?? 0).toInt(),
       isMOTM: json['is_motm'] == true,
       isWorst: json['is_worst'] == true,
+      heatmapUrl: json['heatmap_url']?.toString(),
     );
   }
 
@@ -251,6 +256,7 @@ class MatchAnalysisModel {
     this.highlightText,
     this.intensity = 0,
     this.analyzedVideoUrl,
+    this.heatmapUrl,
   });
 
   final String matchId;
@@ -277,6 +283,10 @@ class MatchAnalysisModel {
   /// Signed URL for the analyzed/annotated video produced by the AI pipeline.
   /// Null while processing or when no video artifact exists.
   final String? analyzedVideoUrl;
+
+  /// URL of the overall match movement heatmap PNG (model output). Null when
+  /// the pipeline hasn't produced one (UI falls back to a synthetic heatmap).
+  final String? heatmapUrl;
 
   // ── Derived helpers ────────────────────────────────────────────────────────
 
@@ -326,6 +336,7 @@ class MatchAnalysisModel {
       highlightText: json['highlight_text']?.toString(),
       intensity: (json['intensity'] as num? ?? 0).toInt(),
       analyzedVideoUrl: json['analyzed_video_url']?.toString(),
+      heatmapUrl: json['heatmap_url']?.toString(),
     );
   }
 }

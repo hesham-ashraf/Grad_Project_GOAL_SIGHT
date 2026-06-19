@@ -18,10 +18,14 @@ final class SupabaseClubRepository implements IClubRepository {
 
   SupabaseClient get _client => Supabase.instance.client;
 
+  // `players` has two FKs to `teams` (team_id + owner_club_id), so the embed
+  // must name one explicitly or PostgREST returns a 300 ambiguity error. We use
+  // the team_id relationship (the squad roster). For fans this resolves to an
+  // empty list (players are club-private under RLS), which is expected.
   static const _columns =
       'id, name, stadium, league, country, founded_year, coach, '
       'playing_style, primary_color, description, '
-      'team_season_stats(*), players(*)';
+      'team_season_stats(*), players!players_team_id_fkey(*)';
 
   static const _allClubsCacheKey = 'clubs:all';
   static const _clubCacheTtl = Duration(minutes: 10);

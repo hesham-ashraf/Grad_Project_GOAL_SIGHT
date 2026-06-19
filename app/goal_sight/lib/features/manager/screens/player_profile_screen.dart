@@ -12,12 +12,16 @@
 // ---------------------------------------------------------------------------
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:goal_sight/core/theme/app_theme.dart';
 import 'package:goal_sight/core/utils/responsive.dart';
+import 'package:goal_sight/data/models/player_heatmap_model.dart';
 import 'package:goal_sight/data/models/player_profile_model.dart';
 import 'package:goal_sight/features/manager/widgets/player_stat_tile.dart';
 import 'package:goal_sight/features/manager/widgets/player_match_history_item.dart';
+import 'package:goal_sight/providers/repository_providers.dart';
+import 'package:goal_sight/shared/widgets/gs_heatmap_image.dart';
 
 class PlayerProfileScreen extends StatefulWidget {
   const PlayerProfileScreen({
@@ -199,6 +203,39 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
                     }).toList(),
                   ),
                   SizedBox(height: context.rs(AppSpacing.xl)),
+
+                  // Match Heatmaps Section — AI movement heatmaps per match.
+                  Consumer(
+                    builder: (context, ref, _) {
+                      final maps = ref
+                              .watch(playerHeatmapsProvider(widget.player.id))
+                              .asData
+                              ?.value ??
+                          const <PlayerMatchHeatmap>[];
+                      if (maps.isEmpty) return const SizedBox.shrink();
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildSectionTitle(
+                              'Match Heatmaps (${maps.length})', context),
+                          SizedBox(height: context.rs(AppSpacing.lg)),
+                          SizedBox(
+                            height: context.rs(210, min: 180, max: 250),
+                            child: ListView.separated(
+                              scrollDirection: Axis.horizontal,
+                              physics: const BouncingScrollPhysics(),
+                              itemCount: maps.length,
+                              separatorBuilder: (_, __) =>
+                                  SizedBox(width: context.rs(AppSpacing.md)),
+                              itemBuilder: (_, i) =>
+                                  _HeatmapTile(heatmap: maps[i]),
+                            ),
+                          ),
+                          SizedBox(height: context.rs(AppSpacing.xl)),
+                        ],
+                      );
+                    },
+                  ),
 
                   // Insights Section
                   if (widget.player.insights.isNotEmpty) ...[
@@ -926,5 +963,58 @@ class _TrendChartPainter extends CustomPainter {
   @override
   bool shouldRepaint(_TrendChartPainter oldDelegate) {
     return oldDelegate.ratings != ratings || oldDelegate.color != color;
+  }
+}
+
+// ─── Match Heatmap Tile ───────────────────────────────────────────────────────
+
+class _HeatmapTile extends StatelessWidget {
+  const _HeatmapTile({required this.heatmap});
+
+  final PlayerMatchHeatmap heatmap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: context.rs(260, min: 220, max: 300),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceElevated,
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+        border: Border.all(color: AppColors.outline.withValues(alpha: 0.3)),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          GsHeatmapImage(
+            url: heatmap.url,
+            height: context.rs(150, min: 120, max: 180),
+            width: double.infinity,
+          ),
+          Padding(
+            padding: EdgeInsets.all(context.rs(AppSpacing.md)),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  heatmap.matchLabel,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTextStyles.body(color: AppColors.textPrimary)
+                      .copyWith(fontWeight: FontWeight.w600, fontSize: 13),
+                ),
+                if (heatmap.dateLabel.isNotEmpty) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    heatmap.dateLabel,
+                    style: AppTextStyles.caption(color: AppColors.textMuted),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

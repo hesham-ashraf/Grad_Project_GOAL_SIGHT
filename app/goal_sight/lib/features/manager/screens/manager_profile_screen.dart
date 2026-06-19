@@ -6,6 +6,7 @@ import '../../../core/services/haptic_service.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
 import '../../../providers/app_providers.dart';
+import '../../../providers/manager_profile_provider.dart';
 import '../widgets/manager_bottom_navigation_bar.dart';
 
 class ManagerProfileScreen extends ConsumerStatefulWidget {
@@ -108,9 +109,12 @@ class _ManagerProfileScreenState extends ConsumerState<ManagerProfileScreen>
   Widget build(BuildContext context) {
     final authState = ref.watch(authControllerProvider);
     final user = authState.user;
+    final stats = ref.watch(managerProfileStatsProvider).asData?.value ??
+        ManagerProfileStats.empty;
 
     final name = user?.name ?? 'Manager';
     final email = user?.email ?? 'manager@goalsightfc.com';
+    final club = stats.clubName;
     final initials = _initials(name);
 
     final hPad = context.rs(20, min: 16, max: 28);
@@ -135,19 +139,19 @@ class _ManagerProfileScreenState extends ConsumerState<ManagerProfileScreen>
                     name: name,
                     email: email,
                     initials: initials,
-                    club: 'GoalSight FC',
+                    club: club,
                     role: 'Team Manager',
                   )),
 
                   SizedBox(height: context.rs(18, min: 14, max: 24)),
 
                   // ── 1. Quick Stats ─────────────────────────────────────────
-                  _section(1, const _ManagerQuickStats()),
+                  _section(1, _ManagerQuickStats(stats: stats)),
 
                   SizedBox(height: context.rs(18, min: 14, max: 24)),
 
                   // ── 2. Account Details ─────────────────────────────────────
-                  _section(2, _AccountDetailsCard(email: email, club: 'GoalSight FC')),
+                  _section(2, _AccountDetailsCard(email: email, club: club)),
 
                   SizedBox(height: context.rs(18, min: 14, max: 24)),
 
@@ -297,19 +301,21 @@ class _ProfileHeroCard extends StatelessWidget {
 // ─── Quick Stats ──────────────────────────────────────────────────────────────
 
 class _ManagerQuickStats extends StatelessWidget {
-  const _ManagerQuickStats();
+  const _ManagerQuickStats({required this.stats});
+
+  final ManagerProfileStats stats;
 
   @override
   Widget build(BuildContext context) {
-    const stats = [
-      _StatItem(label: 'Matches Analyzed', value: '124', icon: Icons.analytics_rounded, color: AppColors.accentCyan),
-      _StatItem(label: 'Players Tracked', value: '28', icon: Icons.groups_rounded, color: AppColors.primaryPurple),
-      _StatItem(label: 'Win Rate', value: '71%', icon: Icons.emoji_events_rounded, color: AppColors.accentGreen),
+    final items = [
+      _StatItem(label: 'Matches Analyzed', value: '${stats.matchesAnalyzed}', icon: Icons.analytics_rounded, color: AppColors.accentCyan),
+      _StatItem(label: 'Players Tracked', value: '${stats.playersTracked}', icon: Icons.groups_rounded, color: AppColors.primaryPurple),
+      _StatItem(label: 'Win Rate', value: '${stats.winRate}%', icon: Icons.emoji_events_rounded, color: AppColors.accentGreen),
     ];
 
     return Row(
-      children: stats.map((s) {
-        final isLast = s == stats.last;
+      children: items.map((s) {
+        final isLast = s == items.last;
         return Expanded(
           child: Padding(
             padding: EdgeInsets.only(right: isLast ? 0 : context.rs(10, min: 8, max: 12)),

@@ -70,6 +70,7 @@ class AnalysisPlayerVerdict {
     this.keyPasses = 0,
     this.isMotm = false,
     this.isWorst = false,
+    this.heatmapUrl,
   });
 
   final int? jerseyNumber;
@@ -83,6 +84,9 @@ class AnalysisPlayerVerdict {
   final String insight;
   final int goals, assists, tackles, keyPasses;
   final bool isMotm, isWorst;
+
+  /// URL of this player's movement heatmap PNG for this match (model output).
+  final String? heatmapUrl;
 }
 
 class AnalysisTeamBlock {
@@ -114,6 +118,7 @@ class MatchAnalysisResult {
     required this.away,
     required this.players,
     this.analyzedVideoUrl,
+    this.heatmapUrl,
     this.rawModelOutputs = const {},
     this.score = '',
     this.resultStatus = 'FT',
@@ -128,6 +133,9 @@ class MatchAnalysisResult {
   });
 
   final String? analyzedVideoUrl;
+
+  /// URL of the overall match movement heatmap PNG (model output).
+  final String? heatmapUrl;
   final Map<String, dynamic> rawModelOutputs;
   final String score,
       resultStatus,
@@ -184,6 +192,9 @@ class _AnalysisPersister {
           'overall_narrative': result.overallNarrative,
           'key_moments': result.keyMoments,
           'recommendations': result.recommendations,
+          // Overall match movement heatmap PNG (model output), if produced.
+          if (result.heatmapUrl != null && result.heatmapUrl!.isNotEmpty)
+            'heatmap_url': result.heatmapUrl,
           // The playable analyzed match: the model's rendered video when
           // provided, else the manager's uploaded video, else a sample clip.
           'analyzed_video_url': (result.analyzedVideoUrl != null &&
@@ -250,6 +261,8 @@ class _AnalysisPersister {
           'key_passes': v.keyPasses,
           'is_motm': v.isMotm,
           'is_worst': v.isWorst,
+          if (v.heatmapUrl != null && v.heatmapUrl!.isNotEmpty)
+            'heatmap_url': v.heatmapUrl,
         });
       }
       await _client.from('match_player_analysis').insert(rows);
@@ -341,13 +354,15 @@ class _AnalysisPersister {
 ///                     competition, venue, match_date }
 ///   response body : {
 ///     "analyzed_video_url": "https://.../analyzed.mp4",        // rendered match
+///     "heatmap_url": "https://.../match_heatmap.png",          // overall match heatmap PNG
 ///     "match":  { score, result_status, intensity, dominant_team,
 ///                 home_avg_rating, away_avg_rating, highlight_text,
 ///                 overall_narrative, key_moments:[], recommendations:[] },
 ///     "teams":  { "home": <team>, "away": <team> },            // <team> below
 ///     "players":[ { jersey_number, player_name, position, rating, fatigue,
 ///                   performance_status, contribution, impact, insight,
-///                   goals, assists, tackles, key_passes, is_motm, is_worst } ],
+///                   goals, assists, tackles, key_passes, is_motm, is_worst,
+///                   heatmap_url } ],   // each player's own heatmap PNG for this match
 ///     "model_outputs": {
 ///       "tracking": {...}, "possession": {...}, "events": {...}, "tactical": {...}
 ///     }
@@ -432,6 +447,7 @@ class ModelAnalysisEngine implements IAnalysisEngine {
 
     return MatchAnalysisResult(
       analyzedVideoUrl: (j['analyzed_video_url'] as String?) ?? sourceVideoUrl,
+      heatmapUrl: (j['heatmap_url'] ?? match['heatmap_url'])?.toString(),
       score: (match['score'] ?? '').toString(),
       resultStatus: (match['result_status'] ?? 'FT').toString(),
       dominantTeam: (match['dominant_team'] ?? '').toString(),
@@ -480,6 +496,7 @@ class ModelAnalysisEngine implements IAnalysisEngine {
         keyPasses: _toI(p['key_passes']),
         isMotm: p['is_motm'] == true,
         isWorst: p['is_worst'] == true,
+        heatmapUrl: (p['heatmap_url'])?.toString(),
       );
 
   Map<String, dynamic> _extractRawModelOutputs(Map<String, dynamic> j) {
@@ -581,11 +598,15 @@ final class SimulatedAnalysisEngine implements IAnalysisEngine {
         keyPasses: rng.nextInt(5),
         isMotm: i == motm,
         isWorst: i == worst,
+        heatmapUrl:
+            'https://picsum.photos/seed/hm_${uploadJobId.hashCode}_$i/600/400',
       ));
     }
 
     final result = MatchAnalysisResult(
       analyzedVideoUrl: sourceVideoUrl,
+      heatmapUrl:
+          'https://picsum.photos/seed/hm_match_${uploadJobId.hashCode}/700/440',
       score: score,
       resultStatus: 'FT',
       dominantTeam: dominant,

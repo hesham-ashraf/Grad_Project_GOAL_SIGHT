@@ -52,7 +52,15 @@ final routerProvider = Provider<GoRouter>((ref) {
       final isAdminRoute =
           location.startsWith('/admin') || location == '/admin-panel';
       final isManagerRoute = location.startsWith('/manager');
-      final isFanRoute = location.startsWith('/fan');
+      // Shared read-only routes that any authenticated role can navigate to
+      // (e.g. a manager pushing /fan-match-analysis to view a match result).
+      const sharedRoutes = {
+        '/fan-match-analysis',
+        '/fan-club-details',
+        '/fan-player-profile',
+      };
+      final isSharedRoute = sharedRoutes.contains(location);
+      final isFanRoute = !isSharedRoute && location.startsWith('/fan');
 
       // Allow the test page without auth redirects.
       if (isSupabaseTest) return null;
@@ -82,6 +90,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       }
 
       if (role == UserRole.manager && (isAdminRoute || isFanRoute)) {
+        // isFanRoute is already false for shared routes, so this guard
+        // only fires for true fan-shell routes a manager shouldn't see.
         return '/manager';
       }
 
