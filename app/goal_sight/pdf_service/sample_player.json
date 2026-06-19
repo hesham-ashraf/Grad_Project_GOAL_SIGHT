@@ -1,0 +1,39 @@
+{
+  "name": "Mohamed Magdy Afsha",
+  "position": "CAM",
+  "jersey_number": 10,
+  "club": "AlAhly",
+  "nationality": "Egypt",
+  "age": 29,
+  "height_cm": 175,
+  "weight_kg": 70,
+  "market_value": "EUR 8M",
+  "is_captain": false,
+  "current_rating": 8.1,
+  "average_rating": 7.8,
+  "fatigue": 50,
+  "activity_level": 75,
+  "primary_contribution": "Attack",
+  "secondary_contribution": "Balanced",
+  "status": "In Form",
+  "trend": "Improving",
+  "improvement_rate": 6.0,
+  "total_matches": 2,
+  "total_goals": 3,
+  "total_assists": 2,
+  "total_tackles": 4,
+  "insights": [
+    "Creative hub in the final third; high key-pass volume.",
+    "Drops deep to link play and beat the first press.",
+    "Defensive workrate dips in the last 15 minutes."
+  ],
+  "match_history": [
+    {"date": "2026-06-16", "home_team": "Al Ahly", "away_team": "Pyramids FC", "rating": 8.4, "status": "good", "goals": 1, "assists": 1, "tackles": 2, "key_passes": 4},
+    {"date": "2026-06-10", "home_team": "Al Ahly", "away_team": "Zamalek", "rating": 7.8, "status": "good", "goals": 0, "assists": 1, "tackles": 1, "key_passes": 3}
+  ],
+  "heatmaps": [
+    {"match_label": "Al Ahly vs Pyramids FC", "date_label": "16 Jun 2026", "url": "https://picsum.photos/seed/player_a/600/400"},
+    {"match_label": "Al Ahly vs Zamalek", "date_label": "10 Jun 2026", "url": "https://picsum.photos/seed/player_b/600/400"}
+  ],
+  "generated_at": "2026-06-19"
+}

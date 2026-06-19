@@ -6,7 +6,12 @@
     <application
         android:label="goal_sight"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:usesCleartextTraffic="true">
+        <!-- usesCleartextTraffic enables http:// to the local dev services
+             (PDF_API_URL / ANALYSIS_API_URL at http://10.0.2.2). Use https in
+             production. -->
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

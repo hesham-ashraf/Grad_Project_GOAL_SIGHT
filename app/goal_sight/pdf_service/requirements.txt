@@ -1,0 +1,4 @@
+fastapi>=0.110
+uvicorn[standard]>=0.29
+fpdf2>=2.7
+requests>=2.31

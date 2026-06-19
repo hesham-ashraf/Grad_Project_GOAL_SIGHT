@@ -20,10 +20,13 @@ import 'package:goal_sight/data/models/player_heatmap_model.dart';
 import 'package:goal_sight/data/models/player_profile_model.dart';
 import 'package:goal_sight/features/manager/widgets/player_stat_tile.dart';
 import 'package:goal_sight/features/manager/widgets/player_match_history_item.dart';
+import 'package:goal_sight/data/services/pdf_export_service.dart';
+import 'package:goal_sight/providers/manager_profile_provider.dart';
 import 'package:goal_sight/providers/repository_providers.dart';
 import 'package:goal_sight/shared/widgets/gs_heatmap_image.dart';
+import 'package:printing/printing.dart';
 
-class PlayerProfileScreen extends StatefulWidget {
+class PlayerProfileScreen extends ConsumerStatefulWidget {
   const PlayerProfileScreen({
     super.key,
     required this.player,
@@ -32,11 +35,13 @@ class PlayerProfileScreen extends StatefulWidget {
   final PlayerProfileModel player;
 
   @override
-  State<PlayerProfileScreen> createState() => _PlayerProfileScreenState();
+  ConsumerState<PlayerProfileScreen> createState() =>
+      _PlayerProfileScreenState();
 }
 
-class _PlayerProfileScreenState extends State<PlayerProfileScreen>
+class _PlayerProfileScreenState extends ConsumerState<PlayerProfileScreen>
     with SingleTickerProviderStateMixin {
+  bool _exporting = false;
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
 
@@ -57,6 +62,54 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
   void dispose() {
     _fadeController.dispose();
     super.dispose();
+  }
+
+  Future<void> _exportPdf() async {
+    if (_exporting) return;
+    setState(() => _exporting = true);
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.showSnackBar(
+      const SnackBar(
+        content: Text('Generating PDF report…'),
+        behavior: SnackBarBehavior.floating,
+        duration: Duration(seconds: 2),
+      ),
+    );
+    try {
+      // The player's per-match heatmaps + history + the manager's club name
+      // enrich the PDF (the passed player object carries no match history).
+      final heatmaps =
+          await ref.read(playerHeatmapsProvider(widget.player.id).future);
+      final matchHistory =
+          await ref.read(playerMatchHistoryProvider(widget.player.id).future);
+      final clubName =
+          ref.read(managerProfileStatsProvider).asData?.value.clubName;
+
+      final bytes =
+          await ref.read(pdfExportServiceProvider).generatePlayerReport(
+                player: widget.player,
+                heatmaps: heatmaps,
+                matchHistory: matchHistory,
+                clubName: clubName,
+              );
+
+      final safe = widget.player.name.replaceAll(RegExp(r'[^A-Za-z0-9 ]'), '').trim();
+      await Printing.sharePdf(
+        bytes: bytes,
+        filename: '${safe.isEmpty ? 'player' : safe.replaceAll(' ', '_')}_report.pdf',
+      );
+    } catch (e) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text('Export failed: $e'),
+          backgroundColor: AppColors.danger,
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 4),
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _exporting = false);
+    }
   }
 
   Color _getRatingColor() {
@@ -150,6 +203,38 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
           ],
         ),
         centerTitle: false,
+        actions: [
+          Padding(
+            padding: EdgeInsets.only(right: context.rs(8, min: 6, max: 12)),
+            child: IconButton(
+              tooltip: 'Export PDF',
+              onPressed: _exporting ? null : _exportPdf,
+              icon: _exporting
+                  ? SizedBox(
+                      width: context.rs(18, min: 16, max: 20),
+                      height: context.rs(18, min: 16, max: 20),
+                      child: const CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor:
+                            AlwaysStoppedAnimation<Color>(AppColors.accentCyan),
+                      ),
+                    )
+                  : Container(
+                      padding: EdgeInsets.all(context.rs(8, min: 6, max: 10)),
+                      decoration: BoxDecoration(
+                        color: AppColors.surfaceElevated.withValues(alpha: 0.8),
+                        borderRadius: AppRadius.button,
+                        border: Border.all(color: AppColors.outlineSubtle),
+                      ),
+                      child: Icon(
+                        Icons.picture_as_pdf_outlined,
+                        color: AppColors.accentCyan,
+                        size: context.rs(16, min: 14, max: 18),
+                      ),
+                    ),
+            ),
+          ),
+        ],
       ),
       body: SafeArea(
         child: FadeTransition(
@@ -191,18 +276,33 @@ class _PlayerProfileScreenState extends State<PlayerProfileScreen>
                   _buildTrendCard(context),
                   SizedBox(height: context.rs(AppSpacing.xl)),
 
-                  // Match History Section
-                  _buildSectionTitle(
-                    'Recent Matches (${widget.player.matchHistory.length})',
-                    context,
+                  // Match History Section (per-match rows from analyses).
+                  Consumer(
+                    builder: (context, ref, _) {
+                      final history = ref
+                              .watch(playerMatchHistoryProvider(
+                                  widget.player.id))
+                              .asData
+                              ?.value ??
+                          const <PlayerMatchHistory>[];
+                      if (history.isEmpty) return const SizedBox.shrink();
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildSectionTitle(
+                              'Recent Matches (${history.length})', context),
+                          SizedBox(height: context.rs(AppSpacing.lg)),
+                          Column(
+                            children: history
+                                .map((match) =>
+                                    PlayerMatchHistoryItem(match: match))
+                                .toList(),
+                          ),
+                          SizedBox(height: context.rs(AppSpacing.xl)),
+                        ],
+                      );
+                    },
                   ),
-                  SizedBox(height: context.rs(AppSpacing.lg)),
-                  Column(
-                    children: widget.player.matchHistory.map((match) {
-                      return PlayerMatchHistoryItem(match: match);
-                    }).toList(),
-                  ),
-                  SizedBox(height: context.rs(AppSpacing.xl)),
 
                   // Match Heatmaps Section — AI movement heatmaps per match.
                   Consumer(

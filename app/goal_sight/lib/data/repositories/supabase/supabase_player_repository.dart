@@ -67,6 +67,43 @@ final class SupabasePlayerRepository implements IPlayerRepository {
   }
 
   @override
+  Future<List<PlayerMatchHistory>> fetchPlayerMatchHistory(
+      String playerId) async {
+    // Per-match verdicts for this player, joined to the parent match for
+    // teams/date. RLS scopes this to the caller's club.
+    final rows = await _client
+        .from('match_player_analysis')
+        .select(
+            'rating, performance_status, goals, assists, tackles, key_passes, '
+            'match_analyses(id, home_team_name, away_team_name, date_label, created_at)')
+        .eq('player_id', playerId);
+
+    final list = (rows as List).cast<Map<String, dynamic>>().map((r) {
+      final m =
+          (r['match_analyses'] as Map?)?.cast<String, dynamic>() ?? const {};
+      final createdAt = (m['created_at'] ?? '').toString();
+      return (
+        history: PlayerMatchHistory(
+          matchId: (m['id'] ?? '').toString(),
+          matchDate: DateTime.tryParse(createdAt) ?? DateTime.now(),
+          homeTeam: (m['home_team_name'] ?? '').toString(),
+          awayTeam: (m['away_team_name'] ?? '').toString(),
+          playerRating: (r['rating'] as num? ?? 0).toDouble(),
+          performanceStatus: (r['performance_status'] ?? '').toString(),
+          goals: (r['goals'] as num? ?? 0).toInt(),
+          assists: (r['assists'] as num? ?? 0).toInt(),
+          tackles: (r['tackles'] as num? ?? 0).toInt(),
+          keyPasses: (r['key_passes'] as num? ?? 0).toInt(),
+        ),
+        createdAt: createdAt,
+      );
+    }).toList()
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+    return list.map((e) => e.history).toList();
+  }
+
+  @override
   Future<List<PlayerProfileModel>> fetchSquad({String? clubId}) async {
     final cacheKey = 'squad:${clubId ?? 'all'}';
     final cached = CacheService.get<List<PlayerProfileModel>>(cacheKey);

@@ -9,6 +9,10 @@ abstract interface class IPlayerRepository {
   /// the AI pipeline hasn't produced any heatmaps for this player yet.
   Future<List<PlayerMatchHeatmap>> fetchPlayerHeatmaps(String playerId);
 
+  /// Per-match history for a player (rating + stats per analysed match),
+  /// newest first. Sourced from match_player_analysis joined to its match.
+  Future<List<PlayerMatchHistory>> fetchPlayerMatchHistory(String playerId);
+
   Future<PlayerProfileModel> createPlayer({
     required String fullName,
     required String position,

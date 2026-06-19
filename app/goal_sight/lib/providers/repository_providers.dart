@@ -122,6 +122,13 @@ final playerHeatmapsProvider =
       ref.watch(playerRepositoryProvider).fetchPlayerHeatmaps(playerId),
 );
 
+/// Per-match history for a player (rating + stats per match), newest first.
+final playerMatchHistoryProvider =
+    FutureProvider.family<List<PlayerMatchHistory>, String>(
+  (ref, playerId) =>
+      ref.watch(playerRepositoryProvider).fetchPlayerMatchHistory(playerId),
+);
+
 /// Risk analysis for a single player
 final playerRiskProvider = FutureProvider.family<RiskAnalysisModel, String>(
   (ref, playerId) =>
