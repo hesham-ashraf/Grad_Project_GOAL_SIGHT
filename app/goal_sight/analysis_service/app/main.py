@@ -41,6 +41,18 @@ app.add_middleware(
 )
 
 
+@app.on_event("startup")
+def _warn_if_no_supabase() -> None:
+    """Make a missing-persistence config obvious at boot — otherwise analyses
+    silently fail to save and the app can't open them."""
+    if settings.has_supabase():
+        print("[startup] Supabase persistence ENABLED.")
+    else:
+        print("[startup] WARNING: SUPABASE_URL / SUPABASE_SERVICE_KEY not set — "
+              "analyses will NOT be saved and the app cannot open them. "
+              "Export both and restart.")
+
+
 def _url(path: str) -> str:
     """Prefix a relative API path with the public base URL when configured."""
     return f"{settings.PUBLIC_BASE_URL}{path}" if settings.PUBLIC_BASE_URL else path
@@ -54,6 +66,8 @@ def health() -> dict:
         "model_dir": str(settings.MODEL_DIR),
         "model_present": settings.MODEL_DIR.is_dir(),
         "device": settings.DEVICE,
+        # So you can confirm persistence is configured from a browser.
+        "supabase": settings.has_supabase(),
     }
 
 
@@ -111,6 +125,11 @@ def job_naming(job_id: str) -> NamingData:
             team_id=p.get("team_id"), track_length=p.get("track_length", 0),
             role_confidence=p.get("role_confidence", 0.0),
             crop_url=_crop_url(job_id, p.get("crop_path")),
+            crop_urls=[
+                u
+                for u in (_crop_url(job_id, c) for c in p.get("crop_paths", []))
+                if u
+            ],
             suggested_name=p.get("suggested_name"),
         )
         for p in job.naming_players
@@ -124,6 +143,17 @@ def job_naming(job_id: str) -> NamingData:
         for e in job.team_legend
     ]
     return NamingData(job_id=job_id, players=players, team_legend=legend)
+
+
+@app.delete("/jobs/{job_id}", status_code=200)
+def cancel_job(job_id: str) -> dict:
+    job = store.get(job_id)
+    if job is None:
+        raise HTTPException(status_code=404, detail="Unknown job id.")
+    ok = store.cancel(job_id)
+    if not ok:
+        raise HTTPException(status_code=409, detail="Could not cancel job.")
+    return {"job_id": job_id, "status": JobStatus.failed.value}
 
 
 @app.post("/jobs/{job_id}/players", status_code=202)

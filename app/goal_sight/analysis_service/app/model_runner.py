@@ -93,6 +93,8 @@ def run_detection_stage(video_path: Path, stem: str) -> Dict[str, Any]:
         ])
         config = load_config(_config_path())
         config = model_main.apply_overrides(config, args)
+        if settings.IMAGE_SIZE:
+            config.model.image_size = settings.IMAGE_SIZE
 
         summary = DetectionPipeline(config).run(video_path)
         if config.tracking.stitching.enabled and summary.get("tracks_json"):
@@ -128,13 +130,27 @@ def _parse_naming_manifest(manifest_path: str) -> Tuple[List[dict], List[dict]]:
     players: List[dict] = []
     for c in data.get("candidates", []):
         crops = c.get("crop_paths") or []
+        # Jersey number is the most reliable human-readable identifier from
+        # broadcast footage (faces are too few pixels to recognise). The model
+        # may key it under several names; take the first non-empty one and pass
+        # it through as a string. Absent → null (badge simply won't render).
+        jersey = (
+            c.get("jersey_number")
+            or c.get("jersey")
+            or c.get("number")
+        )
+        jersey_str = str(jersey).strip() if jersey not in (None, "") else None
         players.append({
             "track_id": int(c["track_id"]),
             "auto_role": str(c.get("current_role", "unknown")),
             "team_id": c.get("team_id"),
+            "jersey_number": jersey_str,
             "track_length": int(c.get("track_length", 0)),
             "role_confidence": float(c.get("role_confidence", 0.0)),
+            # First crop kept for backwards-compat; full list powers the
+            # multi-frame verification gallery on the naming screen.
             "crop_path": crops[0] if crops else None,
+            "crop_paths": list(crops),
             "suggested_name": None,
         })
     legend: List[dict] = []
@@ -209,6 +225,8 @@ def run_analysis_stage(
         ])
         config = load_config(_config_path())
         config = model_main.apply_overrides(config, args)
+        if settings.IMAGE_SIZE:
+            config.model.image_size = settings.IMAGE_SIZE
 
         reuse = model_main._find_reusable_tracks(config, video_path) or tracks_json
         summary = {"tracking": True, "reused": True, "tracks_json": reuse}

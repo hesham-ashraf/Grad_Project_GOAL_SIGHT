@@ -37,6 +37,25 @@ class _PlayerNamingScreenState extends ConsumerState<PlayerNamingScreen> {
   final Map<int, TextEditingController> _controllers = {};
   final Map<int, String?> _playerIds = {}; // track_id -> existing squad player id
   int? _myTeamId;
+  bool _squadAutoMatched = false; // run the jersey→squad link only once
+
+  /// Link detected players to squad members by shirt number — once, after the
+  /// squad loads. Only fills tracks the manager hasn't already named/linked, so
+  /// it never overwrites manual edits. A no-op when jerseys weren't detected.
+  void _applySquadAutoMatch(List<PlayerProfileModel> squad) {
+    if (_squadAutoMatched || squad.isEmpty) return;
+    _squadAutoMatched = true;
+    for (final p in widget.data.players) {
+      final jersey = p.jerseyNumber;
+      if (jersey == null) continue;
+      final ctrl = _controllers[p.trackId];
+      if (ctrl == null || ctrl.text.trim().isNotEmpty) continue; // keep manual
+      final match = squad.where((s) => s.jerseyNumber?.toString() == jersey);
+      if (match.isEmpty) continue;
+      ctrl.text = match.first.name;
+      _playerIds[p.trackId] = match.first.id;
+    }
+  }
 
   @override
   void initState() {
@@ -98,6 +117,7 @@ class _PlayerNamingScreenState extends ConsumerState<PlayerNamingScreen> {
   Widget build(BuildContext context) {
     final squadAsync = ref.watch(managerPlayersProvider);
     final squad = squadAsync.asData?.value ?? const <PlayerProfileModel>[];
+    _applySquadAutoMatch(squad);
     final teamIds = widget.data.teamLegend.map((e) => e.teamId).toList()..sort();
     final myPlayers = _playersForTeam(_myTeamId);
     final otherPlayers = widget.data.players
@@ -168,16 +188,17 @@ class _PlayerNamingScreenState extends ConsumerState<PlayerNamingScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Multi-frame verification gallery: swipe the strip, tap to expand
+          // (pinch-zoom). More frames = easier to confirm the same player.
+          _PlayerFramesGallery(player: p),
+          const SizedBox(height: 10),
           Row(
             children: [
-              _CropAvatar(url: p.cropUrl, role: p.autoRole),
-              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('#${p.trackId} · ${p.autoRole}',
-                        style: AppTextStyles.caption(color: AppColors.textMuted)),
+                    _PlayerIdentityLine(player: p),
                     const SizedBox(height: 6),
                     TextField(
                       controller: ctrl,
@@ -359,9 +380,30 @@ class _TeamPicker extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Which team is YOUR club?',
-            style: AppTextStyles.title(color: AppColors.textPrimary)),
-        const SizedBox(height: 10),
+        Row(
+          children: [
+            Text('Which team is YOUR club?',
+                style: AppTextStyles.title(color: AppColors.textPrimary)),
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: AppColors.warning.withValues(alpha: 0.14),
+                borderRadius: AppRadius.chip,
+              ),
+              child: Text('Required',
+                  style: AppTextStyles.caption(color: AppColors.warning)
+                      .copyWith(fontWeight: FontWeight.w700)),
+            ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'This decides which side owns the analytics, fatigue, risks and '
+          'recommendations.',
+          style: AppTextStyles.caption(color: AppColors.textMuted),
+        ),
+        const SizedBox(height: 12),
         Row(
           children: teamIds.map((t) {
             final entry = legend.firstWhere(
@@ -376,42 +418,86 @@ class _TeamPicker extends StatelessWidget {
             return Expanded(
               child: GestureDetector(
                 onTap: () => onSelect(t),
-                child: Container(
-                  margin: EdgeInsets.only(right: t == teamIds.first ? 10 : 0),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 240),
+                  curve: Curves.easeOutCubic,
+                  margin: EdgeInsets.only(right: t == teamIds.last ? 0 : 10),
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: isSel
-                        ? AppColors.primaryPurple.withValues(alpha: 0.18)
-                        : AppColors.surfaceElevated,
+                    gradient: isSel
+                        ? LinearGradient(
+                            colors: [
+                              AppColors.primaryPurple.withValues(alpha: 0.28),
+                              AppColors.primaryBlue.withValues(alpha: 0.12),
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          )
+                        : null,
+                    color: isSel ? null : AppColors.surfaceElevated,
                     borderRadius: AppRadius.card,
                     border: Border.all(
                       color: isSel
                           ? AppColors.primaryPurple
                           : AppColors.outlineSubtle,
-                      width: isSel ? 1.6 : 1,
+                      width: isSel ? 1.8 : 1,
                     ),
+                    boxShadow: isSel
+                        ? [
+                            BoxShadow(
+                              color:
+                                  AppColors.primaryPurple.withValues(alpha: 0.3),
+                              blurRadius: 16,
+                              spreadRadius: -2,
+                            ),
+                          ]
+                        : null,
                   ),
                   child: Row(
                     children: [
-                      Container(
-                        width: 22,
-                        height: 22,
-                        decoration: BoxDecoration(
-                          color: color,
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white24),
+                      AnimatedScale(
+                        scale: isSel ? 1.12 : 1,
+                        duration: const Duration(milliseconds: 240),
+                        curve: Curves.easeOutBack,
+                        child: Container(
+                          width: 22,
+                          height: 22,
+                          decoration: BoxDecoration(
+                            color: color,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: isSel ? Colors.white : Colors.white24,
+                              width: isSel ? 2 : 1,
+                            ),
+                          ),
                         ),
                       ),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
                           entry.label.isEmpty ? 'Team $t' : entry.label,
-                          style: AppTextStyles.body(color: AppColors.textPrimary),
+                          style: AppTextStyles.body(
+                            color: isSel
+                                ? AppColors.textPrimary
+                                : AppColors.textSecondary,
+                          ).copyWith(
+                            fontWeight:
+                                isSel ? FontWeight.w700 : FontWeight.w500,
+                          ),
                         ),
                       ),
-                      if (isSel)
-                        const Icon(Icons.check_circle,
-                            color: AppColors.primaryPurple, size: 20),
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 200),
+                        transitionBuilder: (c, a) =>
+                            ScaleTransition(scale: a, child: c),
+                        child: isSel
+                            ? const Icon(Icons.check_circle,
+                                key: ValueKey('sel'),
+                                color: AppColors.primaryPurple,
+                                size: 20)
+                            : const SizedBox(
+                                key: ValueKey('unsel'), width: 20),
+                      ),
                     ],
                   ),
                 ),
@@ -424,16 +510,13 @@ class _TeamPicker extends StatelessWidget {
   }
 }
 
-class _CropAvatar extends StatelessWidget {
-  const _CropAvatar({required this.url, required this.role});
-  final String? url;
-  final String role;
+/// HTTP header that keeps ngrok from injecting its browser-warning HTML in
+/// place of the actual image bytes.
+const _kImageHeaders = {'ngrok-skip-browser-warning': 'true'};
 
-  @override
-  Widget build(BuildContext context) {
-    final fallback = Container(
-      width: 52,
-      height: 64,
+Widget _frameFallback(String role, {double w = 52, double h = 64}) => Container(
+      width: w,
+      height: h,
       decoration: BoxDecoration(
         color: AppColors.surfaceRaised,
         borderRadius: BorderRadius.circular(10),
@@ -443,17 +526,208 @@ class _CropAvatar extends StatelessWidget {
         color: AppColors.textMuted,
       ),
     );
-    if (url == null || !url!.startsWith('http')) return fallback;
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(10),
-      child: Image.network(
-        url!,
-        width: 52,
-        height: 64,
-        fit: BoxFit.cover,
-        headers: const {'ngrok-skip-browser-warning': 'true'},
-        errorBuilder: (_, __, ___) => fallback,
+
+/// Horizontal, swipeable strip of every extracted frame for one track. Tapping
+/// any frame opens a full-screen, pinch-zoomable viewer that swipes between
+/// frames — so the manager can verify identity from multiple angles.
+class _PlayerFramesGallery extends StatelessWidget {
+  const _PlayerFramesGallery({required this.player});
+  final DetectedPlayer player;
+
+  @override
+  Widget build(BuildContext context) {
+    final urls = player.galleryUrls;
+    if (urls.isEmpty) return _frameFallback(player.autoRole);
+
+    return SizedBox(
+      height: 64,
+      child: Row(
+        children: [
+          Expanded(
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              itemCount: urls.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 8),
+              itemBuilder: (_, i) => GestureDetector(
+                onTap: () => Navigator.of(context).push(
+                  PageRouteBuilder(
+                    opaque: false,
+                    barrierColor: Colors.black87,
+                    pageBuilder: (_, __, ___) => _FramesViewerPage(
+                      urls: urls,
+                      initialIndex: i,
+                      trackId: player.trackId,
+                    ),
+                  ),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.network(
+                    urls[i],
+                    width: 52,
+                    height: 64,
+                    fit: BoxFit.cover,
+                    filterQuality: FilterQuality.high,
+                    headers: _kImageHeaders,
+                    errorBuilder: (_, __, ___) =>
+                        _frameFallback(player.autoRole),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          if (urls.length > 1) ...[
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: const BoxDecoration(
+                color: AppColors.surfaceRaised,
+                borderRadius: AppRadius.chip,
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.photo_library_outlined,
+                      size: 13, color: AppColors.textMuted),
+                  const SizedBox(width: 4),
+                  Text('${urls.length}',
+                      style: AppTextStyles.caption(color: AppColors.textMuted)),
+                ],
+              ),
+            ),
+          ],
+        ],
       ),
+    );
+  }
+}
+
+/// Full-screen pinch-zoom viewer that swipes between a track's frames.
+class _FramesViewerPage extends StatefulWidget {
+  const _FramesViewerPage({
+    required this.urls,
+    required this.initialIndex,
+    required this.trackId,
+  });
+  final List<String> urls;
+  final int initialIndex;
+  final int trackId;
+
+  @override
+  State<_FramesViewerPage> createState() => _FramesViewerPageState();
+}
+
+class _FramesViewerPageState extends State<_FramesViewerPage> {
+  late final PageController _page = PageController(initialPage: widget.initialIndex);
+  late int _index = widget.initialIndex;
+
+  @override
+  void dispose() {
+    _page.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Stack(
+        children: [
+          PageView.builder(
+            controller: _page,
+            itemCount: widget.urls.length,
+            onPageChanged: (i) => setState(() => _index = i),
+            itemBuilder: (_, i) => Center(
+              child: InteractiveViewer(
+                minScale: 1,
+                maxScale: 5,
+                child: Image.network(
+                  widget.urls[i],
+                  fit: BoxFit.contain,
+                  filterQuality: FilterQuality.high,
+                  headers: _kImageHeaders,
+                  errorBuilder: (_, __, ___) => const Icon(
+                      Icons.broken_image_outlined,
+                      color: Colors.white38,
+                      size: 48),
+                ),
+              ),
+            ),
+          ),
+          // Top bar: track id + frame counter + close.
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 8,
+            left: 12,
+            right: 12,
+            child: Row(
+              children: [
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.5),
+                    borderRadius: AppRadius.chip,
+                  ),
+                  child: Text(
+                    'Track #${widget.trackId}  ·  ${_index + 1}/${widget.urls.length}',
+                    style: const TextStyle(color: Colors.white, fontSize: 13),
+                  ),
+                ),
+                const Spacer(),
+                GestureDetector(
+                  onTap: () => Navigator.of(context).pop(),
+                  child: Container(
+                    width: 38,
+                    height: 38,
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.5),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.close_rounded, color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Identity line on each card: a prominent jersey-number pill (the most
+/// reliable identifier from broadcast footage) when the model read one, plus
+/// the role and the internal track id (kept small — it is NOT the shirt number).
+class _PlayerIdentityLine extends StatelessWidget {
+  const _PlayerIdentityLine({required this.player});
+  final DetectedPlayer player;
+
+  @override
+  Widget build(BuildContext context) {
+    final jersey = player.jerseyNumber;
+    return Row(
+      children: [
+        if (jersey != null) ...[
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+            decoration: BoxDecoration(
+              color: AppColors.primaryBlue.withValues(alpha: 0.18),
+              borderRadius: AppRadius.chip,
+              border: Border.all(
+                  color: AppColors.primaryBlue.withValues(alpha: 0.55)),
+            ),
+            child: Text('#$jersey',
+                style: AppTextStyles.body(color: AppColors.textPrimary)
+                    .copyWith(fontWeight: FontWeight.w800)),
+          ),
+          const SizedBox(width: 8),
+        ],
+        Text(player.autoRole,
+            style: AppTextStyles.caption(color: AppColors.textSecondary)),
+        const SizedBox(width: 8),
+        Text('Track ${player.trackId}',
+            style: AppTextStyles.caption(color: AppColors.textMuted)),
+      ],
     );
   }
 }

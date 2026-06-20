@@ -122,6 +122,14 @@ class JobStore:
         self._pool.submit(self._run_analysis, job_id, mappings, my_team_id)
         return True
 
+    def cancel(self, job_id: str) -> bool:
+        """Mark a job as failed/cancelled by the user. Background threads will run to completion but results will be dropped."""
+        job = self.get(job_id)
+        if job is None or job.status in (JobStatus.completed, JobStatus.failed):
+            return False
+        self._set(job_id, JobStatus.failed, "Cancelled by user.")
+        return True
+
     # ── Worker bodies ────────────────────────────────────────────────────--
     def _set(self, job_id: str, status: JobStatus, error: Optional[str] = None) -> None:
         with self._lock:
@@ -177,6 +185,12 @@ class JobStore:
                 except Exception as exc:  # noqa: BLE001
                     print(f"[jobs] Supabase persist failed for {job_id}: {exc}\n"
                           f"{traceback.format_exc()}")
+            else:
+                # Loud, actionable warning: without these the analysis is NOT
+                # saved, so the app gets a null analysis_id and can't open it.
+                print(f"[jobs] WARNING: SUPABASE_URL / SUPABASE_SERVICE_KEY not "
+                      f"set — analysis {job_id} was NOT persisted. The app will "
+                      f"be unable to open it. Set both env vars and restart.")
             out["analysis_id"] = analysis_id
             with self._lock:
                 j = self._jobs[job_id]

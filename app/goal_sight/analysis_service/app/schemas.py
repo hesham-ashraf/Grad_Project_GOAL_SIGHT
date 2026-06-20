@@ -30,9 +30,11 @@ class DetectedPlayer(BaseModel):
     track_id: int
     auto_role: str                     # player | goalkeeper | referee | unknown
     team_id: Optional[int] = None      # detected cluster 0/1 (None for non-players)
+    jersey_number: Optional[str] = None  # detected shirt number, if the model read one
     track_length: int = 0              # frames observed (confidence proxy)
     role_confidence: float = 0.0
     crop_url: Optional[str] = None     # representative jersey crop image
+    crop_urls: List[str] = Field(default_factory=list)  # all extracted frames for this track
     suggested_name: Optional[str] = None  # model's prior name if any
 
 

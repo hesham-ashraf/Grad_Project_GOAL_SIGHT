@@ -105,14 +105,19 @@ final class SupabaseAnalysisRepository implements IAnalysisRepository {
         keyMoments: _stringList(row['key_moments']),
         overallNarrative: (row['overall_narrative'] ?? '').toString(),
       ),
-      homeAnalysis: _mapTeam(home),
-      awayAnalysis: _mapTeam(away),
+      homeAnalysis: _mapTeam(home, (row['home_team_name'] ?? '').toString()),
+      awayAnalysis: _mapTeam(away, (row['away_team_name'] ?? '').toString()),
       players: players,
     );
   }
 
-  TeamAnalysisModel _mapTeam(Map<String, dynamic> t) => TeamAnalysisModel(
-        teamName: (t['team_name'] ?? '').toString(),
+  /// [fallbackName] is the header home/away name — used when the team block
+  /// has no `team_name` of its own (the model only emits team 0/1).
+  TeamAnalysisModel _mapTeam(Map<String, dynamic> t, String fallbackName) =>
+      TeamAnalysisModel(
+        teamName: (t['team_name'] as String?)?.trim().isNotEmpty == true
+            ? t['team_name'].toString()
+            : fallbackName,
         possession: (t['possession'] as num? ?? 0).toInt(),
         style: (t['style'] ?? '').toString(),
         pressureStyle: (t['pressure_style'] ?? '').toString(),
@@ -128,7 +133,10 @@ final class SupabaseAnalysisRepository implements IAnalysisRepository {
         name: (p['player_name'] ?? '').toString(),
         position: (p['player_position'] ?? '').toString(),
         rating: (p['rating'] as num? ?? 0).toDouble(),
-        fatigue: (p['fatigue'] as num? ?? 0).toInt(),
+        // The model emits a fatigue *label* (Low/Medium/High), not a number.
+        // Map it to an approximate % so risk/fatigue UI isn't stuck at 0.
+        fatigue: (p['fatigue'] as num?)?.toInt() ??
+            _fatigueFromLabel(p['fatigue_label']?.toString()),
         performanceStatus: PerformanceStatus.values.firstWhere(
           (e) => e.name == p['performance_status'],
           orElse: () => PerformanceStatus.average,
@@ -153,5 +161,19 @@ final class SupabaseAnalysisRepository implements IAnalysisRepository {
   List<String> _stringList(dynamic value) {
     if (value is List) return value.map((e) => e.toString()).toList();
     return const [];
+  }
+
+  /// Approximate fatigue % from the model's coarse label.
+  int _fatigueFromLabel(String? label) {
+    switch ((label ?? '').toLowerCase()) {
+      case 'high':
+        return 85;
+      case 'medium':
+        return 60;
+      case 'low':
+        return 30;
+      default:
+        return 0;
+    }
   }
 }

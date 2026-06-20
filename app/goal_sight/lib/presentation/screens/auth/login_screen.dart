@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -80,16 +79,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     await ref.read(authControllerProvider.notifier).login(
           email: _emailController.text.trim(),
           password: _passwordController.text,
-        );
-  }
-
-  Future<void> _demoLogin(String email, String password) async {
-    await HapticService.selection();
-    _emailController.text = email;
-    _passwordController.text = password;
-    await ref.read(authControllerProvider.notifier).login(
-          email: email,
-          password: password,
         );
   }
 
@@ -248,17 +237,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
 
                             SizedBox(height: context.rs(20, min: 14, max: 26)),
 
-                            // Demo login — dev only
-                            if (kDebugMode) ...[
-                              const AuthDividerLabel(label: 'Quick Demo'),
-                              SizedBox(height: context.rs(14, min: 10, max: 18)),
-                              DemoLoginSection(
-                                loading: loading,
-                                onLogin: _demoLogin,
-                              ),
-                              SizedBox(height: context.rs(20, min: 14, max: 26)),
-                            ],
-
                             // Register link
                             Center(
                               child: GestureDetector(
@@ -338,7 +316,7 @@ class _GoogleSignInButton extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(vertical: 14),
           side: const BorderSide(color: AppColors.outlineSubtle),
           backgroundColor: AppColors.surfaceElevated.withValues(alpha: 0.5),
-          shape: RoundedRectangleBorder(
+          shape: const RoundedRectangleBorder(
             borderRadius: AppRadius.button,
           ),
         ),

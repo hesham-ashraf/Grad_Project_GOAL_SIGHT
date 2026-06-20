@@ -72,28 +72,48 @@ class DetectedPlayer {
     required this.trackId,
     required this.autoRole,
     this.teamId,
+    this.jerseyNumber,
     this.trackLength = 0,
     this.roleConfidence = 0.0,
     this.cropUrl,
+    this.cropUrls = const [],
     this.suggestedName,
   });
 
   final int trackId;
   final String autoRole; // player | goalkeeper | referee | unknown
   final int? teamId; // detected cluster 0/1 (null for non-players)
+  final String? jerseyNumber; // detected shirt number (null if unread)
   final int trackLength;
   final double roleConfidence;
   final String? cropUrl;
+  final List<String> cropUrls; // all extracted frames for this track (gallery)
   final String? suggestedName;
+
+  /// Frames to show in the verification gallery: prefer the full list, fall
+  /// back to the single representative crop so older servers still render.
+  List<String> get galleryUrls {
+    final urls = cropUrls.where((u) => u.startsWith('http')).toList();
+    if (urls.isNotEmpty) return urls;
+    final single = cropUrl;
+    return (single != null && single.startsWith('http')) ? [single] : const [];
+  }
 
   factory DetectedPlayer.fromJson(Map<String, dynamic> j) => DetectedPlayer(
         trackId: (j['track_id'] as num).toInt(),
         autoRole: (j['auto_role'] ?? 'unknown').toString(),
         teamId: (j['team_id'] as num?)?.toInt(),
+        jerseyNumber: (j['jersey_number']?.toString().trim().isEmpty ?? true)
+            ? null
+            : j['jersey_number'].toString().trim(),
         trackLength: (j['track_length'] as num?)?.toInt() ?? 0,
         roleConfidence:
             (j['role_confidence'] as num?)?.toDouble() ?? 0.0,
         cropUrl: j['crop_url']?.toString(),
+        cropUrls: (j['crop_urls'] as List?)
+                ?.map((e) => e.toString())
+                .toList() ??
+            const [],
         suggestedName: j['suggested_name']?.toString(),
       );
 }
@@ -177,6 +197,7 @@ class AnalysisJobResult {
     this.myTeamId = 0,
     this.analyzedVideoUrl,
     this.heatmapUrls = const {},
+    this.raw = const {},
   });
 
   final String jobId;
@@ -184,6 +205,11 @@ class AnalysisJobResult {
   final int myTeamId;
   final String? analyzedVideoUrl;
   final Map<String, String> heatmapUrls;
+
+  /// Verbatim model JSONs (final_report, player_analytics, possession,
+  /// team_tactical, speed_distance). Lets the app render the analysis even when
+  /// Supabase persistence is unavailable.
+  final Map<String, dynamic> raw;
 
   factory AnalysisJobResult.fromJson(Map<String, dynamic> j) => AnalysisJobResult(
         jobId: (j['job_id'] ?? '').toString(),
@@ -193,5 +219,6 @@ class AnalysisJobResult {
         heatmapUrls: (j['heatmap_urls'] as Map?)
                 ?.map((k, v) => MapEntry(k.toString(), v.toString())) ??
             const {},
+        raw: (j['raw'] as Map?)?.cast<String, dynamic>() ?? const {},
       );
 }

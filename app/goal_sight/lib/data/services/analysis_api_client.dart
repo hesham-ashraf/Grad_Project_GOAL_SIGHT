@@ -128,6 +128,11 @@ class AnalysisApiClient {
     return AnalysisJobResult.fromJson(_asMap(res.data));
   }
 
+  Future<void> cancelJob(String jobId) async {
+    _ensure();
+    await _dio.delete('$_base/jobs/$jobId', options: _opts());
+  }
+
   Map<String, dynamic> _asMap(dynamic data) {
     if (data is Map) return data.cast<String, dynamic>();
     throw AnalysisApiException('Unexpected server response: $data');

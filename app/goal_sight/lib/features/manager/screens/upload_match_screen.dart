@@ -16,6 +16,7 @@ import '../../../providers/manager_players_provider.dart';
 import '../../../providers/repository_providers.dart';
 import '../widgets/ai_processing_widgets.dart';
 import '../widgets/upload_widgets.dart';
+import '../widgets/video_preview_card.dart';
 import 'player_naming_screen.dart';
 
 // ─── Step Enum ────────────────────────────────────────────────────────────────
@@ -50,10 +51,14 @@ class _UploadMatchScreenState extends ConsumerState<UploadMatchScreen>
   Timer? _processingTimer;
   String? _serviceJobId; // WSL analysis-service job id
   String? _analysisId; // real match_analyses ID once the engine persists it
+  String? _serviceVideoUrl; // this job's analyzed video served by the service
   XFile? _pickedVideo; // the real video file the manager selected
 
   // Failure state
   String _failureReason = '';
+
+  // Cancellation state
+  bool _isCancelled = false;
 
   // Page scroll controller
   final _scrollController = ScrollController();
@@ -191,6 +196,7 @@ class _UploadMatchScreenState extends ConsumerState<UploadMatchScreen>
     setState(() {
       _currentStage = ProcessingStage.detectingPlayers;
       _overallProgress = 0.0;
+      _isCancelled = false;
     });
     unawaited(_runPipeline());
   }
@@ -275,13 +281,16 @@ class _UploadMatchScreenState extends ConsumerState<UploadMatchScreen>
       // 5) Poll until the full analysis is complete.
       final done =
           await _pollUntil(api, _serviceJobId!, (s) => s.status.isTerminal);
+      if (_isCancelled) return;
       if (done.status == AnalysisJobStatus.failed) {
         _fail(done.error ?? 'Analysis failed.');
         return;
       }
       await _finish(api, _serviceJobId!);
     } catch (e) {
-      _fail(e.toString().replaceFirst('Exception: ', ''));
+      if (!_isCancelled) {
+        _fail(e.toString().replaceFirst('Exception: ', ''));
+      }
     }
   }
 
@@ -296,9 +305,11 @@ class _UploadMatchScreenState extends ConsumerState<UploadMatchScreen>
       try {
         s = await api.getStatus(jobId);
       } catch (_) {
+        if (_isCancelled) return AnalysisJobStatusResult(jobId: jobId, status: AnalysisJobStatus.failed);
         await Future.delayed(const Duration(seconds: 3));
         continue; // transient network hiccup → keep polling
       }
+      if (_isCancelled) return AnalysisJobStatusResult(jobId: jobId, status: AnalysisJobStatus.failed);
       if (mounted) {
         setState(() {
           _overallProgress = s.progress.clamp(0.0, 1.0);
@@ -306,6 +317,7 @@ class _UploadMatchScreenState extends ConsumerState<UploadMatchScreen>
         });
       }
       if (done(s)) return s;
+      if (_isCancelled) return AnalysisJobStatusResult(jobId: jobId, status: AnalysisJobStatus.failed);
       await Future.delayed(const Duration(seconds: 3));
     }
     return api.getStatus(jobId);
@@ -332,6 +344,12 @@ class _UploadMatchScreenState extends ConsumerState<UploadMatchScreen>
   Future<void> _finish(AnalysisApiClient api, String jobId) async {
     final res = await api.getResult(jobId);
     _analysisId = res.analysisId;
+    // The service serves THIS job's annotated video directly — the freshest,
+    // most reliable source. Supabase may lag or (if persistence failed) hold a
+    // different match's URL, so we prefer this when showing the result.
+    _serviceVideoUrl = res.analyzedVideoUrl;
+    debugPrint('[upload] finish job=$jobId analysisId=$_analysisId '
+        'serviceVideo=${res.analyzedVideoUrl}');
 
     MatchAnalysisModel? persisted;
     if (_analysisId != null) {
@@ -342,6 +360,26 @@ class _UploadMatchScreenState extends ConsumerState<UploadMatchScreen>
       } catch (_) {
         persisted = null;
       }
+    }
+    // Always show THIS job's freshly-rendered video, even if Supabase stored a
+    // different/stale URL for the row.
+    if (persisted != null && _serviceVideoUrl != null) {
+      persisted = persisted.copyWith(analyzedVideoUrl: _serviceVideoUrl);
+    }
+    // Persistence unavailable (e.g. the service has no Supabase keys, so no
+    // analysis_id) → build the analysis straight from the model's raw output so
+    // the manager can still open the result the model just produced.
+    if (persisted == null && res.raw.isNotEmpty) {
+      persisted = MatchAnalysisModel.fromServiceResult(
+        jobId: jobId,
+        raw: res.raw,
+        myTeamId: res.myTeamId,
+        homeTeam: _formData.homeTeam,
+        awayTeam: _formData.awayTeam,
+        date: _formData.matchDate.toIso8601String().split('T').first,
+        analyzedVideoUrl: _serviceVideoUrl,
+        heatmapUrls: res.heatmapUrls,
+      );
     }
 
     // The analysis, analyzed video and per-player verdicts are in Supabase now,
@@ -374,6 +412,26 @@ class _UploadMatchScreenState extends ConsumerState<UploadMatchScreen>
     _startProcessing();
   }
 
+  Future<void> _cancelAnalysis() async {
+    setState(() => _isCancelled = true);
+    if (_serviceJobId != null) {
+      try {
+        await ref.read(analysisApiClientProvider).cancelJob(_serviceJobId!);
+      } catch (_) {
+        // ignore cancellation errors
+      }
+    }
+    _reset();
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Analysis cancelled.'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
   void _retryFromDetails() {
     _goTo(_UploadStep.matchDetails);
   }
@@ -381,20 +439,32 @@ class _UploadMatchScreenState extends ConsumerState<UploadMatchScreen>
   // ── Analysis navigation ─────────────────────────────────────────────────────
 
   Future<void> _viewAnalysis() async {
-    // Prefer the REAL persisted analysis (with the analyzed video) over the
-    // on-screen preview. Fall back to the latest club analysis, then the mock.
+    // Show ONLY this job's analysis. We deliberately do NOT fall back to
+    // "latest analysis" — that surfaced a previous match's data (and its old
+    // video) when this job didn't persist, which is worse than an honest error.
     final repo = ref.read(analysisRepositoryProvider);
-    MatchAnalysisModel? real;
-    try {
-      real = _analysisId != null
-          ? await repo.fetchAnalysisById(_analysisId!)
-          : await repo.fetchLatestAnalysis(clubId: null);
-    } catch (_) {
-      real = null;
+    MatchAnalysisModel? toShow = _generatedAnalysis;
+    if (toShow == null && _analysisId != null) {
+      try {
+        toShow = await repo.fetchAnalysisById(_analysisId!);
+      } catch (_) {
+        toShow = null;
+      }
     }
-    final toShow = real ?? _generatedAnalysis;
-    if (toShow != null && mounted) {
+    // Always point the viewer at this job's freshly-rendered video.
+    if (toShow != null && _serviceVideoUrl != null) {
+      toShow = toShow.copyWith(analyzedVideoUrl: _serviceVideoUrl);
+    }
+
+    if (!mounted) return;
+    if (toShow != null) {
       context.push('/fan-match-analysis', extra: toShow);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text(
+            'This analysis didn’t finish saving. Check the match history shortly.'),
+        behavior: SnackBarBehavior.floating,
+      ));
     }
   }
 
@@ -410,6 +480,7 @@ class _UploadMatchScreenState extends ConsumerState<UploadMatchScreen>
       _generatedAnalysis = null;
       _analysisId = null;
       _serviceJobId = null;
+      _serviceVideoUrl = null;
       _pickedVideo = null;
       _currentStage = null;
       _overallProgress = 0.0;
@@ -520,6 +591,7 @@ class _UploadMatchScreenState extends ConsumerState<UploadMatchScreen>
       case _UploadStep.matchDetails:
         return _MatchDetailsStep(
           formData: _formData,
+          videoPath: _pickedVideo?.path,
           onChanged: _onFormDataChanged,
           onFileRemoved: _onFileRemoved,
           onContinue: _proceedToConfirmation,
@@ -540,18 +612,25 @@ class _UploadMatchScreenState extends ConsumerState<UploadMatchScreen>
           homeTeam: _formData.homeTeam,
           awayTeam: _formData.awayTeam,
           competition: _formData.competition,
+          onCancel: _cancelAnalysis,
         );
 
       case _UploadStep.success:
+        // The job completed. If the persisted analysis couldn't be loaded
+        // (null analysis_id or a transient Supabase fetch failure), still show
+        // the success card with safe placeholders rather than a blank screen —
+        // "View Analysis" falls back to fetching the latest analysis.
         final analysis = _generatedAnalysis;
-        if (analysis == null) return const SizedBox.shrink();
         return ProcessingSuccessCard(
           homeTeam: _formData.homeTeam,
           awayTeam: _formData.awayTeam,
           competition: _formData.competition,
-          matchScore: analysis.score,
-          intensityScore: analysis.intensity,
-          tacticalSummary: _buildTacticalSummary(analysis),
+          matchScore: analysis?.score ?? '—',
+          intensityScore: analysis?.intensity ?? 0,
+          tacticalSummary: analysis != null
+              ? _buildTacticalSummary(analysis)
+              : 'Your match analysis is ready. Open it to see the full '
+                  'breakdown, player ratings and tactical insights.',
           onViewAnalysis: _viewAnalysis,
           onUploadAnother: _reset,
           onViewHistory: _viewHistory,
@@ -601,6 +680,7 @@ class _FileSelectionStep extends StatelessWidget {
 class _MatchDetailsStep extends StatelessWidget {
   const _MatchDetailsStep({
     required this.formData,
+    required this.videoPath,
     required this.onChanged,
     required this.onFileRemoved,
     required this.onContinue,
@@ -608,6 +688,7 @@ class _MatchDetailsStep extends StatelessWidget {
   });
 
   final UploadFormData formData;
+  final String? videoPath;
   final ValueChanged<UploadFormData> onChanged;
   final VoidCallback onFileRemoved;
   final VoidCallback onContinue;
@@ -630,6 +711,12 @@ class _MatchDetailsStep extends StatelessWidget {
           style: AppTextStyles.body(color: AppColors.textSecondary),
         ),
         SizedBox(height: context.rs(16, min: 12, max: 20)),
+
+        // Video preview — play / scrub / fullscreen before analyzing.
+        if (videoPath != null) ...[
+          VideoPreviewCard(key: ValueKey(videoPath), path: videoPath!),
+          SizedBox(height: context.rs(12, min: 8, max: 16)),
+        ],
 
         // Selected file card
         if (formData.fileName != null) ...[

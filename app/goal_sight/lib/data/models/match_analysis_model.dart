@@ -313,6 +313,193 @@ class MatchAnalysisModel {
     }
   }
 
+  /// Returns a copy with selected fields replaced. Used to attach the analysis
+  /// service's fresh per-job video URL so the viewer never shows a stale clip.
+  MatchAnalysisModel copyWith({String? analyzedVideoUrl}) => MatchAnalysisModel(
+        matchId: matchId,
+        homeTeam: homeTeam,
+        awayTeam: awayTeam,
+        score: score,
+        date: date,
+        status: status,
+        players: players,
+        homeAnalysis: homeAnalysis,
+        awayAnalysis: awayAnalysis,
+        summary: summary,
+        recommendations: recommendations,
+        highlightText: highlightText,
+        intensity: intensity,
+        analyzedVideoUrl: analyzedVideoUrl ?? this.analyzedVideoUrl,
+        heatmapUrl: heatmapUrl,
+      );
+
+  /// Builds the full analysis directly from the analysis service's raw model
+  /// JSONs (the `raw` block of `GET /jobs/{id}/result`). This is the offline
+  /// path used when Supabase persistence is unavailable, so the manager can
+  /// still open the result the model just produced.
+  factory MatchAnalysisModel.fromServiceResult({
+    required String jobId,
+    required Map<String, dynamic> raw,
+    required int myTeamId,
+    required String homeTeam,
+    required String awayTeam,
+    String date = 'TBD',
+    String? analyzedVideoUrl,
+    Map<String, String> heatmapUrls = const {},
+  }) {
+    Map<String, dynamic> asMap(dynamic v) =>
+        (v as Map?)?.cast<String, dynamic>() ?? const {};
+    List<Map<String, dynamic>> asList(dynamic v) =>
+        (v as List?)?.map((e) => asMap(e)).toList() ?? const [];
+
+    final finalReport = asMap(raw['final_report']);
+    final analytics = asMap(raw['player_analytics']);
+    final possession = asMap(raw['possession']);
+    final tactical = asMap(raw['team_tactical']);
+
+    final perf = asList(analytics['players']);
+    final frPlayers = asList(finalReport['players']);
+    final impactByTrack = {
+      for (final p in frPlayers) (p['track_id'] as num?)?.toInt(): p,
+    };
+    final motm = (finalReport['man_of_the_match'] as num?)?.toInt();
+    final worst = (finalReport['weakest_player'] as num?)?.toInt();
+
+    // Per-team rating lists (for avg) and the top-rated track (for the best
+    // player heatmap).
+    final ratingsByTeam = <int, List<double>>{};
+    final bestTrackByTeam = <int, int>{};
+    final bestRatingByTeam = <int, double>{};
+    for (final p in perf) {
+      final tid = (p['track_id'] as num?)?.toInt();
+      final team = (p['team_id'] as num?)?.toInt();
+      final rating = (p['player_rating'] as num? ?? 0).toDouble();
+      if (team != null) {
+        ratingsByTeam.putIfAbsent(team, () => []).add(rating);
+        if (tid != null && rating >= (bestRatingByTeam[team] ?? -1)) {
+          bestRatingByTeam[team] = rating;
+          bestTrackByTeam[team] = tid;
+        }
+      }
+    }
+    double teamAvg(int t) {
+      final l = ratingsByTeam[t];
+      if (l == null || l.isEmpty) return 0;
+      return l.reduce((a, b) => a + b) / l.length;
+    }
+
+    final players = <PlayerModel>[];
+    for (final p in perf) {
+      final tid = (p['track_id'] as num?)?.toInt();
+      final team = (p['team_id'] as num?)?.toInt();
+      final fr = impactByTrack[tid] ?? const {};
+      final isBest = team != null && bestTrackByTeam[team] == tid;
+      players.add(PlayerModel(
+        id: tid?.toString() ?? '',
+        name: (p['player_display_name'] ?? p['player_name'] ?? 'Player $tid')
+            .toString(),
+        position: (p['role'] ?? '').toString(),
+        rating: (p['player_rating'] as num? ?? 0).toDouble(),
+        fatigue: _fatiguePct(p['fatigue_level']?.toString()),
+        performanceStatus: _perfFromLabel(p['performance_status']?.toString()),
+        insight: (p['insight'] ?? '').toString(),
+        contribution: ContributionType.balanced,
+        impact: (fr['impact'] ?? '').toString(),
+        isMOTM: tid != null && tid == motm,
+        isWorst: tid != null && tid == worst,
+        heatmapUrl: isBest ? heatmapUrls['team${team}_best_player'] : null,
+      ));
+    }
+
+    final styleByTeam = {
+      for (final t in asList(finalReport['teams']))
+        (t['team_id'] as num?)?.toInt(): t,
+    };
+    final tacByTeam = {
+      for (final t in asList(tactical['teams']))
+        (t['team_id'] as num?)?.toInt(): t,
+    };
+    final poss = {
+      0: (possession['team_0_possession'] as num?)?.round() ?? 0,
+      1: (possession['team_1_possession'] as num?)?.round() ?? 0,
+    };
+    TeamAnalysisModel teamModel(int mt, String name) {
+      final st = (styleByTeam[mt] as Map?)?.cast<String, dynamic>() ?? const {};
+      final tac = (tacByTeam[mt] as Map?)?.cast<String, dynamic>() ?? const {};
+      final zone = tac['attacking_zone'];
+      return TeamAnalysisModel(
+        teamName: name,
+        possession: poss[mt] ?? 0,
+        style: (st['style'] ?? '').toString(),
+        pressureStyle: (st['pressure'] ?? '').toString(),
+        compactness: (st['compactness'] ?? '').toString(),
+        attackingZones: [if (zone != null) zone.toString()],
+        avgRating: teamAvg(mt),
+        topPlayers: const [],
+        worstPlayers: const [],
+      );
+    }
+
+    // Intensity from the teams' average on-ball speed (km/h → 0-100).
+    final speeds = asList(tactical['teams'])
+        .map((t) => (t['metrics'] as Map?)?['avg_speed_kmh'])
+        .whereType<num>()
+        .map((e) => e.toDouble())
+        .toList();
+    final intensity = speeds.isEmpty
+        ? 0
+        : (speeds.reduce((a, b) => a + b) / speeds.length / 12 * 100)
+            .round()
+            .clamp(0, 100);
+
+    final otherTeam = 1 - myTeamId;
+    return MatchAnalysisModel(
+      matchId: jobId,
+      homeTeam: homeTeam,
+      awayTeam: awayTeam,
+      score: '',
+      date: date,
+      status: 'FT',
+      intensity: intensity,
+      analyzedVideoUrl: analyzedVideoUrl,
+      heatmapUrl: heatmapUrls['team$myTeamId'],
+      recommendations:
+          (finalReport['recommendations'] as List?)?.map((e) => e.toString()).toList() ??
+              const [],
+      summary: MatchSummaryModel(
+        dominantTeam: (finalReport['dominant_team'] ?? '').toString(),
+        homeAvgRating: teamAvg(myTeamId),
+        awayAvgRating: teamAvg(otherTeam),
+        motmPlayerId: motm?.toString() ?? '',
+        worstPlayerId: worst?.toString() ?? '',
+        keyMoments: const [],
+        overallNarrative: (finalReport['summary'] ?? '').toString(),
+      ),
+      homeAnalysis: teamModel(myTeamId, homeTeam),
+      awayAnalysis: teamModel(otherTeam, awayTeam),
+      players: players,
+    );
+  }
+
+  static PerformanceStatus _perfFromLabel(String? label) =>
+      PerformanceStatus.values.firstWhere(
+        (e) => e.name == (label ?? '').toLowerCase(),
+        orElse: () => PerformanceStatus.average,
+      );
+
+  static int _fatiguePct(String? label) {
+    switch ((label ?? '').toLowerCase()) {
+      case 'high':
+        return 85;
+      case 'medium':
+        return 60;
+      case 'low':
+        return 30;
+      default:
+        return 0;
+    }
+  }
+
   // ── Serialisation ──────────────────────────────────────────────────────────
 
   factory MatchAnalysisModel.fromJson(Map<String, dynamic> json) {

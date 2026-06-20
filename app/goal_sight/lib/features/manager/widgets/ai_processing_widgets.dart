@@ -18,6 +18,7 @@ class AiProcessingView extends StatefulWidget {
     required this.homeTeam,
     required this.awayTeam,
     required this.competition,
+    this.onCancel,
   });
 
   final ProcessingStage? currentStage;
@@ -25,6 +26,7 @@ class AiProcessingView extends StatefulWidget {
   final String homeTeam;
   final String awayTeam;
   final String competition;
+  final VoidCallback? onCancel;
 
   @override
   State<AiProcessingView> createState() => _AiProcessingViewState();
@@ -117,6 +119,21 @@ class _AiProcessingViewState extends State<AiProcessingView>
 
           // Info banner
           const _ProcessingInfoBanner(),
+          SizedBox(height: context.rs(20, min: 16, max: 28)),
+
+          // Cancel button
+          if (widget.onCancel != null)
+            OutlinedButton.icon(
+              onPressed: widget.onCancel,
+              icon: const Icon(Icons.cancel_rounded, size: 18),
+              label: const Text('Cancel Analysis'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.danger,
+                side: BorderSide(color: AppColors.danger.withValues(alpha: 0.5)),
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: const RoundedRectangleBorder(borderRadius: AppRadius.button),
+              ),
+            ),
         ],
       ),
     );

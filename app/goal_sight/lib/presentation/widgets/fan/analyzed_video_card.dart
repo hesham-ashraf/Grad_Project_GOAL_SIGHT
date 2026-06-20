@@ -11,6 +11,7 @@ import 'package:video_player/video_player.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/responsive.dart';
+import '../../../shared/widgets/gs_fullscreen_video.dart';
 
 class AnalyzedVideoCard extends StatefulWidget {
   const AnalyzedVideoCard({super.key, required this.videoUrl});
@@ -92,6 +93,15 @@ class _AnalyzedVideoCardState extends State<AnalyzedVideoCard> {
     if (ctrl == null) return;
     final pos = ctrl.value.duration * fraction;
     ctrl.seekTo(pos);
+  }
+
+  Future<void> _openFullscreen() async {
+    final ctrl = _ctrl;
+    if (ctrl == null || !_initialized) return;
+    // Same controller → the playback position is shared, so returning from
+    // fullscreen restores the exact position automatically.
+    await openFullscreenVideo(context, ctrl);
+    if (mounted) setState(() => _showControls = true);
   }
 
   @override
@@ -382,6 +392,28 @@ class _AnalyzedVideoCardState extends State<AnalyzedVideoCard> {
                         },
                       ),
                     ],
+                  ),
+                ),
+              ),
+              // Fullscreen toggle (top-right), gated by the same controls fade.
+              Positioned(
+                top: 8,
+                right: 8,
+                child: AnimatedOpacity(
+                  opacity: _showControls ? 1.0 : 0.0,
+                  duration: const Duration(milliseconds: 200),
+                  child: GestureDetector(
+                    onTap: _openFullscreen,
+                    child: Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.45),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.fullscreen_rounded,
+                          color: Colors.white, size: 22),
+                    ),
                   ),
                 ),
               ),

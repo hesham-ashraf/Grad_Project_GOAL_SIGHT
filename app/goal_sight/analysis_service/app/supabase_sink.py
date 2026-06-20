@@ -61,10 +61,14 @@ class SupabaseSink:
         players_perf = (raw.get("player_analytics", {}) or {}).get("players", [])
         team_avg = self._team_avg_ratings(players_perf)
 
+        # 2b) Match intensity (0–100). The model emits no single intensity score,
+        #     so derive one from the teams' average on-ball speed (km/h).
+        intensity = self._match_intensity(tactical)
+
         # 3) Analysis header.
         analysis_id = self._insert_header(
             job, club_id, my_team, final, possession, video_url,
-            heatmap_urls.get(f"team{my_team}"), team_avg,
+            heatmap_urls.get(f"team{my_team}"), team_avg, intensity,
         )
 
         # 4) Raw JSONs (Phase 7 — keep everything, verbatim).
@@ -72,7 +76,7 @@ class SupabaseSink:
 
         # 5) Team tactical blocks + metrics.
         self._safe(self._insert_teams, analysis_id, my_team, final, tactical,
-                   possession, team_avg)
+                   possession, team_avg, job.home_team, job.away_team)
 
         # 6) Per-player verdicts (+ resolve/create club players for my team).
         self._safe(self._insert_players, analysis_id, club_id, my_team,
@@ -122,8 +126,9 @@ class SupabaseSink:
 
     # ── inserts ─────────────────────────────────────────────────────────────
     def _insert_header(self, job, club_id, my_team, final, possession, video_url,
-                       my_heatmap_url, team_avg) -> str:
+                       my_heatmap_url, team_avg, intensity=None) -> str:
         row = {
+            "intensity": intensity,
             "owner_club_id": club_id,
             "generated_by": job.uploaded_by,
             "status": "completed",
@@ -161,15 +166,20 @@ class SupabaseSink:
         if rows:
             self._sb.table("analysis_artifacts").insert(rows).execute()
 
-    def _insert_teams(self, analysis_id, my_team, final, tactical, possession, team_avg) -> None:
+    def _insert_teams(self, analysis_id, my_team, final, tactical, possession, team_avg,
+                      home_name=None, away_name=None) -> None:
         rows, metric_rows = [], []
         poss = {0: possession.get("team_0_possession"), 1: possession.get("team_1_possession")}
         for t in final.get("teams", []):
             tid = int(t["team_id"])
             tac = tactical.get(tid, {})
+            is_home = tid == my_team
             rows.append(_clean({
                 "match_analysis_id": analysis_id,
-                "side": "home" if tid == my_team else "away",
+                "side": "home" if is_home else "away",
+                # Carry the human team name onto the block so the app shows it
+                # instead of an empty label.
+                "team_name": (home_name if is_home else away_name),
                 "model_team_id": tid,
                 "possession": _int(poss.get(tid)),
                 "style": t.get("style"),
@@ -317,6 +327,23 @@ class SupabaseSink:
         return pid
 
     # ── helpers ───────────────────────────────────────────────────────────--
+    @staticmethod
+    def _match_intensity(tactical: Dict[int, dict]) -> Optional[int]:
+        """Derive a 0–100 intensity from teams' average on-ball speed (km/h).
+        ~12 km/h sustained ≈ a full-tilt match → 100. None if no speeds."""
+        speeds = []
+        for t in tactical.values():
+            s = (t.get("metrics", {}) or {}).get("avg_speed_kmh")
+            if s is not None:
+                try:
+                    speeds.append(float(s))
+                except (TypeError, ValueError):
+                    pass
+        if not speeds:
+            return None
+        avg = sum(speeds) / len(speeds)
+        return max(0, min(100, round(avg / 12.0 * 100)))
+
     @staticmethod
     def _team_avg_ratings(players_perf) -> Dict[int, float]:
         sums: Dict[int, List[float]] = {}

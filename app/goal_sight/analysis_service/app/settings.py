@@ -27,6 +27,11 @@ MODEL_CONFIG = _env("GOALSIGHT_MODEL_CONFIG", "config/config.yaml")
 # Inference device passed to the model: "auto" | "cpu" | "cuda:0" ...
 DEVICE = _env("GOALSIGHT_DEVICE", "cuda:0")
 
+# Optional override of the model's YOLO inference image size (imgsz). On small
+# GPUs (e.g. a 4 GB RTX 3050) the default 1280 can OOM; 960/736 fit and run
+# faster with minimal accuracy loss. 0 = keep the config.yaml value.
+IMAGE_SIZE = int(_env("GOALSIGHT_IMAGE_SIZE", "0") or "0")
+
 # Where uploaded videos are copied before processing. Each job uses its job id
 # as the file stem so all model outputs (outputs/<job_id>_*.json) are isolated.
 UPLOADS_DIR = MODEL_DIR / "uploads"

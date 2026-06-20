@@ -145,7 +145,10 @@ class _PlayersScreenState extends ConsumerState<PlayersScreen>
 
     return Scaffold(
       backgroundColor: Colors.transparent,
-      floatingActionButton: FloatingActionButton.extended(
+      // Lift the FAB above the manager bottom nav bar so it isn't hidden.
+      floatingActionButton: Padding(
+        padding: EdgeInsets.only(bottom: bottomPad),
+        child: FloatingActionButton.extended(
         onPressed: () async {
           HapticService.medium();
           await context.push('/manager/add-player');
@@ -173,7 +176,7 @@ class _PlayersScreenState extends ConsumerState<PlayersScreen>
             ],
           ),
         ),
-      ),
+      )),
       body: SafeArea(
         bottom: false,
         child: Column(
