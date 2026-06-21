@@ -39,7 +39,7 @@
 | Name | ID | Program |
 |---|---|---|
 | Hesham Ashraf | 202201477 | SWD (Software Development) |
-| Ahmed Sameh | 202202151 | SWD (Software Development) |
+| Ahmed Sameh | 20220215 | SWD (Software Development) |
 | Ahmed Amr | 202201404 | DSAI (Data Science & AI) |
 | Mohamed Wael | 202201445 | DSAI (Data Science & AI) |
 
@@ -284,7 +284,7 @@ Screenshots and sample model outputs live in **[docs/SCREENSHOTS.md](docs/SCREEN
 and the [docs/screenshots/](docs/screenshots/) folder.
 
 <p align="center">
-  <img src="docs/screenshots/app-preview.png" alt="GoalSight app screen" width="300"/>
+  <img src="docs/screenshots/image.png" alt="GoalSight app screen" width="300"/>
 </p>
 
 ---
