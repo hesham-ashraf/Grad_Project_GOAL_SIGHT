@@ -11,6 +11,36 @@ import os
 from pathlib import Path
 
 
+def _load_dotenv() -> None:
+    """Load ``analysis_service/.env`` into ``os.environ`` once, at import.
+
+    Real env vars always win (we never overwrite an already-set variable), but
+    this means the Supabase keys persist across WSL/uvicorn restarts instead of
+    needing a manual ``export`` every time — the #1 cause of analyses silently
+    not being saved. Format: ``KEY=value`` per line; ``#`` comments and blank
+    lines ignored; surrounding quotes stripped.
+    """
+    # .env lives next to the service package: analysis_service/.env
+    env_path = Path(__file__).resolve().parent.parent / ".env"
+    if not env_path.is_file():
+        return
+    try:
+        for raw in env_path.read_text(encoding="utf-8").splitlines():
+            line = raw.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, _, value = line.partition("=")
+            key = key.strip()
+            value = value.strip().strip('"').strip("'")
+            if key and key not in os.environ:
+                os.environ[key] = value
+    except Exception as exc:  # noqa: BLE001 — never let config loading crash boot
+        print(f"[settings] could not read {env_path}: {exc}")
+
+
+_load_dotenv()
+
+
 def _env(name: str, default: str = "") -> str:
     return os.environ.get(name, default).strip()
 
